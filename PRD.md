@@ -308,7 +308,7 @@ O formulário deverá oferecer as seguintes funcionalidades:
 *   **Dados do Participante:** Coleta de informações essenciais para cada participante: Nome Completo, Telefone de Contato, CPF, Endereço de E-mail e Data de Nascimento.
 *   **Escolhas Individuais por Participante (Condicional pelo `tipo_formulario`):** Para cada participante, permitir a seleção independente de:
     *   **Se `hospedagem_apenas` ou `hospedagem_e_evento`:**
-        *   Tipo de acomodação (cada participante equivale a uma pessoa na acomodação). A regra de `capacidade_maxima` para tipos de acomodação foi removida e não é mais utilizada para validação neste formulário.
+        *   Tipo de acomodação (cada participante equivale a uma pessoa na acomodação).
         *   Período de estadia (Check-in/Check-out com data e hora simplificada para hora e minuto).
     *   **Se `evento_apenas` ou `hospedagem_e_evento`:**
         *   Opção de valor de participação no evento.
@@ -324,11 +324,11 @@ O formulário deverá oferecer as seguintes funcionalidades:
     *   A validação do cupom será feita contra os dados `cupons_desconto` definidos no JSON do evento, verificando: código, validade (`data_validade_fim`), tipo de desconto (`percentual` ou `fixo`), e o local de `aplicacao` (sobre o valor `total`, `hospedagem` ou `evento`).
     *   **Não haverá validação de um valor mínimo de compra para a aplicação do cupom.**
     *   O desconto será aplicado ao `VALOR TOTAL GERAL A PAGAR`.
-*   **Cálculo Total Agregado (com Taxa de Gateway):** O formulário calculará e exibirá o valor total a ser pago, somando os valores de hospedagem e evento de *todos* os participantes (após aplicação das regras de precificação por idade) e subtraindo o desconto do cupom aplicado. **Este valor final exibido ao usuário já incluirá a `taxa_gateway_percentual` da forma de pagamento selecionada, que será aplicada internamente ao valor base.**
-*   **Formas de Pagamento Dinâmicas:** O participante selecionará uma forma de pagamento entre as opções disponíveis para o evento através de um **dropdown**, conforme configurado no JSON.
+*   **Cálculo Total Agregado (com Taxa de Gateway):** O formulário calculará e exibirá o valor total a ser pago, somando os valores de hospedagem e evento de *todos* os participantes (após aplicação das regras de precificação por idade) e subtraindo o desconto do cupom aplicado. **Este valor final exibido ao usuário já incluirá a `taxa_gateway_percentual` da forma de pagamento selecionada, que será aplicada internamente ao valor base, ou seja, o valor exibido ao usuario final já será com as taxas do gateway inclusas.**
+*   **Formas de Pagamento Dinâmicas:** O participante selecionará uma forma de pagamento entre as opções disponíveis para o evento através de um **dropdown**, conforme configurado no JSON. Cada evento pode ter diferentes formas de pagamento.
 *   **Display de Opções Simplificado:** Para campos de seleção (Tipo de Acomodação, Período de Estadia, Valor de Participação no Evento, Forma de Pagamento), se houver **apenas uma única opção** disponível para o evento (conforme o JSON), esta opção não será apresentada como um elemento selecionável (dropdown), mas sim como um **texto informativo não editável**, simplificando a interface.
 *   **Resumo e Confirmação:** Uma tela final para revisão de todos os dados e valores antes da submissão.
-*   **Notificações:** Envio automático de confirmações por e-mail para o **responsável pelo pagamento** e para a administração da **Fazenda Serrinha**, incluindo o ID único da inscrição.
+*   **Notificações:** Envio automático de confirmações por e-mail para o **responsável pelo pagamento** e para a administração da **Fazenda Serrinha**, incluindo o ID único da inscrição através de integração com n8n.
 
 ### 7. Fluxo de Usuário (User Flow)
 
@@ -379,21 +379,20 @@ Este fluxo descreve a jornada do participante ao preencher o formulário:
         *   `Valor Total Agregado do Evento`: Soma de todos os `Valor do Evento (individual)`. Visível condicionalmente.
     *   **Campo Cupom de Desconto:**
         *   Um campo de texto (`input`) é fornecido para o participante inserir um `codigo` de cupom.
-        *   Um botão \"Aplicar Cupom\" permite validar e aplicar o desconto.
+        *   Não é necessário um botão \"Aplicar Cupom\" para validar e aplicar o desconto, valide e aplique o cupom através do preenchimento dos dados do cupom.
         *   **Feedback Visual:** Mensagens claras indicarão se o cupom é válido, inválido, expirado, ou qual o valor do desconto aplicado.
         *   **Cálculo do Desconto:** O desconto será calculado com base no `tipo_desconto` (`percentual` ou `fixo`) e no `aplicacao` (`total`, `hospedagem` ou `evento`) do cupom correspondente no JSON.
     *   `Valor do Desconto Aplicado`: Exibição do valor total do desconto subtraído.
-    *   `Valor Total Geral a Pagar`: O valor final e total em destaque, calculado como (`Valor Total Agregado da Hospedagem` + `Valor Total Agregado do Evento` - `Valor do Desconto Aplicado`) **e então aplicado a `taxa_gateway_percentual` da forma de pagamento selecionada**. Atualizado dinamicamente.
-    *   **Forma de Pagamento:** Se a lista `formas_pagamento_opcoes` no JSON tiver apenas 1 item, exibe o rótulo e o valor como texto informativo não editável. Caso contrário, exibe as opções de **dropdown** carregadas do JSON (com `label` e `descricao`). A seleção desta opção impacta o `Valor Total Geral a Pagar` pela sua `taxa_gateway_percentual`.
+    *   `Valor Total Geral a Pagar`: O valor final e total em destaque, calculado como (`Valor Total Agregado da Hospedagem` + `Valor Total Agregado do Evento` - `Valor do Desconto Aplicado`) **a `taxa_gateway_percentual` não precisa ser recalculada devido a aplicação do desconto. **.
+    *   **Forma de Pagamento:** Se a lista `formas_pagamento_opcoes` no JSON tiver apenas 1 item, exibe o rótulo e o valor como texto informativo não editável. Caso contrário, exibe as opções de **dropdown** carregadas do JSON (com `label` e `descricao`). A seleção desta opção impacta o `Valor Total Agregado da Hospedagem` e o `Valor Total Agregado do Evento` pela sua respectiva `taxa_gateway_percentual`, toda vez que a forma de pagamento for alterada o calculo do cupom de desconto deve ser calculado novamente.
     *   **Termos e Condições:** Um checkbox obrigatório \"Li e concordo com os Termos e Condições de Reserva/Participação\" é exibido, com um link para a `politicas_evento_url` carregada do JSON.
     *   Um botão \"Confirmar Inscrição(ões) e Prosseguir para Pagamento\" finaliza esta etapa.
 
 5.  **Tela 4: Confirmação e Próximos Passos:**
     *   Uma mensagem de sucesso: \"Sua inscrição(ões) na Fazenda Serrinha foi enviada com sucesso!\"
     *   O `ID da Inscrição` único gerado para esta reserva será exibido claramente para o usuário.
-    *   Instruções claras para os próximos passos, dependendo da Forma de Pagamento escolhida (ex: \"Aguarde as instruções de pagamento no seu e-mail\", \"Realize o PIX para a chave XXXXX\", etc.).
-    *   Informação sobre o envio da confirmação por e-mail para o **responsável pelo pagamento**.
-    *   Um botão \"Voltar para o Início\" permite iniciar um novo processo ou retornar à página principal.
+    *   Instruções claras para os próximos passos.
+    *   Um botão \"Link de pagamento" permite abrir o link que será usado para efetivar o pagamento.
 
 ### 8. Requisitos Não Funcionais
 
