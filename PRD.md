@@ -110,7 +110,7 @@ Esta seção apresenta a estrutura visual e organizacional de cada tela do formu
 ```
 
 **Elementos da Tela:**
-- Header com logo e navegação da Fazenda Serrinha
+- Header com logo
 - Seção central com informações do evento carregadas dinamicamente do JSON
 - Botão de call-to-action para iniciar o processo de inscrição
 
