@@ -113,7 +113,6 @@ Esta seção apresenta a estrutura visual e organizacional de cada tela do formu
 - Header com logo e navegação da Fazenda Serrinha
 - Seção central com informações do evento carregadas dinamicamente do JSON
 - Botão de call-to-action para iniciar o processo de inscrição
-- Footer padrão do site
 
 #### 5.2. Tela 2: Dados dos Participantes e Escolhas Individuais
 
