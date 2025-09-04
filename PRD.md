@@ -447,7 +447,10 @@ O formulário depende das seguintes integrações externas:
     *   Arquivos: `index.html`, `style.css`, `js/script.js`, `js/priceCalculator.js`, `js/cpfValidation.js`, `eventos.json`, imagens
 
 ### 11. Estrutura do Arquivo JSON de Eventos
-´´´
+
+## Estrutura de Dados dos Eventos
+
+```json
 {
   "eventos": [
     {
@@ -769,7 +772,7 @@ O formulário depende das seguintes integrações externas:
     }
   ]
 }
-´´´
+```
 
 #### Detalhamento dos Campos do JSON:
 *   `id`: (String, único) Identificador único para o evento, usado no parâmetro da URL.
