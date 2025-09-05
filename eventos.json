@@ -3,11 +3,11 @@
     {
       "id": "G001",
       "header": {
-        "banner_url": "https://assets.fazendaserrinha.com.br/banners/retiro_g001.jpg",
-        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png",
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
         "partner_logos": [
-          "https://assets.parceiroA.com.br/logos/partnerA_circle.png",
-          "https://assets.parceiroB.com.br/logos/partnerB_circle.png"
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
         ],
         "logo_duplo": true
       },
@@ -53,8 +53,8 @@
     {
       "id": "G002",
       "header": {
-        "banner_url": "https://assets.fazendaserrinha.com.br/banners/workshop_g002.jpg",
-        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Workshop de Yoga (Apenas Evento)",
       "descricao": "Workshop intensivo, sem hospedagem.",
@@ -70,8 +70,8 @@
     {
       "id": "G003",
       "header": {
-        "banner_url": "https://assets.fazendaserrinha.com.br/banners/hospedagem_g003.jpg",
-        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Reserva de Quarto (Apenas Hospedagem)",
       "descricao": "Hospedagem avulsa.",
