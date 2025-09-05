@@ -310,30 +310,32 @@
 
     // choose defaults from event
     const ev = STATE.evento;
-    let hospVal = 0;
-    let eventVal = 0;
-    if(ev.tipo_formulario === 'hospedagem_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
-      const tipo = ev.tipos_acomodacao && ev.tipos_acomodacao[0];
-      const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
-      if(tipo && periodo){
-        hospVal = window.priceCalculator.calculateAccommodation(tipo.valor_diaria_por_pessoa, periodo.num_diarias, age, ev.regras_idade_precificacao.hospedagem);
+    // compute base (adult) prices — do NOT apply age rules here; calcTotals will handle reservation-level rules
+    let baseHosp = 0;
+    let baseEvent = 0;
+    if(ev){
+      if(ev.tipo_formulario === 'hospedagem_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
+        const tipo = ev.tipos_acomodacao && ev.tipos_acomodacao[0];
+        const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
+        if(tipo && periodo){
+          baseHosp = (tipo.valor_diaria_por_pessoa || 0) * (periodo.num_diarias || 1);
+        }
       }
-    }
-    if(ev.tipo_formulario === 'evento_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
-      const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
-      const valOpt = (periodo && periodo.valores_evento_opcoes && periodo.valores_evento_opcoes[0]) || (ev.valores_evento_opcoes && ev.valores_evento_opcoes[0]);
-      if(valOpt){
-        eventVal = window.priceCalculator.calculateEventValue(valOpt.valor, age, ev.regras_idade_precificacao.evento);
+      if(ev.tipo_formulario === 'evento_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
+        const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
+        const valOpt = (periodo && periodo.valores_evento_opcoes && periodo.valores_evento_opcoes[0]) || (ev.valores_evento_opcoes && ev.valores_evento_opcoes[0]);
+        if(valOpt){ baseEvent = valOpt.valor || 0; }
       }
     }
 
-    block.querySelector('.val-hosp').textContent = hospVal.toFixed(2);
-    block.querySelector('.val-event').textContent = eventVal.toFixed(2);
+    // show preliminary base values in UI until recalcAll replaces them with final computed values
+    block.querySelector('.val-hosp').textContent = baseHosp.toFixed(2);
+    block.querySelector('.val-event').textContent = baseEvent.toFixed(2);
 
-    // persist in state
+    // persist base values and age in state
     STATE.participantes[index] = STATE.participantes[index] || {};
-    STATE.participantes[index].valorHospedagem = hospVal;
-    STATE.participantes[index].valorEvento = eventVal;
+    STATE.participantes[index].baseHosp = baseHosp;
+    STATE.participantes[index].baseEvent = baseEvent;
     STATE.participantes[index].age = age;
   }
 
@@ -341,7 +343,27 @@
   const formaId = document.getElementById('paymentMethodSelect') ? document.getElementById('paymentMethodSelect').value : null;
   const forma = (STATE.evento && STATE.evento.formas_pagamento_opcoes) ? (STATE.evento.formas_pagamento_opcoes.find(f=>f.id===formaId) || STATE.evento.formas_pagamento_opcoes[0]) : null;
   const cupom = STATE.appliedCupom || null;
-  const totals = window.priceCalculator.calcTotals(STATE.participantes, forma, cupom);
+  const regras = (STATE.evento && STATE.evento.regras_idade_precificacao) ? STATE.evento.regras_idade_precificacao : {hospedagem:[], evento:[]};
+  // ensure participantes have baseHosp/baseEvent/age (recalcParticipant should have set them when inputs changed)
+  const totals = window.priceCalculator.calcTotals(STATE.participantes, forma, cupom, regras);
+
+    // update participant UI values from totals.participants and persist into STATE
+    if(totals && Array.isArray(totals.participants)){
+      totals.participants.forEach((p, idx)=>{
+        const block = document.querySelector(`.participant-block[data-index='${idx}']`);
+        if(block){
+          block.querySelector('.val-hosp').textContent = (p.valorHospedagem || 0).toFixed(2);
+          block.querySelector('.val-event').textContent = (p.valorEvento || 0).toFixed(2);
+        }
+        // persist computed values back to state so payload/readback are accurate
+        STATE.participantes[idx] = STATE.participantes[idx] || {};
+        STATE.participantes[idx].valorHospedagem = +(p.valorHospedagem || 0);
+        STATE.participantes[idx].valorEvento = +(p.valorEvento || 0);
+      });
+      // persist to localStorage
+      saveState();
+    }
+
     document.getElementById('subtotalHosp').textContent = totals.subtotalHospedagem.toFixed(2);
     document.getElementById('subtotalEvent').textContent = totals.subtotalEvento.toFixed(2);
     document.getElementById('totalPay').textContent = totals.total.toFixed(2);
@@ -441,7 +463,8 @@
             total: document.getElementById('totalPay').textContent
           },
           cupom: STATE.appliedCupom || null,
-          forma_pagamento: document.getElementById('paymentMethodSelect') ? document.getElementById('paymentMethodSelect').value : null
+          forma_pagamento: document.getElementById('paymentMethodSelect') ? document.getElementById('paymentMethodSelect').value : null,
+          responsavel: (typeof STATE.responsavel === 'number') ? STATE.responsavel : null
         };
         return payload;
       }

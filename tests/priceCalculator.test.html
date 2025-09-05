@@ -22,9 +22,13 @@ assert('calculateEventValue with rule', (function(){
 
 // calcTotals
 (function(){
-  const parts = [{valorHospedagem:200, valorEvento:100},{valorHospedagem:0, valorEvento:50}];
+  // pass base fields for participants (baseHosp/baseEvent/age)
+  const parts = [
+    {baseHosp:200, baseEvent:100, age:30},
+    {baseHosp:0, baseEvent:50, age:8}
+  ];
   const forma = {taxa_gateway_percentual:0.1};
-  const totals = window.priceCalculator.calcTotals(parts, forma, null);
+  const totals = window.priceCalculator.calcTotals(parts, forma, null, {hospedagem:[], evento:[]});
   assert('calcTotals subtotalHospedagem', totals.subtotalHospedagem === 200);
   assert('calcTotals subtotalEvento', totals.subtotalEvento === 150);
   assert('calcTotals total with tax', totals.total === +( (200+150)*(1+0.1) ).toFixed(2) );
@@ -36,10 +40,20 @@ assert('invalid CPF 00000000000', window.cpfValidation.validateCPF('000.000.000-
 
 // simple integration: priceCalculator with age rules
 assert('integration calc with age rules', (function(){
-  const rules = [{faixa_min_anos:0, faixa_max_anos:12, percentual_valor_adulto:0.5}];
-  const p = [{valorHospedagem: 100, valorEvento: window.priceCalculator.applyAgeRules(200,10,rules)}];
-  const totals = window.priceCalculator.calcTotals(p, {taxa_gateway_percentual:0}, null);
-  return totals.subtotalEvento === 100 && totals.subtotalHospedagem === 100;
+  const rules = { hospedagem:[{faixa_min_anos:0, faixa_max_anos:12, percentual_valor_adulto:0.5}], evento:[] };
+  const p = [{baseHosp: 100, baseEvent: 200, age:10}];
+  const totals = window.priceCalculator.calcTotals(p, {taxa_gateway_percentual:0}, null, rules);
+  return totals.subtotalEvento === 100 && totals.subtotalHospedagem === 50;
+})());
+
+// test reservation-level limite_gratuidade_por_reserva and regra_excedente_gratuito
+assert('limite_gratuidade_por_reserva assigns one free and extra charged by regra_excedente_gratuito', (function(){
+  // rule: 0-4 anos => 1 free per reservation, excedente charged at 50% of adult; hospedagem base adult = 200
+  const regras = { hospedagem: [ {faixa_min_anos:0, faixa_max_anos:4, percentual_valor_adulto:0.0, limite_gratuidade_por_reserva:1, regra_excedente_gratuito: {percentual_valor_adulto:0.5} } ], evento: [] };
+  const parts = [ {baseHosp:200, baseEvent:0, age:3}, {baseHosp:200, baseEvent:0, age:4} ];
+  const totals = window.priceCalculator.calcTotals(parts, {taxa_gateway_percentual:0}, null, regras);
+  // one free (0), one charged 50% = 100 -> subtotalHosp 100
+  return totals.subtotalHospedagem === 100 && totals.participants[0].valorHospedagem === 0 && totals.participants[1].valorHospedagem === 100;
 })());
 
 // coupon aplicacao tests
