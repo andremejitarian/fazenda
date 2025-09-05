@@ -48,6 +48,7 @@ Criar um formulário online intuitivo e dinâmico que permita aos participantes:
 *   **Dados:** Eventos armazenados em `eventos.json`
 *   **Máscaras de Input:** jQuery Mask (v1.14.16) para formatação de campos
 *   **Assets:** Imagens e recursos organizados em pastas específicas
+*   **Header por evento:** Banner e logo do cabeçalho personalizáveis por evento via JSON (campo opcional `header` no objeto do evento). Ver seção "Estrutura do Arquivo JSON de Eventos" para detalhes de implementação e campos suportados.
 
 #### 4.2. Validações e Formatações
 
@@ -111,6 +112,8 @@ Esta seção apresenta a estrutura visual e organizacional de cada tela do formu
 
 **Elementos da Tela:**
 - Header com logo
+- O banner e o logo do cabeçalho são carregados a partir do JSON do evento (campo `header`).
+- Para eventos que indiquem parceria (campo `header.partner_logos` com 2 itens) e quando o `tipo_formulario` for `hospedagem_e_evento`, o frontend deverá renderizar um "logo duplo" circular (estética semelhante ao indicador de collab do Instagram) para demonstrar a colaboração entre dois parceiros.
 - Seção central com informações do evento carregadas dinamicamente do JSON
 - Botão de call-to-action para iniciar o processo de inscrição
 
@@ -299,6 +302,12 @@ Esta seção apresenta a estrutura visual e organizacional de cada tela do formu
 O formulário deverá oferecer as seguintes funcionalidades:
 
 *   **Carregamento Dinâmico por URL:** Todos os detalhes específicos de um evento (título, descrição, opções de acomodação, períodos de estadia, valores do evento, regras de precificação por idade e cupons) serão carregados a partir de um arquivo JSON, com base em um ID de evento passado via parâmetro de URL (`?evento=ID`).
+*   **Header por evento (banner + logo):** O JSON de evento poderá conter um objeto `header` com os campos:
+  * `banner_url` (string): URL da imagem a ser usada como banner do topo.
+  * `logo_url` (string): URL do logo circular principal.
+  * `partner_logos` (array[string], opcional): lista de URLs de logos de parceiros. Quando contiver exatamente 2 itens e o `tipo_formulario` for `hospedagem_e_evento`, o frontend deverá renderizar um "logo duplo" circular (sobreposição leve) para indicar colaboração/colab entre dois parceiros.
+  * `logo_duplo` (boolean, opcional): força a renderização do logo duplo quando true.
+  * Comportamento de fallback: se nenhum `header` for informado, usar banner/logo padrão da Fazenda Serrinha.
 *   **Geração de ID Único:** Cada nova inscrição bem-sucedida gerará um identificador único (`inscricao`) para rastreamento e comunicação futura.
 *   **Configuração Dinâmica do Tipo de Formulário:** O formulário adaptará seus campos e fluxo com base no campo `tipo_formulario` no JSON do evento:
     *   `hospedagem_apenas`: Exibirá apenas campos e cálculos relacionados à hospedagem.
@@ -455,6 +464,15 @@ O formulário depende das seguintes integrações externas:
   "eventos": [
     {
       "id": "G001",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/retiro_g001.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png",
+        "partner_logos": [
+          "https://assets.parceiroA.com.br/logos/partnerA_circle.png",
+          "https://assets.parceiroB.com.br/logos/partnerB_circle.png"
+        ],
+        "logo_duplo": true
+      },
       "nome": "Retiro de Bem-Estar e Meditação na Fazenda Serrinha (Hospedagem e Evento)",
       "descricao": "Um retiro completo de 3 dias focado em mindfulness, yoga e conexão com a natureza, incluindo hospedagem e workshops.",
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G001",
@@ -610,6 +628,10 @@ O formulário depende das seguintes integrações externas:
     },
     {
       "id": "G002",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/workshop_g002.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+      },
       "nome": "Inscrição para o Workshop de Yoga (Apenas Evento)",
       "descricao": "Workshop intensivo de Yoga e Meditação, sem hospedagem inclusa.",
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G002",
@@ -683,6 +705,10 @@ O formulário depende das seguintes integrações externas:
     },
     {
       "id": "G003",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/hospedagem_g003.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+      },
       "nome": "Reserva de Quarto Pós-Evento (Apenas Hospedagem)",
       "descricao": "Hospedagem avulsa em nossos quartos aconchegantes.",
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G003",
@@ -792,6 +818,11 @@ O formulário depende das seguintes integrações externas:
 *   `formas_pagamento_opcoes`: (Array de Objetos) Define as opções de pagamento com `taxa_gateway_percentual`.
 *   `regras_idade_precificacao`: (Objeto) Contém arrays de regras para `hospedagem` e `evento`.
 *   `cupons_desconto`: (Array de Objetos) Lista de cupons disponíveis com validação e aplicação.
+*   `header`: (Objeto, Opcional) Campos para personalizar o cabeçalho do formulário por evento:
+  *   `banner_url`: (String) URL da imagem de banner a ser exibida no topo da tela.
+  *   `logo_url`: (String) URL do logo circular principal.
+  *   `partner_logos`: (Array[String], Opcional) Lista de URLs de logos de parceiros — quando houver exatamente 2 itens e o evento combinar hospedagem + evento, o frontend deverá renderizar um "logo duplo" circular para indicar colaboração entre dois parceiros.
+  *   `logo_duplo`: (Boolean, Opcional) Força a renderização do logo duplo quando true (override do comportamento automático). Se ausente, o frontend decide com base na presença de `partner_logos`.
 
 ### 12. Requisitos Detalhados dos Campos
 
