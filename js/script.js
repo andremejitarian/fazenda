@@ -2,13 +2,14 @@
 (function(){
   const STATE = {
     evento: null,
-    participantes: []
+    participantes: [],
+    responsavel: null
   };
 
   // localStorage helpers
   const STORAGE_KEY = 'fazenda_reserva_state_v1';
   function saveState(){
-    try{ const copy = {participantes: STATE.participantes, appliedCupom: STATE.appliedCupom, eventoId: STATE.evento && STATE.evento.id};
+    try{ const copy = {participantes: STATE.participantes, appliedCupom: STATE.appliedCupom, eventoId: STATE.evento && STATE.evento.id, responsavel: STATE.responsavel};
       localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
     }catch(e){console.warn('saveState failed', e)}
   }
@@ -18,6 +19,7 @@
       const parsed = JSON.parse(raw);
       if(parsed && Array.isArray(parsed.participantes)) STATE.participantes = parsed.participantes;
       if(parsed && parsed.appliedCupom) STATE.appliedCupom = parsed.appliedCupom;
+      if(parsed && typeof parsed.responsavel !== 'undefined') STATE.responsavel = parsed.responsavel;
     }catch(e){console.warn('loadState failed', e)}
   }
 
@@ -106,6 +108,7 @@
     wrapper.innerHTML = `
       <div class="participant-header">
         <h3>Participante ${index+1}</h3>
+        <label class="responsavel-label" style="display:none"><input type="radio" name="responsavel" class="p-responsavel" value="${index}" /> Responsável pelo Pagamento</label>
         <button type="button" class="remove-participant" title="Remover">✖</button>
       </div>
       <div class="grid">
@@ -223,6 +226,15 @@
     wrapper.querySelector('.remove-participant').addEventListener('click', ()=>{
       const idx = Number(wrapper.dataset.index);
       STATE.participantes.splice(idx,1);
+      // adjust responsavel index if needed
+      if(typeof STATE.responsavel === 'number'){
+        if(STATE.responsavel === idx){
+          STATE.responsavel = null;
+        } else if(STATE.responsavel > idx){
+          STATE.responsavel = STATE.responsavel - 1;
+        }
+      }
+      saveState();
       rebuildParticipants();
       recalcAll();
     });
@@ -276,6 +288,16 @@
     container.innerHTML = '';
     STATE.participantes.forEach((p,idx)=>{
       const block = createParticipantBlock(idx,p);
+      // show/hide responsavel radio depending on number of participants
+      const label = block.querySelector('.responsavel-label');
+      const radio = block.querySelector('.p-responsavel');
+      if(label && radio){
+        if(STATE.participantes.length > 1){
+          label.style.display = 'inline-block';
+          radio.checked = (typeof STATE.responsavel === 'number' && STATE.responsavel === idx);
+          radio.addEventListener('change', ()=>{ STATE.responsavel = Number(radio.value); saveState(); recalcAll(); });
+        } else { label.style.display = 'none'; }
+      }
       container.appendChild(block);
     });
   }
@@ -350,26 +372,36 @@
   // if persisted participants exist, ensure UI uses them; otherwise start with one
   if(!STATE.participantes || STATE.participantes.length === 0) STATE.participantes = [{}];
 
-      // coupon apply handler
+      // coupon apply handler (extract so it can be re-run when payment method changes)
       const applyBtn = document.getElementById('applyCouponBtn');
       const couponInput = document.getElementById('couponCode');
       const couponMsg = document.getElementById('couponMsg');
-      if(applyBtn && couponInput){
-        applyBtn.addEventListener('click', ()=>{
-          const code = (couponInput.value || '').trim();
-          if(!code){ couponMsg.textContent = 'Informe um código.'; return; }
-          const found = (ev.cupons_desconto || []).find(c=>c.codigo.toUpperCase() === code.toUpperCase());
-          if(!found){ couponMsg.textContent = 'Cupom inválido ou expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
-          // validate expiry
-          if(found.data_validade_fim){
-            const now = new Date();
-            const until = new Date(found.data_validade_fim);
-            if(now > until){ couponMsg.textContent = 'Cupom expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
-          }
-          STATE.appliedCupom = found;
-          couponMsg.textContent = `Cupom aplicado: ${found.codigo}`;
-          recalcAll();
+      function applyCouponFromInput(){
+        const code = (couponInput.value || '').trim();
+        if(!code){ couponMsg.textContent = 'Informe um código.'; STATE.appliedCupom = null; recalcAll(); return; }
+        const found = (ev.cupons_desconto || []).find(c=>c.codigo.toUpperCase() === code.toUpperCase());
+        if(!found){ couponMsg.textContent = 'Cupom inválido ou expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
+        // validate expiry
+        if(found.data_validade_fim){
+          const now = new Date();
+          const until = new Date(found.data_validade_fim);
+          if(now > until){ couponMsg.textContent = 'Cupom expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
+        }
+        STATE.appliedCupom = found;
+        couponMsg.textContent = `Cupom aplicado: ${found.codigo}`;
+        recalcAll();
+        saveState();
+      }
+      // auto-apply on coupon input (debounced) and reapply on payment method change
+      if(couponInput){
+        let timer = null;
+        couponInput.addEventListener('input', ()=>{
+          clearTimeout(timer);
+          timer = setTimeout(()=>{ applyCouponFromInput(); }, 450);
         });
+      }
+      if(document.getElementById('paymentMethodSelect')){
+        document.getElementById('paymentMethodSelect').addEventListener('change', ()=>{ applyCouponFromInput(); recalcAll(); });
       }
       // preparar UI
       const addBtn = document.getElementById('addParticipant');
@@ -424,6 +456,13 @@
 
       if(submitBtn){
         submitBtn.addEventListener('click', async ()=>{
+          // validation: require responsavel when more than one participant
+          if(STATE.participantes.length > 1 && (typeof STATE.responsavel !== 'number' || STATE.responsavel === null)){
+            const previewArea = document.getElementById('previewArea');
+            previewArea.style.display = 'block';
+            previewArea.innerHTML = '<div class="preview-json">Selecione o responsável pelo pagamento antes de enviar.</div>';
+            return;
+          }
           submitBtn.disabled = true; submitBtn.textContent = 'Enviando...';
           const payload = buildPayload();
           // add inscricao id

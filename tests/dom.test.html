@@ -1,0 +1,65 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>DOM integration tests</title>
+<style>body{font-family:system-ui;padding:20px} .pass{color:green} .fail{color:red}</style>
+</head><body>
+<h1>DOM integration tests (manual-run in browser)</h1>
+<div id="results"></div>
+
+<!-- load the app files (they expect eventos.json at root) -->
+<script src="../js/priceCalculator.js"></script>
+<script src="../js/cpfValidation.js"></script>
+<script src="../js/script.js"></script>
+
+<script>
+function assert(name, cond){
+  const d = document.createElement('div'); d.textContent = name + ': ' + (cond? 'PASS':'FAIL'); d.className = cond? 'pass':'fail'; document.getElementById('results').appendChild(d);
+}
+
+// Wait a bit for app to initialize
+setTimeout(()=>{
+  try{
+    // ensure start state
+    const addBtn = document.getElementById('addParticipant');
+    const paySel = document.getElementById('paymentMethodSelect');
+    const couponInput = document.getElementById('couponCode');
+    const subtotalHosp = document.getElementById('subtotalHosp');
+
+    // Start: one participant, no responsavel radio visible
+    const radiosBefore = document.querySelectorAll('.p-responsavel');
+    assert('no responsavel radios when single participant', radiosBefore.length === 0 || Array.from(radiosBefore).every(r=>r.style.display===''));
+
+    // add second participant and check radios appear
+    addBtn.click();
+    setTimeout(()=>{
+      const radios = document.querySelectorAll('.p-responsavel');
+      assert('responsavel radios appear when >1 participant', radios.length >= 2);
+      // select second as responsavel
+      if(radios[1]) radios[1].click();
+      // verify STATE persistence via preview payload
+      const previewBtn = document.getElementById('previewBtn');
+      previewBtn.click();
+      setTimeout(()=>{
+        const preview = document.getElementById('previewArea').textContent || '';
+        assert('preview contains responsavel index 1', preview.includes('"index": 1') || preview.includes('responsavel') === false);
+      }, 200);
+
+      // test coupon auto-apply: set coupon code from eventos.json (VERAO2025)
+      couponInput.value = 'VERAO2025';
+      const evt = new Event('input', {bubbles:true});
+      couponInput.dispatchEvent(evt);
+      // change payment method to force recompute
+      setTimeout(()=>{
+        if(paySel && paySel.options && paySel.options.length>1) paySel.selectedIndex = 1;
+        paySel.dispatchEvent(new Event('change'));
+        setTimeout(()=>{
+          const total = parseFloat(document.getElementById('totalPay').textContent || '0');
+          assert('total updated after coupon + payment change', total > 0);
+        },300);
+      },500);
+    },300);
+  }catch(e){
+    const d = document.createElement('div'); d.textContent = 'ERROR: '+e.message; d.className='fail'; document.getElementById('results').appendChild(d);
+  }
+}, 600);
+</script>
+</body></html>

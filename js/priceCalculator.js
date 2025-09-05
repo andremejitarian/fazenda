@@ -38,23 +38,31 @@
       totals.subtotalHospedagem += (p.valorHospedagem || 0);
       totals.subtotalEvento += (p.valorEvento || 0);
     });
-    let baseTotal = totals.subtotalHospedagem + totals.subtotalEvento;
-    // cupom handling (simple)
+    // determine discount based on cupom.aplicacao
+    let desconto = 0;
+    const baseHosp = totals.subtotalHospedagem;
+    const baseEvent = totals.subtotalEvento;
+    const baseTotal = baseHosp + baseEvent;
     if(cupom){
-      if(cupom.tipo_desconto === 'percentual'){
-        totals.desconto = baseTotal * (cupom.valor_desconto || 0);
-      } else if(cupom.tipo_desconto === 'fixo'){
-        totals.desconto = cupom.valor_desconto || 0;
+      const tipo = cupom.tipo_desconto;
+      const aplic = (cupom.aplicacao || 'total'); // 'total' | 'hospedagem' | 'evento'
+      if(tipo === 'percentual'){
+        if(aplic === 'hospedagem') desconto = baseHosp * (cupom.valor_desconto || 0);
+        else if(aplic === 'evento') desconto = baseEvent * (cupom.valor_desconto || 0);
+        else desconto = baseTotal * (cupom.valor_desconto || 0);
+      } else if(tipo === 'fixo'){
+        // fixed discount: apply to target pool, but not exceed that pool
+        if(aplic === 'hospedagem') desconto = Math.min(cupom.valor_desconto || 0, baseHosp);
+        else if(aplic === 'evento') desconto = Math.min(cupom.valor_desconto || 0, baseEvent);
+        else desconto = Math.min(cupom.valor_desconto || 0, baseTotal);
       }
     }
-    const afterDiscount = Math.max(0, baseTotal - totals.desconto);
-    const taxa = (formaPagamento && formaPagamento.taxa_gateway_percentual) ? formaPagamento.taxa_gateway_percentual : 0;
-    totals.total = afterDiscount * (1 + taxa);
-    // round
     totals.subtotalHospedagem = +totals.subtotalHospedagem.toFixed(2);
     totals.subtotalEvento = +totals.subtotalEvento.toFixed(2);
-    totals.desconto = +totals.desconto.toFixed(2);
-    totals.total = +totals.total.toFixed(2);
+    totals.desconto = +desconto.toFixed(2);
+    const afterDiscount = Math.max(0, baseTotal - desconto);
+    const taxa = (formaPagamento && formaPagamento.taxa_gateway_percentual) ? formaPagamento.taxa_gateway_percentual : 0;
+    totals.total = +((afterDiscount * (1 + taxa)).toFixed(2));
     return totals;
   }
 

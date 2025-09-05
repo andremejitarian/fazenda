@@ -30,7 +30,7 @@ Criar um formulário online intuitivo e dinâmico que permita aos participantes:
 *   Indicar a forma de pagamento preferida através de um **dropdown**.
 *   Gerar um ID de inscrição único para cada nova submissão.
 *   Experimentar uma interface simplificada, onde opções únicas de seleção são apresentadas apenas como texto informativo, evitando cliques desnecessários.
-*   **Pré-preenchimento automático de campos através de token de evento via webhook**.
+*   **Pré-preenchimento automático de campos a partir do arquivo local `eventos.json` (via parâmetro `?evento=` na URL).**
 *   Agilizar e otimizar todo o processo de inscrição e reserva para a **Fazenda Serrinha**.
 
 #### 3.4. Público-Alvo
@@ -64,17 +64,11 @@ Criar um formulário online intuitivo e dinâmico que permita aos participantes:
 
 #### 4.3. Pré-preenchimento de Campos
 
-##### 4.3.1. Preenchimento Automático via Webhook (Token de Evento)
-*   **Detecção de Parâmetro:** O formulário deve detectar a presença do parâmetro `evento` na URL (ex: `https://fazendaserrinha.com/?evento=003`)
-*   **Chamada ao Webhook:** Se o parâmetro for encontrado, realizar chamada fetch para:
-    *   **Endpoint:** `https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/sua_webhook_de_consulta_dados_evento`
-    *   **Método:** GET
-    *   **Parâmetro:** `?evento=003`
-*   **Processamento da Resposta:**
-    *   O webhook do N8N consultará fonte de dados (Google Sheets, banco de dados) usando o evento como chave
-    *   Retornará objeto JSON abrangente com todos os dados do evento
-    *   O formulário parseará a resposta e pré-preencherá campos correspondentes
-*   **Tratamento de Falhas:** Em caso de falha na consulta ou ausência do parâmetro, o formulário iniciará vazio
+##### 4.3.1. Carregamento de Evento via parâmetro de URL
+*   **Detecção de Parâmetro:** O formulário detecta a presença do parâmetro `evento` na URL (ex: `https://fazendaserrinha.com/?evento=003`).
+*   **Fonte dos Dados:** Quando presente, o formulário buscará o evento correspondente no arquivo local `eventos.json` (carregado por `fetch('eventos.json')`) e carregará os dados do evento diretamente do JSON.
+*   **Processamento:** O formulário parseará o objeto do evento encontrado no `eventos.json` e usará seus campos para pré-preencher e configurar a interface (título, descrição, header, tipos de acomodação, períodos, regras de precificação, cupons, formas de pagamento etc.).
+*   **Tratamento de Falhas / Fallbacks:** Se o parâmetro não for encontrado, ou se o ID não existir no `eventos.json`, o formulário carregará o primeiro evento disponível do arquivo como fallback ou exibirá uma mensagem de erro conforme a configuração do deploy.
 
 ### 5. Wireframes Textuais
 
@@ -1067,7 +1061,6 @@ O formulário depende das seguintes integrações externas:
 - ✅ **Validação completa de CPF e outros campos**
 - ✅ **Sistema de cupons de desconto funcional**
 - ✅ **Cálculo correto de taxas de gateway**
-- ✅ **Pré-preenchimento via webhook**
 - ✅ **Geração de ID único de inscrição**
 - ✅ **Responsividade completa**
 

@@ -41,5 +41,28 @@ assert('integration calc with age rules', (function(){
   const totals = window.priceCalculator.calcTotals(p, {taxa_gateway_percentual:0}, null);
   return totals.subtotalEvento === 100 && totals.subtotalHospedagem === 100;
 })());
+
+// coupon aplicacao tests
+(function(){
+  // participants: hospedagem 200, evento 100
+  const parts = [{valorHospedagem:200, valorEvento:100}];
+  const forma = {taxa_gateway_percentual:0};
+  // percentual coupon applied to hospedagem (10%) -> desconto = 20
+  const cupHosp = {tipo_desconto:'percentual', valor_desconto:0.10, aplicacao:'hospedagem'};
+  const t1 = window.priceCalculator.calcTotals(parts, forma, cupHosp);
+  assert('coupon percentual aplicacao=hospedagem desconta 20', t1.desconto === 20 && t1.total === 280);
+  // percentual coupon applied to evento (50%) -> desconto = 50
+  const cupEvent = {tipo_desconto:'percentual', valor_desconto:0.50, aplicacao:'evento'};
+  const t2 = window.priceCalculator.calcTotals(parts, forma, cupEvent);
+  assert('coupon percentual aplicacao=evento desconta 50', t2.desconto === 50 && t2.total === 250);
+  // fixed coupon applied to hospedagem (fixed 150) -> desconto limited to hospedagem (200) => 150
+  const cupFixedHosp = {tipo_desconto:'fixo', valor_desconto:150, aplicacao:'hospedagem'};
+  const t3 = window.priceCalculator.calcTotals(parts, forma, cupFixedHosp);
+  assert('coupon fixo aplicacao=hospedagem desconta max hospedagem', t3.desconto === 150 && t3.total === 150);
+  // fixed coupon applied to total (fixed 50) -> desconto 50
+  const cupFixedTotal = {tipo_desconto:'fixo', valor_desconto:50, aplicacao:'total'};
+  const t4 = window.priceCalculator.calcTotals(parts, forma, cupFixedTotal);
+  assert('coupon fixo aplicacao=total desconta 50', t4.desconto === 50 && t4.total === 250);
+})();
 </script>
 </body></html>
