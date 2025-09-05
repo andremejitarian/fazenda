@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>priceCalculator tests</title>
+<style>body{font-family:system-ui;padding:20px} .pass{color:green} .fail{color:red}</style>
+</head><body>
+<h1>priceCalculator basic tests</h1>
+<script src="../js/priceCalculator.js"></script>
+<script src="../js/cpfValidation.js"></script>
+<div id="results"></div>
+<script>
+function assert(name, cond){
+  const d = document.createElement('div'); d.textContent = name + ': ' + (cond? 'PASS':'FAIL'); d.className = cond? 'pass':'fail'; document.getElementById('results').appendChild(d);
+}
+
+// tests
+assert('age calc for 2000-01-01 should be >= 25', window.priceCalculator.calculateAge('2000-01-01') >= 25);
+assert('applyAgeRules returns base when no rules', window.priceCalculator.applyAgeRules(100,30,[]) === 100);
+assert('calculateAccommodation basic', window.priceCalculator.calculateAccommodation(100,2,30,[]) === 200);
+assert('calculateEventValue with rule', (function(){
+  const rules = [{faixa_min_anos:0, faixa_max_anos:12, percentual_valor_adulto:0.5}];
+  return window.priceCalculator.calculateEventValue(200,10,rules) === 100;
+})());
+
+// calcTotals
+(function(){
+  const parts = [{valorHospedagem:200, valorEvento:100},{valorHospedagem:0, valorEvento:50}];
+  const forma = {taxa_gateway_percentual:0.1};
+  const totals = window.priceCalculator.calcTotals(parts, forma, null);
+  assert('calcTotals subtotalHospedagem', totals.subtotalHospedagem === 200);
+  assert('calcTotals subtotalEvento', totals.subtotalEvento === 150);
+  assert('calcTotals total with tax', totals.total === +( (200+150)*(1+0.1) ).toFixed(2) );
+})();
+
+// CPF validation tests
+assert('valid CPF 11144477735', window.cpfValidation.validateCPF('111.444.777-35') === true);
+assert('invalid CPF 00000000000', window.cpfValidation.validateCPF('000.000.000-00') === false);
+
+// simple integration: priceCalculator with age rules
+assert('integration calc with age rules', (function(){
+  const rules = [{faixa_min_anos:0, faixa_max_anos:12, percentual_valor_adulto:0.5}];
+  const p = [{valorHospedagem: 100, valorEvento: window.priceCalculator.applyAgeRules(200,10,rules)}];
+  const totals = window.priceCalculator.calcTotals(p, {taxa_gateway_percentual:0}, null);
+  return totals.subtotalEvento === 100 && totals.subtotalHospedagem === 100;
+})());
+</script>
+</body></html>

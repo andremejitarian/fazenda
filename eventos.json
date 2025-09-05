@@ -1,0 +1,86 @@
+{
+  "eventos": [
+    {
+      "id": "G001",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/retiro_g001.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png",
+        "partner_logos": [
+          "https://assets.parceiroA.com.br/logos/partnerA_circle.png",
+          "https://assets.parceiroB.com.br/logos/partnerB_circle.png"
+        ],
+        "logo_duplo": true
+      },
+      "nome": "Retiro de Bem-Estar e Meditação",
+      "descricao": "Retiro de 3 dias com hospedagem e workshops.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G001",
+      "tipo_formulario": "hospedagem_e_evento",
+      "tipos_acomodacao": [
+        { "id": "indiv", "label": "Individual", "valor_diaria_por_pessoa": 250.00 },
+        { "id": "compart", "label": "Compartilhada", "valor_diaria_por_pessoa": 180.00 }
+      ],
+      "periodos_estadia_opcoes": [
+        {
+          "id": "padrao",
+          "label": "10/10 - 12/10",
+          "data_inicio": "2025-10-10T18:00",
+          "data_fim": "2025-10-12T14:00",
+          "num_diarias": 2,
+          "valores_evento_opcoes": [
+            { "id": "ideal_2dias", "label": "Ideal (2 dias)", "valor": 850.00 },
+            { "id": "social_2dias", "label": "Social (2 dias)", "valor": 700.00 }
+          ]
+        }
+      ],
+      "formas_pagamento_opcoes": [
+        { "id": "pix_vista", "label": "PIX à vista", "taxa_gateway_percentual": 0.01 },
+        { "id": "cartao", "label": "Cartão (parcelado)", "taxa_gateway_percentual": 0.035 }
+      ],
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          { "faixa_min_anos": 0, "faixa_max_anos": 4, "percentual_valor_adulto": 0.0, "limite_gratuidade_por_reserva": 1 },
+          { "faixa_min_anos": 5, "faixa_max_anos": 10, "percentual_valor_adulto": 0.5 }
+        ],
+        "evento": [
+          { "faixa_min_anos": 0, "faixa_max_anos": 4, "percentual_valor_adulto": 0.0, "limite_gratuidade_por_reserva": 1 },
+          { "faixa_min_anos": 5, "faixa_max_anos": 10, "percentual_valor_adulto": 0.5 }
+        ]
+      },
+      "cupons_desconto": [
+        { "codigo": "VERAO2025", "tipo_desconto": "percentual", "valor_desconto": 0.10, "data_validade_fim": "2025-12-31T23:59:59", "aplicacao": "total" }
+      ]
+    },
+    {
+      "id": "G002",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/workshop_g002.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+      },
+      "nome": "Workshop de Yoga (Apenas Evento)",
+      "descricao": "Workshop intensivo, sem hospedagem.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G002",
+      "tipo_formulario": "evento_apenas",
+      "valores_evento_opcoes": [
+        { "id": "workshop_basico", "label": "Básico", "valor": 300.00 },
+        { "id": "workshop_premium", "label": "Premium", "valor": 450.00 }
+      ],
+      "formas_pagamento_opcoes": [ { "id": "pix_vista", "label": "PIX", "taxa_gateway_percentual": 0.01 } ],
+      "cupons_desconto": [ { "codigo": "WORKSHOP10", "tipo_desconto": "percentual", "valor_desconto": 0.10, "data_validade_fim": "2025-09-30T23:59:59", "aplicacao": "total" } ]
+    },
+    {
+      "id": "G003",
+      "header": {
+        "banner_url": "https://assets.fazendaserrinha.com.br/banners/hospedagem_g003.jpg",
+        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+      },
+      "nome": "Reserva de Quarto (Apenas Hospedagem)",
+      "descricao": "Hospedagem avulsa.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G003",
+      "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [ { "id": "padrao_single", "label": "Single", "valor_diaria_por_pessoa": 200.00 } ],
+      "periodos_estadia_opcoes": [ { "id": "uma_noite", "label": "1 Noite", "data_inicio": "2025-10-20T14:00", "data_fim": "2025-10-21T12:00", "num_diarias": 1 } ],
+      "formas_pagamento_opcoes": [ { "id": "cartao_credito", "label": "Cartão", "taxa_gateway_percentual": 0.04 } ],
+      "cupons_desconto": [ { "codigo": "HOSPEDAGEM15", "tipo_desconto": "percentual", "valor_desconto": 0.15, "data_validade_fim": "2025-11-15T23:59:59", "aplicacao": "hospedagem" } ]
+    }
+  ]
+}

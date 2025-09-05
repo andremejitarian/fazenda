@@ -444,6 +444,61 @@ O formulário depende das seguintes integrações externas:
 *   **Parâmetro de Query:** `evento={valor_do_evento}`
 *   **Funcionalidade:** Consulta base de dados (Google Sheets, Airtable, etc.) utilizando o token de evento e retorna dados no formato JSON especificado para pré-preenchimento do formulário.
 
+##### 9.3. Webhook de Geração de Link de Pagamento (Payment Link)
+
+*   Contexto: Alguns fluxos precisam gerar um link de pagamento externo (ex: gerador de cobrança, gateway ou fluxo de checkout hospedado) após a confirmação dos dados da inscrição. Para este caso, o frontend fará uma chamada ao webhook responsável por gerar o link de pagamento e retornará a URL que será exibida ao usuário como "Botão de Pagamento".
+*   Endpoint: (por evento ou global) — a URL do webhook de geração de link pode ser configurada por evento no JSON através do campo `payment_link_webhook_url`. Caso este campo não exista, o frontend utilizará o webhook de submissão definido em 9.1, desde que este retorne `{ "link": "..." }`.
+*   Método: POST
+*   Cabeçalhos Recomendados:
+    *   `Content-Type: application/json`
+    *   `Authorization: Bearer <TOKEN_SEGURO>` (quando aplicável; o token deve ser armazenado no backend e não exposto ao frontend)
+*   Payload de Exemplo:
+
+```json
+{
+  "inscricao_id": "FS2025-000123",
+  "evento": { "id": "G001", "nome": "Retiro de Bem-Estar" },
+  "responsavel": { "nome": "Fulano de Tal", "cpf": "000.000.000-00", "email": "fulano@example.com" },
+  "participantes": [
+    { "nome": "Fulano", "cpf": "000.000.000-00", "valorHospedagem": 500.00, "valorEvento": 850.00 },
+    { "nome": "Ciclano", "cpf": "111.111.111-11", "valorHospedagem": 360.00, "valorEvento": 700.00 }
+  ],
+  "totals": { "subtotalHospedagem": 860.00, "subtotalEvento": 1550.00, "desconto": 0.00, "total": 2410.00 },
+  "forma_pagamento": { "id": "pix_vista", "label": "PIX à Vista" },
+  "cupom": null,
+  "meta": { "origin": "frontend", "lang": "pt-BR" }
+}
+```
+
+*   Resposta de Sucesso (exemplo):
+
+```json
+{ "link": "https://pagamento.gateway/checkout/abc123", "provider": "gatewayX", "expires_at": "2025-10-10T23:59:59Z" }
+```
+
+*   Resposta de Erro (exemplo):
+
+```json
+{ "error": "mensagem amigavel ao usuario", "code": 400 }
+```
+
+*   Regras e comportamentos frontend:
+  *   O botão "Gerar Link de Pagamento" / "Ir para Pagamento" só é habilitado após validação dos campos obrigatórios e aceite dos termos.
+  *   Ao acionar, o frontend exibirá estado de carregamento (spinner) e desabilitará o botão para evitar chamadas duplicadas.
+  *   Tempo limite recomendado: 5s; exibir mensagem de erro e permitir nova tentativa em caso de timeout.
+  *   No sucesso, abrir a `link` em nova aba (target="_blank") e apresentar um botão alternativo "Copiar link" e o QR-code (quando aplicável) no `previewArea`.
+  *   Em caso de falha, exibir a mensagem retornada pelo webhook (campo `error`) e um botão "Tentar Novamente"; logar erro para análise.
+  *   Se o webhook suportar idempotência, enviar `inscricao_id` para evitar duplicação de cobranças.
+  *   Após geração bem-sucedida do link, gravar a URL no registro da inscrição (backend) — o frontend não deve persistir formas de pagamento sensíveis.
+
+*   Segurança:
+  *   Todas as chamadas devem usar HTTPS.
+  *   O webhook deve validar assinatura/token no backend do gateway para garantir origem legítima.
+  *   Não exibir tokens ou credenciais no frontend.
+
+*   Logs e auditoria: registrar request/response no backend (n8n ou sistema de integração) para permitir suporte e reconciliação de pagamentos.
+
+
 ### 10. Considerações Técnicas/Assunções
 
 *   **Tecnologias Frontend:** HTML5, CSS3, JavaScript.

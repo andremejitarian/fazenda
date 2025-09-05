@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Formulário - Fazenda Serrinha</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="banner" id="banner">
+      <div class="banner-overlay"></div>
+      <div class="header-inner">
+        <div class="logo-wrap" id="logoWrap">
+          <!-- logo(s) serão inseridos por JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero-card" id="heroCard">
+      <h1 id="eventTitle">Carregando...</h1>
+      <p id="eventDescription">Aguarde enquanto carregamos os detalhes do evento.</p>
+      <div class="hero-actions">
+        <button id="startBtn" class="btn">Avançar →</button>
+      </div>
+    </section>
+    
+    <section id="formArea" class="form-area">
+      <div class="form-controls">
+        <button id="addParticipant" class="btn">+ Adicionar Participante</button>
+      </div>
+
+      <div id="participantsContainer"></div>
+      <aside class="summary">
+        <h3>Resumo</h3>
+        <div>Subtotal Hospedagem: R$ <span id="subtotalHosp">0.00</span></div>
+        <div>Subtotal Evento: R$ <span id="subtotalEvent">0.00</span></div>
+        <div style="margin-top:8px">Forma de Pagamento:<br>
+          <select id="paymentMethodSelect"></select>
+        </div>
+        <div style="margin-top:12px">Cupom de Desconto:<br>
+          <div class="coupon-row">
+            <input id="couponCode" placeholder="Código do cupom" />
+            <button id="applyCouponBtn" class="btn">Aplicar</button>
+          </div>
+          <div id="couponMsg" class="text-muted" style="margin-top:6px;font-size:13px"></div>
+        </div>
+        <div style="margin-top:14px"><strong>Total a Pagar: R$ <span id="totalPay">0.00</span></strong></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button id="previewBtn" class="btn">Visualizar Reserva</button>
+          <button id="submitBtn" class="btn">Enviar Reserva</button>
+        </div>
+        <div id="previewArea" style="display:none;margin-top:12px;background:#fafafa;padding:10px;border-radius:8px;border:1px solid #eee;max-height:320px;overflow:auto;font-family:monospace;font-size:13px"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="js/priceCalculator.js"></script>
+  <script src="js/cpfValidation.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>
