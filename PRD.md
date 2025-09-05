@@ -933,7 +933,7 @@ O formulário depende das seguintes integrações externas:
       <td>Calculado (R$)</td>
       <td>Não</td>
       <td>Normal (Exibição)</td>
-      <td>Soma de 'Valor Total Agregado da Hospedagem' e 'Valor Total Agregado do Evento', MENOS 'Valor do Desconto Aplicado', **MAIS a `taxa_gateway_percentual` da forma de pagamento selecionada**.</td>
+      <td>Soma de 'Valor Total Agregado da Hospedagem' e 'Valor Total Agregado do Evento', MENOS 'Valor do Desconto Aplicado', **não precisa somar a `taxa_gateway_percentual` pois ao selecionar a forma de pagamento o valores totais agregados são recalculados a depender da forma de pagamento selecionada que possui suas regras da taxa do gateway**.</td>
     </tr>
     <tr>
       <td></td>
@@ -941,7 +941,7 @@ O formulário depende das seguintes integrações externas:
       <td>Dropdown</td>
       <td>Sim</td>
       <td>Dropdown se > 1 opção no JSON; Texto Informativo se 1 opção no JSON.</td>
-      <td>Opções carregadas de `formas_pagamento_opcoes` do JSON. Exibe `label` e `descricao`. A seleção afeta o `Valor Total Geral a Pagar` com a `taxa_gateway_percentual`.</td>
+      <td>Opções carregadas de `formas_pagamento_opcoes` do JSON. Exibe `label` e `descricao`. A seleção afeta o 'Valor Total Agregado da Hospedagem' e 'Valor Total Agregado do Evento', toda vez que a forma de pagamento for alterada o cupom de desconto deve ser recalculado`.</td>
     </tr>
     <tr>
       <td></td>
