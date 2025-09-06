@@ -252,5 +252,86 @@
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G003",
       "observacoes_adicionais": "Não inclui acesso a eventos ou alimentação. Check-out até 12h.",
       "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [
+        {
+          "id": "padrao_single",
+          "label": "Quarto Padrão Individual",
+          "descricao": "Acomodação para uma pessoa.",
+          "valor_diaria_por_pessoa": 200.00
+        },
+        {
+          "id": "padrao_duplo",
+          "label": "Quarto Padrão Duplo",
+          "descricao": "Acomodação para duas pessoas.",
+          "valor_diaria_por_pessoa": 150.00
+        }
+      ],
 
-      "tipos_acomo
+      "periodos_estadia_opcoes": [
+        {
+          "id": "uma_noite",
+          "label": "1 Noite (20/10 - 21/10)",
+          "data_inicio": "2025-10-20T14:00",
+          "data_fim": "2025-10-21T12:00",
+          "num_diarias": 1
+        },
+        {
+          "id": "duas_noites",
+          "label": "2 Noites (20/10 - 22/10)",
+          "data_inicio": "2025-10-20T14:00",
+          "data_fim": "2025-10-22T12:00",
+          "num_diarias": 2
+        }
+      ],
+
+      "valores_evento_opcoes": [],
+
+      "formas_pagamento_opcoes": [
+        {
+          "id": "cartao_credito",
+          "label": "Cartão de Crédito",
+          "tipo": "Cartao",
+          "descricao": "Pagamento em até 3x.",
+          "taxa_gateway_percentual": 0.04
+        }
+      ],
+
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 0.3,
+              "descricao": "Crianças 0-3 anos extras pagam 30% da hospedagem"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.6,
+            "descricao": "Crianças de 4 a 10 anos pagam 60% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 10 anos pagam valor integral de hospedagem"
+          }
+        ],
+        "evento": []
+      },
+
+      "cupons_desconto": [
+        {
+          "codigo": "HOSPEDAGEM15",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.15,
+          "data_validade_fim": "2025-11-15T23:59:59",
+          "aplicacao": "hospedagem"
+        }
+      ]
+    }
+  ]
+}
