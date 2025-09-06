@@ -1,199 +1,266 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulário de Inscrição - Fazenda Serrinha</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- jQuery e jQuery Mask -->
+    <title>Formulário de Inscrição – Fazenda Serrinha</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery Mask CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <!-- Scripts -->
+    <script src="js/script.js" defer></script>
 </head>
 <body>
-    <header id="event-header">
-        <div class="banner-container">
-            <img id="event-banner" src="https://images.unsplash.com/photo-1470137237906-d8a4f71e1966" alt="Banner do Evento">
-        </div>
-    </header>
-    <div class="logo-container">
-        <img id="event-logo" src="https://fazendaserrinha.com.br/wp-content/uploads/2023/05/logo-fazenda-serrinha.png" alt="Logo do Evento">
+    <!-- Banner Header -->
+    <div class="header-banner" style="background-image: url('https://fazendaserrinha.com.br/wp-content/uploads/2023/10/aereas-12.jpg');">
     </div>
 
-    <main>
-        <div class="container">
-            <div id="step-1" class="form-step active">
-                <h1>Formulário de Check-in na Fazenda Serrinha</h1>
-                <div class="event-info">
-                    <p class="welcome">Damos as boas-vindas à Fazenda Serrinha! Somos bastante informais no nosso modo de receber, porém o check-in é uma exigência legal que devemos cumprir. Assim, solicitamos que preencha este formulário antes da chegada, de forma a agilizar a acomodação na fazenda. Desejamos uma ótima estadia!</p>
-                    <h2 id="event-name">📅 [NOME DO EVENTO]</h2>
-                    <p id="event-description">📝 [DESCRIÇÃO DO EVENTO]</p>
-                    <p id="event-observations" class="observations">ℹ️ [OBSERVAÇÕES ADICIONAIS]</p>
+    <!-- Container Principal -->
+    <div class="container">
+        <div class="form-card">
+            <!-- Logo Container -->
+            <div class="logo-container">
+                <img src="https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png" alt="Logo Fazenda Serrinha" class="logo">
+            </div>
+            
+            <!-- Tela 1: Boas-vindas -->
+            <div class="form-content" id="step-1">
+                <div class="welcome-section">
+                    <h1 id="event-title">Carregando informações do evento...</h1>
+                    <p id="event-description">Aguarde enquanto carregamos os detalhes do evento.</p>
+                    <p id="event-observations" class="observations"></p>
                 </div>
-                <button id="start-registration" class="btn-primary">Avançar →</button>
+
+                <!-- Estado de Carregamento -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Carregando dados do evento...</p>
+                </div>
+
+                <!-- Estado de Erro -->
+                <div class="error-state" style="display: none;">
+                    <div class="error-icon">❌</div>
+                    <h3>Ops! Algo deu errado</h3>
+                    <p>Não foi possível carregar os dados do evento. Verifique o link ou tente novamente.</p>
+                    <div class="error-actions">
+                        <button class="btn btn-primary" onclick="location.reload()">Tentar Novamente</button>
+                    </div>
+                </div>
+
+                <!-- Botão Avançar -->
+                <button class="btn btn-primary btn-advance" id="start-form-btn" style="display: none;">
+                    Avançar
+                    <span class="btn-arrow">→</span>
+                </button>
             </div>
 
-            <div id="step-2" class="form-step">
-                <h1>👥 DADOS DOS PARTICIPANTES</h1>
+            <!-- Tela 2: Dados dos Participantes (oculta inicialmente) -->
+            <div class="form-content" id="step-2" style="display: none;">
+                <h2 class="section-title">👥 Dados dos Participantes</h2>
+                
                 <div id="participants-container">
-                    <!-- Template para participante será clonado via JavaScript -->
-                    <div class="participant-template">
-                        <div class="participant-header">
-                            <h2>👤 PARTICIPANTE</h2>
-                            <button class="remove-participant" type="button">❌ Remover</button>
-                        </div>
-                        <div class="participant-data">
-                            <div class="form-group">
-                                <label for="nome">Nome Completo:</label>
-                                <input type="text" name="nome" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="telefone">Telefone:</label>
-                                <input type="text" name="telefone" class="phone-mask" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cpf">CPF:</label>
-                                <input type="text" name="cpf" class="cpf-mask" required>
-                                <span class="error-message"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="email">E-mail:</label>
-                                <input type="email" name="email" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="data_nascimento">Data de Nascimento:</label>
-                                <input type="date" name="data_nascimento" required>
-                            </div>
-                        </div>
-
-                        <div class="accommodation-section">
-                            <h3>HOSPEDAGEM</h3>
-                            <div class="form-group">
-                                <label for="periodo">Período de Estadia:</label>
-                                <select name="periodo" class="periodo-select"></select>
-                            </div>
-                            <div class="form-group">
-                                <label for="checkin">Check-in:</label>
-                                <input type="datetime-local" name="checkin" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="checkout">Check-out:</label>
-                                <input type="datetime-local" name="checkout" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="acomodacao">Acomodação:</label>
-                                <select name="acomodacao" class="acomodacao-select"></select>
-                            </div>
-                            <div class="price-display">
-                                <p>💰 Valor Hospedagem: <span class="accommodation-price">R$ 0,00</span></p>
-                            </div>
-                        </div>
-
-                        <div class="event-section">
-                            <h3>EVENTO</h3>
-                            <div class="form-group">
-                                <label for="participacao">Participação:</label>
-                                <select name="participacao" class="participacao-select"></select>
-                            </div>
-                            <div class="price-display">
-                                <p>💰 Valor Evento: <span class="event-price">R$ 0,00</span></p>
-                            </div>
-                        </div>
-
-                        <div class="payment-responsible">
-                            <label>
-                                <input type="radio" name="responsavel_pagamento" value="">
-                                Responsável pelo Pagamento
-                            </label>
-                        </div>
-                    </div>
+                    <!-- Participantes serão adicionados aqui via JavaScript -->
                 </div>
-
-                <button id="add-participant" class="btn-secondary">➕ ADICIONAR PARTICIPANTE</button>
+                
+                <button class="btn btn-secondary btn-add-participant" id="add-participant-btn">
+                    ➕ Adicionar Participante
+                </button>
+                
                 <div class="navigation-buttons">
-                    <button id="back-to-step-1" class="btn-back">Voltar</button>
-                    <button id="go-to-step-3" class="btn-primary">Próximo</button>
+                    <button class="btn btn-secondary back-btn">← Voltar</button>
+                    <button class="btn btn-primary next-btn">Próximo</button>
                 </div>
             </div>
 
-            <div id="step-3" class="form-step">
-                <h1>🧾 RESUMO E PAGAMENTO</h1>
-                <div class="payment-responsible-summary">
-                    <h2>RESPONSÁVEL PELO PAGAMENTO</h2>
-                    <div id="responsible-info">
-                        <!-- Preenchido via JavaScript -->
-                    </div>
-                </div>
-
-                <div class="participants-summary">
-                    <h2>DETALHAMENTO POR PESSOA</h2>
-                    <div id="participants-summary-container">
-                        <!-- Preenchido via JavaScript -->
-                    </div>
-                </div>
-
-                <div class="payment-method">
-                    <h2>FORMA DE PAGAMENTO</h2>
-                    <div class="form-group">
-                        <label for="payment-method">Método:</label>
-                        <select id="payment-method-select"></select>
-                    </div>
-                    <div id="payment-description"></div>
+            <!-- Tela 3: Resumo e Pagamento (oculta inicialmente) -->
+            <div class="form-content" id="step-3" style="display: none;">
+                <h2 class="section-title">🧾 Resumo e Pagamento</h2>
+                
+                <div id="summary-content">
+                    <!-- Resumo será preenchido via JavaScript -->
                 </div>
 
                 <div class="coupon-section">
-                    <h2>CUPOM DE DESCONTO</h2>
-                    <div class="form-group">
-                        <label for="coupon-code">Código:</label>
-                        <input type="text" id="coupon-code">
-                        <button id="apply-coupon" class="btn-secondary">APLICAR CUPOM</button>
-                    </div>
-                    <div id="coupon-message"></div>
+                    <label for="coupon-code">Cupom de Desconto:</label>
+                    <input type="text" id="coupon-code" class="form-control" placeholder="Insira seu código de cupom">
+                    <p id="coupon-feedback" class="feedback-message"></p>
                 </div>
 
-                <div class="totals-section">
-                    <h2>TOTAIS</h2>
-                    <p>Subtotal Hospedagem: <span id="subtotal-accommodation">R$ 0,00</span></p>
-                    <p>Subtotal Evento: <span id="subtotal-event">R$ 0,00</span></p>
-                    <p>Desconto Cupom: <span id="coupon-discount">-R$ 0,00</span></p>
-                    <hr>
-                    <p class="total-amount">💰 TOTAL A PAGAR: <span id="total-amount">R$ 0,00</span></p>
+                <div class="payment-method-section">
+                    <label for="payment-method">Forma de Pagamento:</label>
+                    <select id="payment-method" class="form-control">
+                        <!-- Opções carregadas via JavaScript -->
+                    </select>
+                    <p id="payment-method-description" class="help-text"></p>
+                </div>
+
+                <div class="totals-summary">
+                    <div class="total-line">
+                        <span>Subtotal Hospedagem:</span>
+                        <span id="subtotal-hospedagem">R\$ 0,00</span>
+                    </div>
+                    <div class="total-line">
+                        <span>Subtotal Evento:</span>
+                        <span id="subtotal-evento">R\$ 0,00</span>
+                    </div>
+                    <div class="total-line discount">
+                        <span>Desconto Cupom:</span>
+                        <span id="discount-value">-R\$ 0,00</span>
+                    </div>
+                    <div class="total-line final">
+                        <span>TOTAL A PAGAR:</span>
+                        <span id="final-total">R\$ 0,00</span>
+                    </div>
                 </div>
 
                 <div class="terms-section">
-                    <label>
-                        <input type="checkbox" id="terms-checkbox" required>
-                        Li e concordo com os <a href="#" id="terms-link">Termos e Condições</a>
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="terms-conditions" required>
+                        <span class="checkmark"></span>
+                        Li e concordo com os <a href="#" id="terms-link" >Termos e Condições</a>
                     </label>
                 </div>
 
                 <div class="navigation-buttons">
-                    <button id="back-to-step-2" class="btn-back">Voltar</button>
-                    <button id="confirm-registration" class="btn-primary">CONFIRMAR INSCRIÇÃO E PROSSEGUIR</button>
+                    <button class="btn btn-secondary back-btn">← Voltar</button>
+                    <button class="btn btn-primary submit-btn">Confirmar Inscrição e Prosseguir</button>
                 </div>
             </div>
 
-            <div id="step-4" class="form-step">
-                <h1>✅ INSCRIÇÃO CONFIRMADA!</h1>
-                <div class="confirmation-message">
-                    <h2>🎉 SUCESSO!</h2>
-                    <p>Sua inscrição na Fazenda Serrinha foi enviada com sucesso!</p>
-                    <p>🆔 ID da Inscrição: <span id="registration-id"></span></p>
-                    <p>💰 Valor Total: <span id="final-amount"></span></p>
-                    <p>💳 Forma de Pagamento: <span id="selected-payment-method"></span></p>
-                    <p>📧 Clique no botão abaixo para realizar o pagamento.</p>
-                    <button id="proceed-to-payment" class="btn-primary">PROSSEGUIR PARA PAGAMENTO</button>
+            <!-- Tela 4: Confirmação (oculta inicialmente) -->
+            <div class="form-content" id="step-4" style="display: none;">
+                <div class="success-container">
+                    <div class="success-icon">✅</div>
+                    <h2>INSCRIÇÃO CONFIRMADA!</h2>
+                    
+                    <div class="confirmation-card">
+                        <h3>🎉 SUCESSO!</h3>
+                        <p>Sua inscrição na Fazenda Serrinha foi enviada com sucesso!</p>
+                        
+                        <div class="confirmation-details">
+                            <div class="detail-item">
+                                <span class="label">📄 ID da Inscrição:</span>
+                                <span class="value" id="confirmation-id">#FS2025000000</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">💰 Valor Total:</span>
+                                <span class="value" id="confirmation-total">R\$ 0,00</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">💳 Forma de Pagamento:</span>
+                                <span class="value" id="confirmation-payment-method"></span>
+                            </div>
+                        </div>
+                        
+                        <p class="payment-instruction">📧 Clique no botão abaixo para realizar o pagamento.</p>
+                    </div>
+                    
+                    <button class="btn btn-primary payment-link-btn" style="display: none;">
+                        Ir para Pagamento
+                    </button>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer>
-        <p>© 2025 Fazenda Serrinha - Todos os direitos reservados</p>
-    </footer>
+    <!-- Template para Participantes -->
+    <template id="participant-template">
+        <div class="participant-block">
+            <div class="participant-header">
+                <h3>👤 PARTICIPANTE <span class="participant-number">1</span></h3>
+                <button class="btn btn-danger btn-remove-participant" style="display: none;">❌ Remover</button>
+            </div>
+            
+            <div class="participant-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome Completo:</label>
+                        <input type="text" class="form-control full-name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Telefone:</label>
+                        <input type="text" class="form-control phone-mask" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF:</label>
+                        <input type="text" class="form-control cpf-mask" required>
+                        <p class="feedback-message cpf-feedback"></p>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>E-mail:</label>
+                        <input type="email" class="form-control email-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Nasc.:</label>
+                        <input type="date" class="form-control dob-input" required>
+                    </div>
+                </div>
 
-    <!-- Scripts -->
-    <script src="js/cpfValidation.js"></script>
-    <script src="js/priceCalculator.js"></script>
-    <script src="js/script.js"></script>
+                <!-- Seção de Hospedagem -->
+                <div class="lodging-section" style="display: none;">
+                    <div class="section-divider">
+                        <h4>🏠 HOSPEDAGEM</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Período Estadia:</label>
+                        <select class="form-control stay-period-select"></select>
+                        <p class="info-text stay-period-info" style="display: none;"></p>
+                    </div>
+                    
+                    <div class="checkin-checkout-info">
+                        <p class="checkin-info">Check-in: <span class="checkin-datetime"></span></p>
+                        <p class="checkout-info">Check-out: <span class="checkout-datetime"></span></p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Acomodação:</label>
+                        <select class="form-control accommodation-select"></select>
+                        <p class="info-text accommodation-info" style="display: none;"></p>
+                    </div>
+                    
+                    <div class="price-display">
+                        <span class="price-label">💰 Valor Hospedagem:</span>
+                        <span class="price-value lodging-value">R\$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Seção de Evento -->
+                <div class="event-section" style="display: none;">
+                    <div class="section-divider">
+                        <h4>🎯 EVENTO</h4>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Participação:</label>
+                        <select class="form-control event-option-select"></select>
+                        <p class="info-text event-option-info" style="display: none;"></p>
+                    </div>
+                    
+                    <div class="price-display">
+                        <span class="price-label">💰 Valor Evento:</span>
+                        <span class="price-value event-value">R\$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Responsável pelo Pagamento -->
+                <div class="responsible-payer-section" style="display: none;">
+                    <label class="checkbox-container">
+                        <input type="radio" class="responsible-payer" name="responsible-payer-radio">
+                        <span class="checkmark"></span>
+                        Responsável pelo Pagamento
+                    </label>
+                </div>
+            </div>
+        </div>
+    </template>
 </body>
 </html>
