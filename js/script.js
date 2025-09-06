@@ -1,5 +1,6 @@
 // script.js — controla o carregamento de eventos e renderização do header/hero
-(function(){
+// Aguardar o carregamento completo do DOM antes de executar o código
+window.addEventListener('load', function() {
   const STATE = {
     evento: null,
     participantes: [],
@@ -492,17 +493,20 @@
   
   console.log('Evento carregado:', ev.id, ev.nome);
   
-  // Esconder mensagem de carregamento
-  const loadingMessage = document.getElementById('loadingMessage');
-  if(loadingMessage) loadingMessage.style.display = 'none';
-  
-  // Mostrar o botão de início quando o evento for carregado
-  const startBtn = document.getElementById('startBtn');
-  if(startBtn) startBtn.style.display = 'block';
+  // Manipular diretamente os elementos DOM para garantir que a mensagem de carregamento seja ocultada
+  document.getElementById('loadingMessage').style.display = 'none';
+  document.getElementById('startBtn').style.display = 'block';
   
   // Definir o evento no estado e renderizar
   STATE.evento = ev;
+  console.log('Renderizando cabeçalho com evento:', ev.nome);
   renderHeader(ev);
+  
+  // Atualizar título e descrição diretamente
+  const eventTitle = document.getElementById('eventTitle');
+  const eventDescription = document.getElementById('eventDescription');
+  if(eventTitle) eventTitle.textContent = ev.nome || 'Evento';
+  if(eventDescription) eventDescription.textContent = ev.descricao || '';
   
   // Função para inicializar o aplicativo após carregar o evento
   function initializeApp(ev) {
@@ -687,5 +691,5 @@
   if(document.querySelector('.form-page')) {
     showPage(STATE.currentPage || 0);
   }
-
-})();
+  
+});
