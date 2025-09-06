@@ -1,695 +1,737 @@
-// script.js — controla o carregamento de eventos e renderização do header/hero
-// Aguardar o carregamento completo do DOM antes de executar o código
-window.addEventListener('load', function() {
-  const STATE = {
-    evento: null,
-    participantes: [],
-    responsavel: null,
-    currentPage: 0 // 0: Welcome, 1: Participants, 2: Payment
-  };
+/**
+ * Script principal do formulário de inscrição
+ * Gerencia a navegação entre etapas, validação de campos e cálculo de preços
+ */
 
-  // localStorage helpers
-  const STORAGE_KEY = 'fazenda_reserva_state_v1';
-  function saveState(){
-    try{ const copy = {participantes: STATE.participantes, appliedCupom: STATE.appliedCupom, eventoId: STATE.evento && STATE.evento.id, responsavel: STATE.responsavel, currentPage: STATE.currentPage};
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
-    }catch(e){console.warn('saveState failed', e)}
-  }
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return;
-      const parsed = JSON.parse(raw);
-      if(parsed && Array.isArray(parsed.participantes)) STATE.participantes = parsed.participantes;
-      if(parsed && parsed.appliedCupom) STATE.appliedCupom = parsed.appliedCupom;
-      if(parsed && typeof parsed.responsavel !== 'undefined') STATE.responsavel = parsed.responsavel;
-      if(parsed && typeof parsed.currentPage !== 'undefined') STATE.currentPage = parsed.currentPage;
-    }catch(e){console.warn('loadState failed', e)}
-  }
+// Variáveis globais
+let currentStep = 1;
+let calculator = null;
+let eventData = null;
 
-  // small inscricao id generator
-  function generateInscricaoId(){
-    const ts = Date.now().toString(36).toUpperCase();
-    const rand = Math.floor(Math.random()*9000+1000).toString(36).toUpperCase();
-    return `FS${ts}${rand}`;
-  }
-
-  function renderPaymentLinkResult(result){
-    const previewArea = document.getElementById('previewArea');
-    if(!previewArea) return;
-    let html = '';
-    if(result && result.link){
-      html += `<div><strong>Link de Pagamento:</strong> <a href="${result.link}" target="_blank">Abrir checkout</a></div>`;
-      html += `<div style="margin-top:8px"><button id="copyLinkBtn" class="btn">Copiar link</button> <button id="openLinkBtn" class="btn">Abrir em nova aba</button></div>`;
-      // attempt to show QR via Google Charts (fallback if external allowed)
-      const qrUrl = 'https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=' + encodeURIComponent(result.link);
-      html += `<div style="margin-top:8px"><img src="${qrUrl}" alt="QR" style="width:140px;height:140px;border:1px solid #eee;border-radius:6px"/></div>`;
-      previewArea.style.display = 'block';
-      previewArea.innerHTML = '<div class="preview-json">' + html + '</div>';
-      // wire buttons
-      document.getElementById('copyLinkBtn').addEventListener('click', ()=>{ navigator.clipboard.writeText(result.link); });
-      document.getElementById('openLinkBtn').addEventListener('click', ()=>{ window.open(result.link, '_blank'); });
-    } else {
-      previewArea.style.display = 'block';
-      previewArea.innerHTML = '<div class="preview-json">Resposta inválida do webhook de pagamento.</div>';
-    }
-  }
-
-  function qs(name){
-    try {
-      const url = new URL(window.location.href);
-      const param = url.searchParams.get(name);
-      console.log(`Parâmetro ${name} da URL:`, param);
-      return param;
-    } catch (error) {
-      console.error('Erro ao obter parâmetro da URL:', error);
-      return null;
-    }
-  }
-
-  function el(id){ return document.getElementById(id); }
-  
-  // Navigation functions
-  function showPage(pageIndex) {
-     // Save current page in state
-     STATE.currentPage = pageIndex;
-     saveState();
-     
-     // Hide all pages and show the current one
-     const pages = document.querySelectorAll('.form-page');
-     pages.forEach((page, index) => {
-       if (index === pageIndex) {
-         page.classList.add('active');
-       } else {
-         page.classList.remove('active');
-       }
-     });
-   }
-  
-  // Progress indicator functionality removed
-  
-  function goToNextPage() {
-    if (validateCurrentPage() && STATE.currentPage < 2) {
-      showPage(STATE.currentPage + 1);
-    }
-  }
-  
-  function goToPreviousPage() {
-    if (STATE.currentPage > 0) {
-      showPage(STATE.currentPage - 1);
-    }
-  }
-  
-  function validateCurrentPage() {
-    // Basic validation logic
-    if (STATE.currentPage === 1 && STATE.participantes.length === 0) {
-      alert('Adicione pelo menos um participante');
-      return false;
-    }
-    return true;
-  }
-
-  function renderHeader(event){
-    const banner = el('banner');
-    const logoWrap = el('logoWrap');
-    const title = el('eventTitle');
-    const desc = el('eventDescription');
-
-    if(event.header && event.header.banner_url){
-      banner.style.backgroundImage = `url(${event.header.banner_url})`;
-    } else {
-      banner.style.backgroundColor = '#e9ecef';
-    }
-
-    // Logo rendering
-    logoWrap.innerHTML = '';
-    if(event.header){
-      const h = event.header;
-      if((h.partner_logos && h.partner_logos.length === 2) || h.logo_duplo){
-        const wrapper = document.createElement('div');
-        wrapper.className = 'logo-duplo';
-        const imgA = document.createElement('img');
-        imgA.src = h.partner_logos && h.partner_logos[0] ? h.partner_logos[0] : h.logo_url;
-        imgA.alt = 'Parceiro A';
-        imgA.className = 'logo-duplo-img a';
-        const imgB = document.createElement('img');
-        imgB.src = h.partner_logos && h.partner_logos[1] ? h.partner_logos[1] : h.logo_url;
-        imgB.alt = 'Parceiro B';
-        imgB.className = 'logo-duplo-img b';
-        wrapper.appendChild(imgA);
-        wrapper.appendChild(imgB);
-        logoWrap.appendChild(wrapper);
-      } else if(h.logo_url){
-        const img = document.createElement('img');
-        img.src = h.logo_url;
-        img.alt = 'Logo Evento';
-        img.className = 'logo-single';
-        logoWrap.appendChild(img);
-      }
-    }
-
-    title.textContent = event.nome || 'Evento';
-    desc.textContent = event.descricao || '';
-  }
-
-  function createParticipantBlock(index, participant){
-    const wrapper = document.createElement('div');
-    wrapper.className = 'participant-block';
-    wrapper.dataset.index = index;
-    wrapper.innerHTML = `
-      <div class="participant-header">
-        <h3>Participante ${index+1}</h3>
-        <label class="responsavel-label" style="display:none"><input type="radio" name="responsavel" class="p-responsavel" value="${index}" /> Responsável pelo Pagamento</label>
-        <button type="button" class="remove-participant" title="Remover">✖</button>
-      </div>
-      <div class="grid">
-        <label>Nome<br><input type="text" class="p-name" /></label>
-        <label>Telefone<br><input type="text" class="p-phone" /></label>
-        <label>CPF<br><input type="text" class="p-cpf" maxlength="14" placeholder="000.000.000-00" /></label>
-        <label>Data Nasc.<br><input type="date" class="p-birth" /></label>
-      </div>
-      <div class="choices">
-        <div class="choice-accomodation"></div>
-        <div class="choice-event"></div>
-      </div>
-      <div class="participant-totals">
-        <div>Valor Hospedagem: R$ <span class="val-hosp">0.00</span></div>
-        <div>Valor Evento: R$ <span class="val-event">0.00</span></div>
-      </div>
-    `;
-
-    // populate choices based on STATE.evento
-    const ev = STATE.evento || {};
-    const accContainer = wrapper.querySelector('.choice-accomodation');
-    const eventContainer = wrapper.querySelector('.choice-event');
-
-    // Accommodation select (if applicable)
-  if(ev.tipos_acomodacao && ev.tipos_acomodacao.length){
-      const sel = document.createElement('select');
-      sel.className = 'p-acomodacao';
-      ev.tipos_acomodacao.forEach(t=>{
-        const opt = document.createElement('option');
-        opt.value = t.id;
-        opt.textContent = `${t.label} — R$ ${t.valor_diaria_por_pessoa.toFixed(2)}/diária`;
-        opt.dataset.valor = t.valor_diaria_por_pessoa;
-        sel.appendChild(opt);
-      });
-      accContainer.appendChild(document.createTextNode('Acomodação: '));
-      accContainer.appendChild(sel);
-      // default from participant state
-      if(participant && participant.acomodacao) sel.value = participant.acomodacao;
-      sel.addEventListener('change', ()=>{ 
-        // persist selection
-        STATE.participantes[index] = STATE.participantes[index] || {};
-        STATE.participantes[index].acomodacao = sel.value;
-        recalcParticipant(Number(wrapper.dataset.index)); recalcAll();
-      });
-    }
-
-    // Period select (if applicable)
-    let periodoSel = null;
-    if(ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes.length){
-      periodoSel = document.createElement('select');
-      periodoSel.className = 'p-periodo';
-      ev.periodos_estadia_opcoes.forEach(p=>{
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = `${p.label} — ${p.num_diarias} diárias`;
-        opt.dataset.numDiarias = p.num_diarias;
-        opt.dataset.valores = JSON.stringify(p.valores_evento_opcoes || []);
-        periodoSel.appendChild(opt);
-      });
-      eventContainer.appendChild(document.createTextNode('Período: '));
-      eventContainer.appendChild(periodoSel);
-      if(participant && participant.periodo) periodoSel.value = participant.periodo;
-      periodoSel.addEventListener('change', ()=>{
-        // persist and update
-        STATE.participantes[index] = STATE.participantes[index] || {};
-        STATE.participantes[index].periodo = periodoSel.value;
-        populateEventOptions();
-        // if participant had previously selected an event option that's not in new choices, clear it
-        const optExists = Array.from(eventOptSel.options).some(o=>o.value === (STATE.participantes[index].evento_opcao||''));
-        if(!optExists) { STATE.participantes[index].evento_opcao = null; }
-        recalcParticipant(Number(wrapper.dataset.index));
-        recalcAll();
-      });
-    }
-
-    // Event option select
-    const eventOptSel = document.createElement('select');
-    eventOptSel.className = 'p-eventopt';
-    function populateEventOptions(){
-      eventOptSel.innerHTML = '';
-      let choices = [];
-      // prefer period-local event values
-      if(periodoSel && periodoSel.value){
-        const chosen = ev.periodos_estadia_opcoes.find(p=>p.id === periodoSel.value);
-        if(chosen && chosen.valores_evento_opcoes) choices = chosen.valores_evento_opcoes;
-      }
-      if(choices.length === 0 && ev.valores_evento_opcoes) choices = ev.valores_evento_opcoes;
-      choices.forEach(v=>{
-        const o = document.createElement('option');
-        o.value = v.id || v.label;
-        o.textContent = `${v.label} — R$ ${v.valor.toFixed(2)}`;
-        o.dataset.valor = v.valor;
-        eventOptSel.appendChild(o);
-      });
-    }
-    populateEventOptions();
-    eventContainer.appendChild(document.createTextNode(' Opção Evento: '));
-    eventContainer.appendChild(eventOptSel);
-    if(participant && participant.evento_opcao) eventOptSel.value = participant.evento_opcao;
-    eventOptSel.addEventListener('change', ()=>{ 
-      STATE.participantes[index] = STATE.participantes[index] || {};
-      STATE.participantes[index].evento_opcao = eventOptSel.value;
-      recalcParticipant(Number(wrapper.dataset.index)); recalcAll(); 
-    });
-
-    // when building, if participant has stored selections ensure selects reflect them
-    // accomodation handled above; period handled above; event option ensured via setting value after populate
-    if(participant){
-      if(participant.acomodacao){ const s = wrapper.querySelector('.p-acomodacao'); if(s) s.value = participant.acomodacao; }
-      if(participant.periodo){ const p = wrapper.querySelector('.p-periodo'); if(p) { p.value = participant.periodo; populateEventOptions(); } }
-      if(participant.evento_opcao){ eventOptSel.value = participant.evento_opcao; }
-    }
-
-    // attach events
-    wrapper.querySelector('.remove-participant').addEventListener('click', ()=>{
-      const idx = Number(wrapper.dataset.index);
-      STATE.participantes.splice(idx,1);
-      // adjust responsavel index if needed
-      if(typeof STATE.responsavel === 'number'){
-        if(STATE.responsavel === idx){
-          STATE.responsavel = null;
-        } else if(STATE.responsavel > idx){
-          STATE.responsavel = STATE.responsavel - 1;
-        }
-      }
-      saveState();
-      rebuildParticipants();
-      recalcAll();
-    });
-
-    // CPF validation live
-    const cpfInput = wrapper.querySelector('.p-cpf');
-    // initialize inputs from participant state
-    const nameInput = wrapper.querySelector('.p-name');
-    const phoneInput = wrapper.querySelector('.p-phone');
-    if(participant){
-      if(participant.nome) nameInput.value = participant.nome;
-      if(participant.telefone) phoneInput.value = participant.telefone;
-      if(participant.cpf) cpfInput.value = participant.cpf;
-      if(participant.data_nasc) wrapper.querySelector('.p-birth').value = participant.data_nasc;
-    }
-
-    cpfInput.addEventListener('input', (e)=>{
-      const v = e.target.value.replace(/\D/g,'');
-      // format
-      e.target.value = v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4').slice(0,14);
-      const ok = window.cpfValidation && window.cpfValidation.validateCPF(e.target.value);
-      e.target.classList.toggle('invalid', !ok && e.target.value.replace(/\D/g,'').length===11);
-      // persist
-      STATE.participantes[index] = STATE.participantes[index] || {};
-      STATE.participantes[index].cpf = e.target.value;
-      saveState();
-    });
-
-    // birth change triggers recalculation
-    const birth = wrapper.querySelector('.p-birth');
-    birth.addEventListener('change', ()=>{
-      // persist
-      STATE.participantes[index] = STATE.participantes[index] || {};
-      STATE.participantes[index].data_nasc = birth.value;
-      recalcParticipant(Number(wrapper.dataset.index));
-      recalcAll();
-      saveState();
-    });
-
-    // persist name and phone on blur
-    const nameInputField = wrapper.querySelector('.p-name');
-    const phoneInputField = wrapper.querySelector('.p-phone');
-    nameInputField.addEventListener('blur', (e)=>{ STATE.participantes[index] = STATE.participantes[index] || {}; STATE.participantes[index].nome = e.target.value; saveState(); });
-    phoneInputField.addEventListener('blur', (e)=>{ STATE.participantes[index] = STATE.participantes[index] || {}; STATE.participantes[index].telefone = e.target.value; saveState(); });
-
-    return wrapper;
-  }
-
-  function rebuildParticipants(){
-    const container = document.getElementById('participantsContainer');
-    container.innerHTML = '';
-    STATE.participantes.forEach((p,idx)=>{
-      const block = createParticipantBlock(idx,p);
-      // show/hide responsavel radio depending on number of participants
-      const label = block.querySelector('.responsavel-label');
-      const radio = block.querySelector('.p-responsavel');
-      if(label && radio){
-        if(STATE.participantes.length > 1){
-          label.style.display = 'inline-block';
-          radio.checked = (typeof STATE.responsavel === 'number' && STATE.responsavel === idx);
-          radio.addEventListener('change', ()=>{ STATE.responsavel = Number(radio.value); saveState(); recalcAll(); });
-        } else { label.style.display = 'none'; }
-      }
-      container.appendChild(block);
-    });
-  }
-
-  function recalcParticipant(index){
-    const block = document.querySelector(`.participant-block[data-index='${index}']`);
-    if(!block) return;
-    const birth = block.querySelector('.p-birth').value;
-    const age = window.priceCalculator.calculateAge(birth);
-
-    // choose defaults from event
-    const ev = STATE.evento;
-    // compute base (adult) prices — do NOT apply age rules here; calcTotals will handle reservation-level rules
-    let baseHosp = 0;
-    let baseEvent = 0;
-    if(ev){
-      if(ev.tipo_formulario === 'hospedagem_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
-        const tipo = ev.tipos_acomodacao && ev.tipos_acomodacao[0];
-        const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
-        if(tipo && periodo){
-          baseHosp = (tipo.valor_diaria_por_pessoa || 0) * (periodo.num_diarias || 1);
-        }
-      }
-      if(ev.tipo_formulario === 'evento_apenas' || ev.tipo_formulario === 'hospedagem_e_evento'){
-        const periodo = ev.periodos_estadia_opcoes && ev.periodos_estadia_opcoes[0];
-        const valOpt = (periodo && periodo.valores_evento_opcoes && periodo.valores_evento_opcoes[0]) || (ev.valores_evento_opcoes && ev.valores_evento_opcoes[0]);
-        if(valOpt){ baseEvent = valOpt.valor || 0; }
-      }
-    }
-
-    // show preliminary base values in UI until recalcAll replaces them with final computed values
-    block.querySelector('.val-hosp').textContent = baseHosp.toFixed(2);
-    block.querySelector('.val-event').textContent = baseEvent.toFixed(2);
-
-    // persist base values and age in state
-    STATE.participantes[index] = STATE.participantes[index] || {};
-    STATE.participantes[index].baseHosp = baseHosp;
-    STATE.participantes[index].baseEvent = baseEvent;
-    STATE.participantes[index].age = age;
-  }
-
-  function recalcAll(){
-  const formaId = document.getElementById('paymentMethodSelect') ? document.getElementById('paymentMethodSelect').value : null;
-  const forma = (STATE.evento && STATE.evento.formas_pagamento_opcoes) ? (STATE.evento.formas_pagamento_opcoes.find(f=>f.id===formaId) || STATE.evento.formas_pagamento_opcoes[0]) : null;
-  const cupom = STATE.appliedCupom || null;
-  const regras = (STATE.evento && STATE.evento.regras_idade_precificacao) ? STATE.evento.regras_idade_precificacao : {hospedagem:[], evento:[]};
-  // ensure participantes have baseHosp/baseEvent/age (recalcParticipant should have set them when inputs changed)
-  const totals = window.priceCalculator.calcTotals(STATE.participantes, forma, cupom, regras);
-
-    // update participant UI values from totals.participants and persist into STATE
-    if(totals && Array.isArray(totals.participants)){
-      totals.participants.forEach((p, idx)=>{
-        const block = document.querySelector(`.participant-block[data-index='${idx}']`);
-        if(block){
-          block.querySelector('.val-hosp').textContent = (p.valorHospedagem || 0).toFixed(2);
-          block.querySelector('.val-event').textContent = (p.valorEvento || 0).toFixed(2);
-        }
-        // persist computed values back to state so payload/readback are accurate
-        STATE.participantes[idx] = STATE.participantes[idx] || {};
-        STATE.participantes[idx].valorHospedagem = +(p.valorHospedagem || 0);
-        STATE.participantes[idx].valorEvento = +(p.valorEvento || 0);
-      });
-      // persist to localStorage
-      saveState();
-    }
-
-    document.getElementById('subtotalHosp').textContent = totals.subtotalHospedagem.toFixed(2);
-    document.getElementById('subtotalEvent').textContent = totals.subtotalEvento.toFixed(2);
-    document.getElementById('totalPay').textContent = totals.total.toFixed(2);
-  }
-
-  // inicialização
-  console.log('Iniciando carregamento do evento');
-  
-  // Dados de eventos hardcoded para garantir o funcionamento
-  const eventosData = {
-    "eventos": [
-      {
-        "id": "G001",
-        "header": {
-          "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
-          "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
-          "partner_logos": [
-            "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
-            "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
-          ],
-          "logo_duplo": true
-        },
-        "nome": "Retiro de Bem-Estar e Meditação",
-        "descricao": "Retiro de 3 dias com hospedagem e workshops.",
-        "tipo_formulario": "hospedagem_e_evento",
-        "tipos_acomodacao": [
-          { "id": "indiv", "label": "Individual", "valor_diaria_por_pessoa": 250.00 },
-          { "id": "compart", "label": "Compartilhada", "valor_diaria_por_pessoa": 180.00 }
-        ],
-        "periodos_estadia_opcoes": [
-          {
-            "id": "padrao",
-            "label": "10/10 - 12/10",
-            "data_inicio": "2025-10-10T18:00",
-            "data_fim": "2025-10-12T14:00",
-            "num_diarias": 2,
-            "valores_evento_opcoes": [
-              { "id": "ideal_2dias", "label": "Ideal (2 dias)", "valor": 850.00 },
-              { "id": "social_2dias", "label": "Social (2 dias)", "valor": 700.00 }
-            ]
-          }
-        ],
-        "formas_pagamento_opcoes": [
-          { "id": "pix_vista", "label": "PIX à vista", "taxa_gateway_percentual": 0.01 },
-          { "id": "cartao", "label": "Cartão (parcelado)", "taxa_gateway_percentual": 0.035 }
-        ]
-      }
-    ]
-  };
-  
-  // Usar diretamente os dados hardcoded
-  console.log('Usando dados hardcoded');
-  const data = eventosData;
-  
-  // Obter o ID do evento da URL
-  const id = qs('evento');
-  let ev = null;
-  
-  if(id){ 
-    console.log('Buscando evento com ID:', id);
-    ev = data.eventos.find(e=>e.id === id);
-    if(!ev){
-      // Se o evento não for encontrado, mostrar mensagem de erro
-      const loadingMessage = document.getElementById('loadingMessage');
-      if(loadingMessage) {
-        loadingMessage.textContent = `Evento com ID ${id} não encontrado.`;
-        loadingMessage.style.display = 'block';
-      }
-      console.error(`Evento com ID ${id} não encontrado.`);
-    }
-  }
-  
-  if(!ev){ 
-    console.log('Usando evento padrão');
-    ev = data.eventos[0]; 
-  }
-  
-  console.log('Evento carregado:', ev.id, ev.nome);
-  
-  // Manipular diretamente os elementos DOM para garantir que a mensagem de carregamento seja ocultada
-  document.getElementById('loadingMessage').style.display = 'none';
-  document.getElementById('startBtn').style.display = 'block';
-  
-  // Definir o evento no estado e renderizar
-  STATE.evento = ev;
-  console.log('Renderizando cabeçalho com evento:', ev.nome);
-  renderHeader(ev);
-  
-  // Atualizar título e descrição diretamente
-  const eventTitle = document.getElementById('eventTitle');
-  const eventDescription = document.getElementById('eventDescription');
-  if(eventTitle) eventTitle.textContent = ev.nome || 'Evento';
-  if(eventDescription) eventDescription.textContent = ev.descricao || '';
-  
-  // Função para inicializar o aplicativo após carregar o evento
-  function initializeApp(ev) {
-    console.log('Inicializando aplicativo com evento:', ev.id);
+// Inicializa o formulário quando o documento estiver pronto
+$(document).ready(function() {
+    // Carrega os dados do evento
+    loadEventData();
     
-    if(ev){
-      // populate payment method select
-      const paySel = document.getElementById('paymentMethodSelect');
-      if(paySel && ev.formas_pagamento_opcoes){
-        paySel.innerHTML = '';
-        ev.formas_pagamento_opcoes.forEach(f=>{
-          const o = document.createElement('option'); o.value = f.id; o.textContent = `${f.label} (${(f.taxa_gateway_percentual*100).toFixed(1)}%)`; paySel.appendChild(o);
-        });
-        paySel.addEventListener('change', ()=>{ recalcAll(); });
-      }
+    // Inicializa máscaras para campos
+    initializeMasks();
+    
+    // Configura navegação entre etapas
+    setupNavigation();
+    
+    // Configura validações de formulário
+    setupValidations();
+    
+    // Verifica parâmetros da URL para pré-preenchimento
+    checkUrlParams();
+});
 
-      // restore persisted state if any
-      loadState();
+// Carrega os dados do evento do arquivo JSON
+function loadEventData() {
+    $.getJSON('events.json', function(data) {
+        eventData = data;
+        
+        // Inicializa o calculador de preços
+        calculator = new PriceCalculator(eventData);
+        
+        // Preenche os selects com dados do evento
+        populateSelects();
+        
+        // Adiciona o primeiro participante
+        addParticipant();
+    }).fail(function() {
+        showError('Erro ao carregar dados do evento. Por favor, recarregue a página.');
+    });
+}
 
-      // if persisted participants exist, ensure UI uses them; otherwise start with one
-      if(!STATE.participantes || STATE.participantes.length === 0) STATE.participantes = [{}];
+// Inicializa máscaras para campos de formulário
+function initializeMasks() {
+    $('.date-mask').mask('00/00/0000');
+    $('.phone-mask').mask('(00) 00000-0000');
+    $('.cep-mask').mask('00000-000');
+}
 
-      // coupon apply handler (extract so it can be re-run when payment method changes)
-      const applyBtn = document.getElementById('applyCouponBtn');
-      const couponInput = document.getElementById('couponCode');
-      const couponMsg = document.getElementById('couponMsg');
-      function applyCouponFromInput(){
-        const code = (couponInput.value || '').trim();
-        if(!code){ couponMsg.textContent = 'Informe um código.'; STATE.appliedCupom = null; recalcAll(); return; }
-        const found = (ev.cupons_desconto || []).find(c=>c.codigo.toUpperCase() === code.toUpperCase());
-        if(!found){ couponMsg.textContent = 'Cupom inválido ou expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
-        // validate expiry
-        if(found.data_validade_fim){
-          const now = new Date();
-          const until = new Date(found.data_validade_fim);
-          if(now > until){ couponMsg.textContent = 'Cupom expirado.'; STATE.appliedCupom = null; recalcAll(); return; }
-        }
-        STATE.appliedCupom = found;
-        couponMsg.textContent = `Cupom aplicado: ${found.codigo}`;
-        recalcAll();
-        saveState();
-      }
-      // auto-apply on coupon input (debounced) and reapply on payment method change
-      if(couponInput){
-        let timer = null;
-        couponInput.addEventListener('input', ()=>{
-          clearTimeout(timer);
-          timer = setTimeout(()=>{ applyCouponFromInput(); }, 450);
-        });
-      }
-      if(document.getElementById('paymentMethodSelect')){
-        document.getElementById('paymentMethodSelect').addEventListener('change', ()=>{ applyCouponFromInput(); recalcAll(); });
-      }
-      // preparar UI
-      const addBtn = document.getElementById('addParticipant');
-      addBtn.addEventListener('click', ()=>{
-        STATE.participantes.push({});
-        rebuildParticipants();
-        recalcAll();
-        saveState();
-      });
-
-      // inicialmente 1 participante
-  STATE.participantes = [{}];
-      rebuildParticipants();
-      recalcAll();
-      // wire preview/submit
-      const previewBtn = document.getElementById('previewBtn');
-      const submitBtn = document.getElementById('submitBtn');
-      const previewArea = document.getElementById('previewArea');
-      function buildPayload(){
-        const payload = {
-          evento: { id: ev.id, nome: ev.nome },
-          participantes: STATE.participantes.map((p,idx)=>({
-            index: idx,
-            nome: p.nome || null,
-            telefone: p.telefone || null,
-            cpf: p.cpf || null,
-            data_nasc: p.data_nasc || null,
-            acomodacao: p.acomodacao || null,
-            periodo: p.periodo || null,
-            evento_opcao: p.evento_opcao || null,
-            valorHospedagem: p.valorHospedagem || 0,
-            valorEvento: p.valorEvento || 0
-          })),
-          totals: {
-            subtotalHospedagem: document.getElementById('subtotalHosp').textContent,
-            subtotalEvento: document.getElementById('subtotalEvent').textContent,
-            total: document.getElementById('totalPay').textContent
-          },
-          cupom: STATE.appliedCupom || null,
-          forma_pagamento: document.getElementById('paymentMethodSelect') ? document.getElementById('paymentMethodSelect').value : null,
-          responsavel: (typeof STATE.responsavel === 'number') ? STATE.responsavel : null
-        };
-        return payload;
-      }
-
-      if(previewBtn){
-        previewBtn.addEventListener('click', ()=>{
-          const payload = buildPayload();
-          previewArea.style.display = 'block';
-          previewArea.innerHTML = '<div class="preview-json">' + JSON.stringify(payload, null, 2) + '</div>';
-        });
-      }
-
-      if(submitBtn){
-        submitBtn.addEventListener('click', async ()=>{
-          // validation: require responsavel when more than one participant
-          if(STATE.participantes.length > 1 && (typeof STATE.responsavel !== 'number' || STATE.responsavel === null)){
-            const previewArea = document.getElementById('previewArea');
-            previewArea.style.display = 'block';
-            previewArea.innerHTML = '<div class="preview-json">Selecione o responsável pelo pagamento antes de enviar.</div>';
-            return;
-          }
-          submitBtn.disabled = true; submitBtn.textContent = 'Enviando...';
-          const payload = buildPayload();
-          // add inscricao id
-          const inscricaoId = generateInscricaoId();
-          payload.inscricao_id = inscricaoId;
-          // prefer event-specific payment link webhook if provided
-          const paymentWebhook = ev.payment_link_webhook_url;
-          const submitWebhook = ev.webhook_url || 'https://httpbin.org/post';
-          try{
-            if(paymentWebhook){
-              // call payment link webhook with 5s timeout
-              const controller = new AbortController();
-              const id = setTimeout(()=>controller.abort(), 5000);
-              const res = await fetch(paymentWebhook, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), signal: controller.signal});
-              clearTimeout(id);
-              if(!res.ok) throw new Error('Erro no webhook de pagamento: '+res.status);
-              const json = await res.json();
-              // render link and keep saved state until user confirms
-              renderPaymentLinkResult(json);
-              // also POST to submission webhook in background (fire-and-forget) to register the inscrição
-              try{ fetch(submitWebhook, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)}).catch(()=>{}); }catch(e){}
-            } else {
-              // fallback: submit to standard webhook and show response
-              const res = await fetch(submitWebhook, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-              const json = await res.json();
-              previewArea.style.display = 'block';
-              previewArea.innerHTML = '<div class="preview-json">' + JSON.stringify({status:res.status, response:json}, null, 2) + '</div>';
-              // if response contains link, render payment link UI
-              if(json && json.link) renderPaymentLinkResult(json);
-              // clear saved state on success
-              localStorage.removeItem(STORAGE_KEY);
+// Configura a navegação entre etapas do formulário
+function setupNavigation() {
+    // Botões de próximo
+    $('.btn-next').click(function() {
+        const currentStepElement = $(`.step-${currentStep}`);
+        
+        // Valida a etapa atual antes de prosseguir
+        if (validateStep(currentStep)) {
+            // Se for a etapa de participantes, processa os dados antes de avançar
+            if (currentStep === 2) {
+                processParticipantsData();
+                updatePriceSummary();
             }
-          }catch(e){
-            const isAbort = (e.name === 'AbortError');
-            previewArea.style.display = 'block';
-            previewArea.innerHTML = '<div class="preview-json">Erro ao enviar: '+ (isAbort? 'Tempo limite atingido.' : (e.message || e)) +'</div>';
-          }finally{ submitBtn.disabled = false; submitBtn.textContent = 'Enviar Reserva'; }
-        });
-      }
-    }
-  }
-  
-  // Chamar a função para inicializar o aplicativo
-  initializeApp(ev);
+            
+            // Esconde a etapa atual e mostra a próxima
+            currentStepElement.hide();
+            currentStep++;
+            $(`.step-${currentStep}`).show();
+            
+            // Atualiza o indicador de progresso
+            updateProgressIndicator();
+            
+            // Rola para o topo da página
+            window.scrollTo(0, 0);
+        }
+    });
+    
+    // Botões de voltar
+    $('.btn-prev').click(function() {
+        const currentStepElement = $(`.step-${currentStep}`);
+        
+        // Esconde a etapa atual e mostra a anterior
+        currentStepElement.hide();
+        currentStep--;
+        $(`.step-${currentStep}`).show();
+        
+        // Atualiza o indicador de progresso
+        updateProgressIndicator();
+        
+        // Rola para o topo da página
+        window.scrollTo(0, 0);
+    });
+    
+    // Inicialmente, mostra apenas a primeira etapa
+    $('.step').hide();
+    $('.step-1').show();
+    
+    // Inicializa o indicador de progresso
+    updateProgressIndicator();
+}
 
-  // hook start button to scroll to form and navigation buttons
-  const start = el('startBtn');
-  if(start) start.addEventListener('click', ()=>{
-    document.getElementById('formArea').scrollIntoView({behavior:'smooth'});
-    // If we have page navigation, go to first page
-    if(document.querySelector('.form-page')) {
-      showPage(0);
+// Atualiza o indicador de progresso
+function updateProgressIndicator() {
+    $('.progress-step').removeClass('active completed');
+    
+    // Marca as etapas anteriores como concluídas
+    for (let i = 1; i < currentStep; i++) {
+        $(`.progress-step[data-step="${i}"]`).addClass('completed');
     }
-  });
-  
-  // Add event listeners for navigation buttons
-  const nextButtons = document.querySelectorAll('.btn-next');
-  nextButtons.forEach(btn => {
-    btn.addEventListener('click', goToNextPage);
-  });
-  
-  const prevButtons = document.querySelectorAll('.btn-prev');
-  prevButtons.forEach(btn => {
-    btn.addEventListener('click', goToPreviousPage);
-  });
-  
-  // Initialize page display based on saved state
-  if(document.querySelector('.form-page')) {
-    showPage(STATE.currentPage || 0);
-  }
-  
+    
+    // Marca a etapa atual como ativa
+    $(`.progress-step[data-step="${currentStep}"]`).addClass('active');
+}
+
+// Configura validações de formulário
+function setupValidations() {
+    // Validação em tempo real para campos obrigatórios
+    $(document).on('blur', '.required', function() {
+        validateField($(this));
+    });
+    
+    // Validação de e-mail
+    $(document).on('blur', '.email-field', function() {
+        validateEmail($(this));
+    });
+    
+    // Validação de data
+    $(document).on('blur', '.date-mask', function() {
+        validateDate($(this));
+    });
+    
+    // Validação de CPF já implementada no cpfValidation.js
+    
+    // Validação de CEP com preenchimento automático
+    $(document).on('blur', '.cep-mask', function() {
+        const cepInput = $(this);
+        const cep = cepInput.val().replace(/\D/g, '');
+        
+        if (cep.length === 8) {
+            // Consulta o CEP via API ViaCEP
+            $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(data) {
+                if (!data.erro) {
+                    // Preenche os campos de endereço
+                    const participantForm = cepInput.closest('.participant-form');
+                    participantForm.find('.street-field').val(data.logradouro);
+                    participantForm.find('.neighborhood-field').val(data.bairro);
+                    participantForm.find('.city-field').val(data.localidade);
+                    participantForm.find('.state-field').val(data.uf);
+                } else {
+                    showFieldError(cepInput, 'CEP não encontrado');
+                }
+            }).fail(function() {
+                showFieldError(cepInput, 'Erro ao consultar CEP');
+            });
+        }
+    });
+    
+    // Validação e aplicação de cupom
+    $('#apply-coupon').click(function() {
+        const couponCode = $('#coupon-code').val().trim();
+        
+        if (couponCode) {
+            const result = calculator.applyCoupon(couponCode);
+            
+            if (result.success) {
+                $('#coupon-message').removeClass('error').addClass('success').text(result.message);
+                updatePriceSummary();
+            } else {
+                $('#coupon-message').removeClass('success').addClass('error').text(result.message);
+            }
+        } else {
+            $('#coupon-message').removeClass('success').addClass('error').text('Digite um código de cupom');
+        }
+    });
+    
+    // Remover cupom
+    $('#remove-coupon').click(function() {
+        calculator.removeCoupon();
+        $('#coupon-code').val('');
+        $('#coupon-message').text('');
+        updatePriceSummary();
+    });
+}
+
+// Valida um campo específico
+function validateField(field) {
+    const value = field.val().trim();
+    const errorMessage = field.siblings('.error-message');
+    
+    if (field.hasClass('required') && value === '') {
+        errorMessage.text('Este campo é obrigatório');
+        field.addClass('invalid-input');
+        return false;
+    } else {
+        errorMessage.text('');
+        field.removeClass('invalid-input');
+        return true;
+    }
+}
+
+// Valida um campo de e-mail
+function validateEmail(field) {
+    const value = field.val().trim();
+    const errorMessage = field.siblings('.error-message');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (value !== '' && !emailRegex.test(value)) {
+        errorMessage.text('E-mail inválido');
+        field.addClass('invalid-input');
+        return false;
+    } else {
+        return validateField(field);
+    }
+}
+
+// Valida um campo de data
+function validateDate(field) {
+    const value = field.val().trim();
+    const errorMessage = field.siblings('.error-message');
+    
+    if (value !== '') {
+        // Verifica o formato da data (DD/MM/AAAA)
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
+        
+        if (!dateRegex.test(value)) {
+            errorMessage.text('Data inválida');
+            field.addClass('invalid-input');
+            return false;
+        }
+        
+        // Converte para objeto Date e verifica se é uma data válida
+        const parts = value.split('/');
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Mês em JavaScript é 0-11
+        const year = parseInt(parts[2], 10);
+        const date = new Date(year, month, day);
+        
+        if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
+            errorMessage.text('Data inválida');
+            field.addClass('invalid-input');
+            return false;
+        }
+        
+        // Verifica se a data de nascimento não é futura
+        if (field.hasClass('birth-date')) {
+            const today = new Date();
+            if (date > today) {
+                errorMessage.text('Data de nascimento não pode ser futura');
+                field.addClass('invalid-input');
+                return false;
+            }
+        }
+        
+        errorMessage.text('');
+        field.removeClass('invalid-input');
+        return true;
+    } else {
+        return validateField(field);
+    }
+}
+
+// Mostra erro em um campo específico
+function showFieldError(field, message) {
+    const errorMessage = field.siblings('.error-message');
+    errorMessage.text(message);
+    field.addClass('invalid-input');
+}
+
+// Mostra mensagem de erro geral
+function showError(message) {
+    $('#error-message').text(message).show();
+    setTimeout(function() {
+        $('#error-message').fadeOut();
+    }, 5000);
+}
+
+// Valida uma etapa inteira do formulário
+function validateStep(step) {
+    let isValid = true;
+    
+    // Valida todos os campos obrigatórios na etapa atual
+    $(`.step-${step} .required`).each(function() {
+        if (!validateField($(this))) {
+            isValid = false;
+        }
+    });
+    
+    // Valida campos de e-mail na etapa atual
+    $(`.step-${step} .email-field`).each(function() {
+        if (!validateEmail($(this))) {
+            isValid = false;
+        }
+    });
+    
+    // Valida campos de data na etapa atual
+    $(`.step-${step} .date-mask`).each(function() {
+        if (!validateDate($(this))) {
+            isValid = false;
+        }
+    });
+    
+    // Valida campos de CPF na etapa atual
+    $(`.step-${step} .cpf-mask`).each(function() {
+        const cpfInput = $(this);
+        const cpfValue = cpfInput.val();
+        const errorMessage = cpfInput.siblings('.error-message');
+        
+        if (cpfValue.length > 0 && !validarCPF(cpfValue)) {
+            errorMessage.text('CPF inválido. Por favor, verifique.');
+            cpfInput.addClass('invalid-input');
+            isValid = false;
+        }
+    });
+    
+    // Se a etapa não for válida, mostra uma mensagem de erro
+    if (!isValid) {
+        showError('Por favor, corrija os campos destacados antes de prosseguir.');
+    }
+    
+    return isValid;
+}
+
+// Preenche os selects com dados do evento
+function populateSelects() {
+    if (!eventData) return;
+    
+    // Template para o select de períodos
+    const periodTemplate = $('#period-template');
+    const periodSelect = periodTemplate.html();
+    
+    // Adiciona as opções de períodos
+    let periodOptions = '<option value="">Selecione o período</option>';
+    eventData.periodos.forEach(function(period) {
+        periodOptions += `<option value="${period.id}">${period.nome} (${period.data_inicio} a ${period.data_fim})</option>`;
+    });
+    
+    // Atualiza o template com as opções
+    const updatedPeriodSelect = periodSelect.replace('<!-- period-options -->', periodOptions);
+    $('#period-template').html(updatedPeriodSelect);
+    
+    // Template para o select de acomodações
+    const accommodationTemplate = $('#accommodation-template');
+    const accommodationSelect = accommodationTemplate.html();
+    
+    // Adiciona as opções de acomodações
+    let accommodationOptions = '<option value="">Selecione a acomodação</option>';
+    eventData.acomodacoes.forEach(function(accommodation) {
+        accommodationOptions += `<option value="${accommodation.id}">${accommodation.nome} - ${accommodation.descricao}</option>`;
+    });
+    
+    // Atualiza o template com as opções
+    const updatedAccommodationSelect = accommodationSelect.replace('<!-- accommodation-options -->', accommodationOptions);
+    $('#accommodation-template').html(updatedAccommodationSelect);
+    
+    // Template para o select de opções de evento
+    const eventOptionTemplate = $('#event-option-template');
+    const eventOptionSelect = eventOptionTemplate.html();
+    
+    // Adiciona as opções de participação no evento
+    let eventOptions = '<option value="">Selecione a opção de participação</option>';
+    eventData.opcoes_evento.forEach(function(option) {
+        eventOptions += `<option value="${option.id}">${option.nome} - ${option.descricao}</option>`;
+    });
+    
+    // Atualiza o template com as opções
+    const updatedEventOptionSelect = eventOptionSelect.replace('<!-- event-options -->', eventOptions);
+    $('#event-option-template').html(updatedEventOptionSelect);
+}
+
+// Adiciona um novo participante ao formulário
+function addParticipant() {
+    const participantsContainer = $('#participants-container');
+    const participantCount = participantsContainer.children('.participant-form').length;
+    const newIndex = participantCount + 1;
+    
+    // Clona o template do participante
+    const participantTemplate = $('#participant-template').html();
+    const newParticipant = participantTemplate
+        .replace(/\{index\}/g, newIndex)
+        .replace('Participante {number}', `Participante ${newIndex}`);
+    
+    // Adiciona o novo participante ao container
+    participantsContainer.append(newParticipant);
+    
+    // Inicializa as máscaras para os novos campos
+    $(`#participant-${newIndex} .date-mask`).mask('00/00/0000');
+    $(`#participant-${newIndex} .phone-mask`).mask('(00) 00000-0000');
+    $(`#participant-${newIndex} .cpf-mask`).mask('000.000.000-00');
+    $(`#participant-${newIndex} .cep-mask`).mask('00000-000');
+    
+    // Atualiza os selects com as opções do evento
+    updateParticipantSelects(newIndex);
+    
+    // Atualiza os botões de remover participante
+    updateRemoveButtons();
+    
+    // Configura os eventos de cálculo de preço
+    setupPriceCalculation(newIndex);
+}
+
+// Atualiza os selects de um participante específico
+function updateParticipantSelects(index) {
+    // Período
+    const periodTemplate = $('#period-template').html();
+    $(`#participant-${index} .period-select-container`).html(periodTemplate);
+    
+    // Acomodação
+    const accommodationTemplate = $('#accommodation-template').html();
+    $(`#participant-${index} .accommodation-select-container`).html(accommodationTemplate);
+    
+    // Opção de evento
+    const eventOptionTemplate = $('#event-option-template').html();
+    $(`#participant-${index} .event-option-select-container`).html(eventOptionTemplate);
+}
+
+// Atualiza os botões de remover participante
+function updateRemoveButtons() {
+    const participantForms = $('.participant-form');
+    
+    // Esconde todos os botões de remover
+    $('.btn-remove-participant').hide();
+    
+    // Se houver mais de um participante, mostra os botões de remover
+    if (participantForms.length > 1) {
+        $('.btn-remove-participant').show();
+    }
+}
+
+// Remove um participante do formulário
+function removeParticipant(index) {
+    $(`#participant-${index}`).remove();
+    
+    // Renumera os participantes restantes
+    $('.participant-form').each(function(i) {
+        const newIndex = i + 1;
+        const currentIndex = parseInt($(this).attr('id').replace('participant-', ''));
+        
+        if (currentIndex !== newIndex) {
+            // Atualiza o ID e o título
+            $(this).attr('id', `participant-${newIndex}`);
+            $(this).find('.participant-title').text(`Participante ${newIndex}`);
+            
+            // Atualiza os IDs e names dos campos
+            $(this).find('[id*="participant-"]').each(function() {
+                const newId = $(this).attr('id').replace(`participant-${currentIndex}`, `participant-${newIndex}`);
+                $(this).attr('id', newId);
+            });
+            
+            $(this).find('[name*="participant-"]').each(function() {
+                const newName = $(this).attr('name').replace(`participant-${currentIndex}`, `participant-${newIndex}`);
+                $(this).attr('name', newName);
+            });
+            
+            // Atualiza o botão de remover
+            $(this).find('.btn-remove-participant').attr('onclick', `removeParticipant(${newIndex})`);
+        }
+    });
+    
+    // Atualiza os botões de remover
+    updateRemoveButtons();
+    
+    // Atualiza o cálculo de preço
+    processParticipantsData();
+    updatePriceSummary();
+}
+
+// Configura os eventos de cálculo de preço para um participante
+function setupPriceCalculation(index) {
+    // Atualiza o preço quando o período, acomodação, opção de evento ou data de nascimento mudar
+    $(`#participant-${index} .period-select, #participant-${index} .accommodation-select, #participant-${index} .event-option-select, #participant-${index} .birth-date`).change(function() {
+        // Atualiza os dados do participante no calculador
+        processParticipantData(index);
+        
+        // Atualiza o resumo de preços
+        updatePriceSummary();
+    });
+}
+
+// Processa os dados de um participante específico
+function processParticipantData(index) {
+    if (!calculator) return;
+    
+    const participantForm = $(`#participant-${index}`);
+    const periodId = participantForm.find('.period-select').val();
+    const accommodationType = participantForm.find('.accommodation-select').val();
+    const participationType = participantForm.find('.event-option-select').val();
+    const birthDateStr = participantForm.find('.birth-date').val();
+    
+    // Converte a data de nascimento para o formato ISO
+    let birthDate = null;
+    if (birthDateStr) {
+        const parts = birthDateStr.split('/');
+        if (parts.length === 3) {
+            birthDate = `${parts[2]}-${parts[1]}-${parts[0]}`; // AAAA-MM-DD
+        }
+    }
+    
+    // Cria o objeto do participante
+    const participant = {
+        name: participantForm.find('.participant-name').val(),
+        birthDate: birthDate,
+        periodId: periodId,
+        accommodationType: accommodationType,
+        participationType: participationType
+    };
+    
+    // Atualiza ou adiciona o participante no calculador
+    if (index - 1 < calculator.participants.length) {
+        calculator.updateParticipant(index - 1, participant);
+    } else {
+        calculator.addParticipant(participant);
+    }
+    
+    return participant;
+}
+
+// Processa os dados de todos os participantes
+function processParticipantsData() {
+    if (!calculator) return;
+    
+    // Limpa os participantes existentes
+    calculator.participants = [];
+    
+    // Processa cada participante
+    $('.participant-form').each(function() {
+        const index = parseInt($(this).attr('id').replace('participant-', ''));
+        processParticipantData(index);
+    });
+}
+
+// Atualiza o resumo de preços
+function updatePriceSummary() {
+    if (!calculator) return;
+    
+    const totals = calculator.calculateTotal();
+    
+    // Atualiza os valores no resumo
+    $('#accommodation-total').text(`R$ ${totals.accommodationTotal.toFixed(2)}`);
+    $('#event-total').text(`R$ ${totals.eventTotal.toFixed(2)}`);
+    
+    // Atualiza o desconto do cupom se houver
+    if (totals.couponDiscount > 0) {
+        $('#coupon-discount-row').show();
+        $('#coupon-discount').text(`R$ ${totals.couponDiscount.toFixed(2)}`);
+    } else {
+        $('#coupon-discount-row').hide();
+    }
+    
+    // Atualiza o total geral
+    $('#total-price').text(`R$ ${totals.total.toFixed(2)}`);
+    
+    // Atualiza o resumo de participantes
+    updateParticipantsSummary();
+}
+
+// Atualiza o resumo de participantes
+function updateParticipantsSummary() {
+    if (!calculator || !calculator.participants.length) return;
+    
+    const participantsSummary = $('#participants-summary');
+    participantsSummary.empty();
+    
+    // Adiciona cada participante ao resumo
+    calculator.participants.forEach(function(participant, index) {
+        if (!participant.name) return;
+        
+        // Encontra os detalhes do período, acomodação e opção de evento
+        const period = eventData.periodos.find(p => p.id === participant.periodId);
+        const accommodation = eventData.acomodacoes.find(a => a.id === participant.accommodationType);
+        const eventOption = eventData.opcoes_evento.find(o => o.id === participant.participationType);
+        
+        // Calcula os preços individuais
+        const accommodationPrice = calculator.calculateAccommodationPrice(
+            participant.accommodationType,
+            participant.periodId,
+            participant.birthDate
+        );
+        
+        const eventPrice = calculator.calculateEventPrice(
+            participant.participationType,
+            participant.periodId,
+            participant.birthDate
+        );
+        
+        // Cria o HTML do resumo do participante
+        let html = `
+            <div class="participant-summary">
+                <h4>Participante ${index + 1}: ${participant.name}</h4>
+                <div class="summary-details">
+        `;
+        
+        if (period) {
+            html += `<p><strong>Período:</strong> ${period.nome}</p>`;
+        }
+        
+        if (accommodation) {
+            html += `<p><strong>Acomodação:</strong> ${accommodation.nome} - R$ ${accommodationPrice.toFixed(2)}</p>`;
+        }
+        
+        if (eventOption) {
+            html += `<p><strong>Opção de Evento:</strong> ${eventOption.nome} - R$ ${eventPrice.toFixed(2)}</p>`;
+        }
+        
+        html += `
+                    <p><strong>Subtotal:</strong> R$ ${(accommodationPrice + eventPrice).toFixed(2)}</p>
+                </div>
+            </div>
+        `;
+        
+        participantsSummary.append(html);
+    });
+}
+
+// Verifica parâmetros da URL para pré-preenchimento
+function checkUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Pré-preenche o nome do responsável
+    if (urlParams.has('nome')) {
+        $('#responsible-name').val(urlParams.get('nome'));
+    }
+    
+    // Pré-preenche o e-mail do responsável
+    if (urlParams.has('email')) {
+        $('#responsible-email').val(urlParams.get('email'));
+    }
+    
+    // Pré-preenche o telefone do responsável
+    if (urlParams.has('telefone')) {
+        $('#responsible-phone').val(urlParams.get('telefone'));
+    }
+    
+    // Pré-preenche o período
+    if (urlParams.has('periodo')) {
+        const periodId = urlParams.get('periodo');
+        // O select será preenchido quando os dados do evento forem carregados
+        // Armazena o valor para ser usado após o carregamento
+        window.prefilledPeriod = periodId;
+    }
+}
+
+// Função para enviar o formulário
+function submitForm() {
+    // Valida a etapa final antes de enviar
+    if (!validateStep(currentStep)) {
+        return;
+    }
+    
+    // Coleta todos os dados do formulário
+    const formData = {
+        responsible: {
+            name: $('#responsible-name').val(),
+            email: $('#responsible-email').val(),
+            phone: $('#responsible-phone').val()
+        },
+        participants: [],
+        payment: {
+            method: $('input[name="payment-method"]:checked').val(),
+            installments: $('#installments').val(),
+            couponCode: calculator.couponCode
+        },
+        totals: calculator.calculateTotal()
+    };
+    
+    // Coleta os dados de cada participante
+    $('.participant-form').each(function() {
+        const index = parseInt($(this).attr('id').replace('participant-', ''));
+        const participantForm = $(`#participant-${index}`);
+        
+        const participant = {
+            name: participantForm.find('.participant-name').val(),
+            email: participantForm.find('.participant-email').val(),
+            phone: participantForm.find('.participant-phone').val(),
+            cpf: participantForm.find('.cpf-mask').val(),
+            birthDate: participantForm.find('.birth-date').val(),
+            address: {
+                cep: participantForm.find('.cep-mask').val(),
+                street: participantForm.find('.street-field').val(),
+                number: participantForm.find('.number-field').val(),
+                complement: participantForm.find('.complement-field').val(),
+                neighborhood: participantForm.find('.neighborhood-field').val(),
+                city: participantForm.find('.city-field').val(),
+                state: participantForm.find('.state-field').val()
+            },
+            period: participantForm.find('.period-select').val(),
+            accommodation: participantForm.find('.accommodation-select').val(),
+            eventOption: participantForm.find('.event-option-select').val()
+        };
+        
+        formData.participants.push(participant);
+    });
+    
+    // Exibe mensagem de sucesso e oculta o formulário
+    $('.form-container').hide();
+    $('.success-message').show();
+    
+    // Rola para o topo da página
+    window.scrollTo(0, 0);
+    
+    // Aqui você pode adicionar o código para enviar os dados para o servidor
+    console.log('Dados do formulário:', formData);
+    
+    // Exemplo de envio via AJAX (descomentado para implementação real)
+    /*
+    $.ajax({
+        url: 'https://api.example.com/submit-registration',
+        type: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function(response) {
+            // Exibe mensagem de sucesso e oculta o formulário
+            $('.form-container').hide();
+            $('.success-message').show();
+            
+            // Rola para o topo da página
+            window.scrollTo(0, 0);
+        },
+        error: function(xhr, status, error) {
+            showError('Erro ao enviar o formulário. Por favor, tente novamente.');
+            console.error('Erro:', error);
+        }
+    });
+    */
+}
+
+// Botão para adicionar participante
+$('#add-participant-btn').click(function() {
+    addParticipant();
+});
+
+// Botão para enviar o formulário
+$('#submit-form-btn').click(function() {
+    submitForm();
 });
