@@ -624,7 +624,286 @@ function validateSummaryStep() {
         alert('Por favor, aceite os termos e condições.');
         return false;
     }
+    // Adicionar estas funções ao final do script.js existente
+
+// Configurar etapa de resumo
+function setupSummaryStep() {
+    // Atualizar dados do calculador com método de pagamento
+    if (selectedPaymentMethod) {
+        priceCalculator.setPaymentMethod(selectedPaymentMethod);
+    }
     
+    // Gerar resumo dos participantes
+    generateParticipantsSummary();
+    
+    // Atualizar todos os cálculos
+    updateAllCalculations();
+    
+    // Configurar cupom se já havia um aplicado
+    const currentCoupon = $('#coupon-code').val();
+    if (currentCoupon) {
+        applyCoupon(currentCoupon);
+    }
+}
+
+// Gerar resumo dos participantes
+function generateParticipantsSummary() {
+    const $summaryContent = $('#summary-content');
+    let summaryHtml = '';
+    
+    // Identificar responsável pelo pagamento
+    const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
+    let responsiblePayerData = null;
+    
+    if ($responsiblePayer.length > 0) {
+        responsiblePayerData = extractParticipantData($responsiblePayer);
+    } else if (participants.length === 1) {
+        // Se só há um participante, ele é o responsável
+        responsiblePayerData = extractParticipantData($('#participants-container .participant-block').first());
+    }
+    
+    // Seção do responsável pelo pagamento
+    if (responsiblePayerData) {
+        summaryHtml += `
+            <div class="responsible-payer-summary">
+                <h3>👤 Responsável pelo Pagamento</h3>
+                <div class="payer-info">
+                    <p><strong>Nome:</strong> ${responsiblePayerData.fullName}</p>
+                    <p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>
+                    <p><strong>Email:</strong> ${responsiblePayerData.email}</p>
+                    <p><strong>Telefone:</strong> ${responsiblePayerData.phone}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Detalhamento por participante
+    summaryHtml += `
+        <div class="participants-summary">
+            <h3>📋 Detalhamento por Participante</h3>
+    `;
+    
+    $('#participants-container .participant-block').each(function(index) {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        const participantNumber = index + 1;
+        
+        // Calcular valores individuais
+        const lodgingValue = priceCalculator ? priceCalculator.calculateLodgingValue(participantData) : 0;
+        const eventValue = priceCalculator ? priceCalculator.calculateEventValue(participantData) : 0;
+        
+        // Obter descrições das opções selecionadas
+        const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
+        const accommodationLabel = getAccommodationLabel(participantData.accommodation);
+        const eventOptionLabel = getEventOptionLabel(participantData.eventOption, participantData.stayPeriod);
+        
+        summaryHtml += `
+            <div class="participant-summary-item">
+                <h4>👤 Participante ${participantNumber}: ${participantData.fullName}</h4>
+                <div class="participant-details">
+        `;
+        
+        // Mostrar detalhes baseado no tipo de formulário
+        if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            summaryHtml += `
+                <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
+                <p><strong>Período:</strong> ${stayPeriodLabel}</p>
+                <p><strong>Valor da Hospedagem:</strong> ${priceCalculator.formatCurrency(lodgingValue)}</p>
+            `;
+        }
+        
+        if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            summaryHtml += `
+                <p><strong>Evento:</strong> ${eventOptionLabel}</p>
+                <p><strong>Valor do Evento:</strong> ${priceCalculator.formatCurrency(eventValue)}</p>
+            `;
+        }
+        
+        summaryHtml += `
+                </div>
+            </div>
+        `;
+    });
+    
+    summaryHtml += '</div>';
+    
+    $summaryContent.html(summaryHtml);
+}
+
+// Obter label do período de estadia
+function getStayPeriodLabel(stayPeriodId) {
+    if (!stayPeriodId) return 'Não selecionado';
+    
+    const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
+    return periodo ? periodo.label : 'Período não encontrado';
+}
+
+// Obter label da acomodação
+function getAccommodationLabel(accommodationId) {
+    if (!accommodationId) return 'Não selecionado';
+    
+    const acomodacao = currentEvent.tipos_acomodacao.find(a => a.id === accommodationId);
+    return acomodacao ? acomodacao.label : 'Acomodação não encontrada';
+}
+
+// Obter label da opção de evento
+function getEventOptionLabel(eventOptionId, stayPeriodId) {
+    if (!eventOptionId) return 'Não selecionado';
+    
+    let eventOptions = [];
+    
+    if (currentEvent.tipo_formulario === 'evento_apenas') {
+        eventOptions = currentEvent.valores_evento_opcoes;
+    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento' && stayPeriodId) {
+        const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
+        eventOptions = periodo ? (periodo.valores_evento_opcoes || []) : [];
+    }
+    
+    const eventOption = eventOptions.find(e => e.id === eventOptionId);
+    return eventOption ? eventOption.label : 'Opção não encontrada';
+}
+
+// Atualizar método de pagamento (sobrescrever função existente)
+function updatePaymentMethod() {
+    const selectedId = $('#payment-method').val();
+    const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
+    
+    if (forma) {
+        $('#payment-method-description').text(forma.descricao);
+        selectedPaymentMethod = forma;
+        
+        // Atualizar calculador
+        if (priceCalculator) {
+            priceCalculator.setPaymentMethod(forma);
+        }
+        
+        // Recalcular totais com nova taxa de gateway
+        updateAllCalculations();
+    }
+}
+
+// Configurar interface com dados do evento (atualizar função existente)
+function setupEventInterface() {
+    // Configurar header se disponível
+    if (currentEvent.header) {
+        setupEventHeader();
+    }
+    
+    // Preencher informações básicas
+    $('#event-title').text(currentEvent.nome);
+    $('#event-description').text(currentEvent.descricao);
+    
+    if (currentEvent.observacoes_adicionais) {
+        $('#event-observations').text(currentEvent.observacoes_adicionais).show();
+    } else {
+        $('#event-observations').hide();
+    }
+    
+    // Configurar link dos termos
+    $('#terms-link').attr('href', currentEvent.politicas_evento_url);
+    
+    // Inicializar calculador de preços
+    initializePriceCalculator(currentEvent);
+    
+    // Mostrar botão de avançar
+    $('#start-form-btn').show();
+}
+
+// Submeter formulário
+function submitForm() {
+    if (!validateSummaryStep()) {
+        return;
+    }
+    
+    // Gerar ID único da inscrição
+    const inscricaoId = generateInscricaoId();
+    
+    // Preparar dados para envio
+    const formData = prepareFormData(inscricaoId);
+    
+    // Simular envio (substituir por chamada real ao webhook)
+    console.log('Dados do formulário:', formData);
+    
+    // Ir para tela de confirmação
+    showConfirmation(inscricaoId, formData);
+}
+
+// Gerar ID único da inscrição
+function generateInscricaoId() {
+    const year = new Date().getFullYear();
+    const timestamp = Date.now().toString().slice(-6);
+    return `FS${year}${timestamp}`;
+}
+
+// Preparar dados do formulário
+function prepareFormData(inscricaoId) {
+    const summary = priceCalculator.getCalculationSummary();
+    
+    // Coletar dados dos participantes
+    const participantsData = [];
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        
+        participantsData.push({
+            ...participantData,
+            valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
+            valorEvento: priceCalculator.calculateEventValue(participantData),
+            idade: priceCalculator.calculateAge(participantData.birthDate)
+        });
+    });
+    
+    // Identificar responsável pelo pagamento
+    const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
+    
+    return {
+        inscricao_id: inscricaoId,
+        evento: {
+            id: currentEvent.id,
+            nome: currentEvent.nome,
+            tipo_formulario: currentEvent.tipo_formulario
+        },
+        responsavel: {
+            nome: responsiblePayer.fullName,
+            cpf: responsiblePayer.cpf,
+            email: responsiblePayer.email,
+            telefone: responsiblePayer.phone
+        },
+        participantes: participantsData,
+        totais: {
+            subtotalHospedagem: summary.lodgingSubtotal,
+            subtotalEvento: summary.eventSubtotal,
+            desconto: summary.discount,
+            total: summary.finalTotal
+        },
+        forma_pagamento: selectedPaymentMethod,
+        cupom: priceCalculator.appliedCoupon,
+        timestamp: new Date().toISOString()
+    };
+}
+
+// Mostrar confirmação
+function showConfirmation(inscricaoId, formData) {
+    // Preencher dados da confirmação
+    $('#confirmation-id').text(`#${inscricaoId}`);
+    $('#confirmation-total').text(priceCalculator.formatCurrency(formData.totais.total));
+    $('#confirmation-payment-method').text(formData.forma_pagamento.label);
+    
+    // Ir para tela de confirmação
+    goToStep(4);
+}
+
+// Configurar etapa de confirmação
+function setupConfirmationStep() {
+    // Aqui seria feita a integração com o webhook de pagamento
+    // Por enquanto, apenas simular
+    
+    setTimeout(() => {
+        $('.payment-link-btn').show().text('Ir para Pagamento');
+    }, 1000);
+}
+
+console.log('Funções de cálculo e resumo adicionadas');
     return true;
 }
 
