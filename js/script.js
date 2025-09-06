@@ -54,8 +54,15 @@
   }
 
   function qs(name){
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name);
+    try {
+      const url = new URL(window.location.href);
+      const param = url.searchParams.get(name);
+      console.log(`Parâmetro ${name} da URL:`, param);
+      return param;
+    } catch (error) {
+      console.error('Erro ao obter parâmetro da URL:', error);
+      return null;
+    }
   }
 
   function el(id){ return document.getElementById(id); }
@@ -412,11 +419,46 @@
   }
 
   // inicialização
-  fetch('eventos.json').then(r=>r.json()).then(data=>{
+  fetch('eventos.json').then(r=>{
+    if (!r.ok) {
+      throw new Error(`Erro ao carregar eventos.json: ${r.status} ${r.statusText}`);
+    }
+    return r.json();
+  }).then(data=>{
+    // Verificar se o objeto data tem a estrutura esperada
+    if (!data || !Array.isArray(data.eventos) || data.eventos.length === 0) {
+      throw new Error('Formato de dados inválido ou nenhum evento encontrado');
+    }
+    
     const id = qs('evento');
     let ev = null;
-    if(id){ ev = data.eventos.find(e=>e.id === id); }
-    if(!ev){ ev = data.eventos[0]; }
+    
+    if(id){ 
+      console.log('Buscando evento com ID:', id);
+      ev = data.eventos.find(e=>e.id === id);
+      if(!ev){
+        // Se o evento não for encontrado, mostrar mensagem de erro
+        const loadingMessage = document.getElementById('loadingMessage');
+        if(loadingMessage) {
+          loadingMessage.textContent = `Evento com ID ${id} não encontrado.`;
+          loadingMessage.style.display = 'block';
+        }
+        console.error(`Evento com ID ${id} não encontrado.`);
+        return;
+      }
+    }
+    
+    if(!ev){ 
+      console.log('Usando evento padrão');
+      ev = data.eventos[0]; 
+    }
+    
+    console.log('Evento carregado:', ev.id, ev.nome);
+    
+    // Esconder mensagem de carregamento
+    const loadingMessage = document.getElementById('loadingMessage');
+    if(loadingMessage) loadingMessage.style.display = 'none';
+    
     if(ev){
       STATE.evento = ev;
       renderHeader(ev);
@@ -570,6 +612,14 @@
     }
   }).catch(err=>{
     console.error('Erro carregando eventos.json', err);
+    const loadingMessage = document.getElementById('loadingMessage');
+    if(loadingMessage) {
+      loadingMessage.textContent = 'Erro ao carregar dados do evento. Por favor, tente novamente mais tarde.';
+      loadingMessage.style.display = 'block';
+    }
+    // Esconder botão de início quando houver erro
+    const startBtn = document.getElementById('startBtn');
+    if(startBtn) startBtn.style.display = 'none';
   });
 
   // hook start button to scroll to form and navigation buttons
