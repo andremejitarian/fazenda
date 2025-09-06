@@ -1,86 +1,216 @@
 {
   "eventos": [
     {
-      "id": "G001",
+      "id": "retiro-yoga-2023",
       "header": {
-        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
-        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
-        "partner_logos": [
-          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
-          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
-        ],
-        "logo_duplo": true
+        "banner_url": "https://images.unsplash.com/photo-1470137237906-d8a4f71e1966",
+        "logo_url": "https://fazendaserrinha.com.br/wp-content/uploads/2023/05/logo-fazenda-serrinha.png"
       },
-      "nome": "Retiro de Bem-Estar e Meditação",
-      "descricao": "Retiro de 3 dias com hospedagem e workshops.",
-      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G001",
+      "nome": "Retiro de Yoga na Fazenda Serrinha",
+      "descricao": "Junte-se a nós para um fim de semana de reconexão com a natureza através da prática de yoga, meditação e alimentação consciente.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas",
+      "observacoes_adicionais": "Trazer tapete de yoga e roupas confortáveis.",
       "tipo_formulario": "hospedagem_e_evento",
+      
       "tipos_acomodacao": [
-        { "id": "indiv", "label": "Individual", "valor_diaria_por_pessoa": 250.00 },
-        { "id": "compart", "label": "Compartilhada", "valor_diaria_por_pessoa": 180.00 }
+        {
+          "id": "chale-compartilhado",
+          "label": "Chalé Compartilhado",
+          "descricao": "Acomodação em chalé compartilhado com outras pessoas (4-6 pessoas por chalé)",
+          "valor_diaria_por_pessoa": 120.00,
+          "imagem_url": "https://fazendaserrinha.com.br/acomodacoes/chale-compartilhado.jpg"
+        },
+        {
+          "id": "chale-privativo",
+          "label": "Chalé Privativo",
+          "descricao": "Acomodação em chalé privativo para 1-2 pessoas",
+          "valor_diaria_por_pessoa": 250.00,
+          "imagem_url": "https://fazendaserrinha.com.br/acomodacoes/chale-privativo.jpg"
+        },
+        {
+          "id": "camping",
+          "label": "Camping",
+          "descricao": "Traga sua barraca e fique em nossa área de camping",
+          "valor_diaria_por_pessoa": 80.00,
+          "imagem_url": "https://fazendaserrinha.com.br/acomodacoes/camping.jpg"
+        }
       ],
+
       "periodos_estadia_opcoes": [
         {
-          "id": "padrao",
-          "label": "10/10 - 12/10",
-          "data_inicio": "2025-10-10T18:00",
-          "data_fim": "2025-10-12T14:00",
+          "id": "fds",
+          "label": "Final de Semana (Sex-Dom)",
+          "data_inicio": "2023-11-10T14:00",
+          "data_fim": "2023-11-12T12:00",
           "num_diarias": 2,
           "valores_evento_opcoes": [
-            { "id": "ideal_2dias", "label": "Ideal (2 dias)", "valor": 850.00 },
-            { "id": "social_2dias", "label": "Social (2 dias)", "valor": 700.00 }
+            {
+              "id": "pacote-completo",
+              "label": "Pacote Completo",
+              "valor": 350.00,
+              "descricao": "Inclui todas as atividades, workshops e refeições"
+            },
+            {
+              "id": "pacote-basico",
+              "label": "Pacote Básico",
+              "valor": 200.00,
+              "descricao": "Inclui apenas as atividades principais e refeições"
+            },
+            {
+              "id": "apenas-hospedagem",
+              "label": "Apenas Hospedagem",
+              "valor": 0.00,
+              "descricao": "Não inclui atividades do evento, apenas hospedagem e refeições"
+            }
+          ]
+        },
+        {
+          "id": "semana-completa",
+          "label": "Semana Completa (Seg-Dom)",
+          "data_inicio": "2023-11-06T14:00",
+          "data_fim": "2023-11-12T12:00",
+          "num_diarias": 6,
+          "valores_evento_opcoes": [
+            {
+              "id": "pacote-completo",
+              "label": "Pacote Completo",
+              "valor": 900.00,
+              "descricao": "Inclui todas as atividades, workshops e refeições"
+            },
+            {
+              "id": "pacote-basico",
+              "label": "Pacote Básico",
+              "valor": 550.00,
+              "descricao": "Inclui apenas as atividades principais e refeições"
+            },
+            {
+              "id": "apenas-hospedagem",
+              "label": "Apenas Hospedagem",
+              "valor": 0.00,
+              "descricao": "Não inclui atividades do evento, apenas hospedagem e refeições"
+            }
           ]
         }
       ],
+
+      "valores_evento_opcoes": [],
+
       "formas_pagamento_opcoes": [
-        { "id": "pix_vista", "label": "PIX à vista", "taxa_gateway_percentual": 0.01 },
-        { "id": "cartao", "label": "Cartão (parcelado)", "taxa_gateway_percentual": 0.035 }
+        {
+          "id": "cartao",
+          "label": "Cartão de Crédito",
+          "tipo": "Cartao",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "Pagamento com cartão de crédito em até 6x",
+          "taxa_gateway_percentual": 2.5,
+          "parcelas_disponiveis": [
+            {
+              "numero": 1,
+              "taxa_adicional_percentual": 0
+            },
+            {
+              "numero": 2,
+              "taxa_adicional_percentual": 0
+            },
+            {
+              "numero": 3,
+              "taxa_adicional_percentual": 0
+            },
+            {
+              "numero": 4,
+              "taxa_adicional_percentual": 2
+            },
+            {
+              "numero": 5,
+              "taxa_adicional_percentual": 3
+            },
+            {
+              "numero": 6,
+              "taxa_adicional_percentual": 4
+            }
+          ]
+        },
+        {
+          "id": "pix",
+          "label": "PIX",
+          "tipo": "PIX",
+          "descricao": "Pagamento via PIX (à vista)",
+          "taxa_gateway_percentual": 0.01,
+          "desconto_percentual": 5
+        },
+        {
+          "id": "boleto",
+          "label": "Boleto Bancário",
+          "tipo": "Boleto",
+          "descricao": "Pagamento via boleto bancário (à vista)",
+          "taxa_gateway_percentual": 2.5
+        }
       ],
+
       "regras_idade_precificacao": {
         "hospedagem": [
-          { "faixa_min_anos": 0, "faixa_max_anos": 4, "percentual_valor_adulto": 0.0, "limite_gratuidade_por_reserva": 1 },
-          { "faixa_min_anos": 5, "faixa_max_anos": 10, "percentual_valor_adulto": 0.5 }
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 5,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "descricao": "Crianças até 5 anos não pagam hospedagem"
+          },
+          {
+            "faixa_min_anos": 6,
+            "faixa_max_anos": 12,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 6 a 12 anos pagam 50% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 13,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 12 anos pagam valor integral de hospedagem"
+          }
         ],
         "evento": [
-          { "faixa_min_anos": 0, "faixa_max_anos": 4, "percentual_valor_adulto": 0.0, "limite_gratuidade_por_reserva": 1 },
-          { "faixa_min_anos": 5, "faixa_max_anos": 10, "percentual_valor_adulto": 0.5 }
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 5,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "descricao": "Crianças até 5 anos não pagam pelo evento"
+          },
+          {
+            "faixa_min_anos": 6,
+            "faixa_max_anos": 12,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 6 a 12 anos pagam 50% do valor do evento"
+          },
+          {
+            "faixa_min_anos": 60,
+            "faixa_max_anos": 120,
+            "percentual_valor_adulto": 0.8,
+            "descricao": "Idosos têm 20% de desconto no evento"
+          }
         ]
       },
+
       "cupons_desconto": [
-        { "codigo": "VERAO2025", "tipo_desconto": "percentual", "valor_desconto": 0.10, "data_validade_fim": "2025-12-31T23:59:59", "aplicacao": "total" }
+        {
+          "codigo": "YOGA10",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.10,
+          "data_validade_fim": "2023-10-15T23:59:59",
+          "aplicacao": "total",
+          "descricao": "10% de desconto para inscrições antecipadas"
+        },
+        {
+          "codigo": "GRUPO5",
+          "tipo_desconto": "fixo",
+          "valor_desconto": 100,
+          "data_validade_fim": "2023-11-05T23:59:59",
+          "aplicacao": "total",
+          "min_pessoas": 5,
+          "descricao": "R$ 100 de desconto para grupos com 5 ou mais pessoas"
+        }
       ]
-    },
-    {
-      "id": "G002",
-      "header": {
-        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
-        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
-      },
-      "nome": "Workshop de Yoga (Apenas Evento)",
-      "descricao": "Workshop intensivo, sem hospedagem.",
-      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G002",
-      "tipo_formulario": "evento_apenas",
-      "valores_evento_opcoes": [
-        { "id": "workshop_basico", "label": "Básico", "valor": 300.00 },
-        { "id": "workshop_premium", "label": "Premium", "valor": 450.00 }
-      ],
-      "formas_pagamento_opcoes": [ { "id": "pix_vista", "label": "PIX", "taxa_gateway_percentual": 0.01 } ],
-      "cupons_desconto": [ { "codigo": "WORKSHOP10", "tipo_desconto": "percentual", "valor_desconto": 0.10, "data_validade_fim": "2025-09-30T23:59:59", "aplicacao": "total" } ]
-    },
-    {
-      "id": "G003",
-      "header": {
-        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
-        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
-      },
-      "nome": "Reserva de Quarto (Apenas Hospedagem)",
-      "descricao": "Hospedagem avulsa.",
-      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G003",
-      "tipo_formulario": "hospedagem_apenas",
-      "tipos_acomodacao": [ { "id": "padrao_single", "label": "Single", "valor_diaria_por_pessoa": 200.00 } ],
-      "periodos_estadia_opcoes": [ { "id": "uma_noite", "label": "1 Noite", "data_inicio": "2025-10-20T14:00", "data_fim": "2025-10-21T12:00", "num_diarias": 1 } ],
-      "formas_pagamento_opcoes": [ { "id": "cartao_credito", "label": "Cartão", "taxa_gateway_percentual": 0.04 } ],
-      "cupons_desconto": [ { "codigo": "HOSPEDAGEM15", "tipo_desconto": "percentual", "valor_desconto": 0.15, "data_validade_fim": "2025-11-15T23:59:59", "aplicacao": "hospedagem" } ]
     }
   ]
 }
