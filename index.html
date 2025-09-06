@@ -19,45 +19,91 @@
   </header>
 
   <main class="container">
-    <section class="hero-card" id="heroCard">
-      <h1 id="eventTitle">Carregando...</h1>
-      <p id="eventDescription">Aguarde enquanto carregamos os detalhes do evento.</p>
-      <div class="hero-actions">
-        <button id="startBtn" class="btn">Avançar →</button>
+    <!-- Page navigation is handled without visual progress indicator -->
+
+    <!-- Page 1: Welcome Page -->
+    <section class="form-page active" id="welcomePage">
+      <div class="hero-card" id="heroCard">
+        <h1 id="eventTitle">Carregando...</h1>
+        <p id="eventDescription">Aguarde enquanto carregamos os detalhes do evento.</p>
+        <div class="hero-actions">
+          <button id="startBtn" class="btn">Avançar para Participantes →</button>
+        </div>
       </div>
     </section>
     
-    <section id="formArea" class="form-area">
-      <div class="form-controls">
-        <button id="addParticipant" class="btn">+ Adicionar Participante</button>
-      </div>
-
-      <div id="participantsContainer"></div>
-      <aside class="summary">
-        <h3>Resumo</h3>
-        <div>Subtotal Hospedagem: R$ <span id="subtotalHosp">0.00</span></div>
-        <div>Subtotal Evento: R$ <span id="subtotalEvent">0.00</span></div>
-        <div style="margin-top:8px">Forma de Pagamento:<br>
-          <select id="paymentMethodSelect"></select>
-        </div>
-        <div style="margin-top:12px">Cupom de Desconto:<br>
-          <div class="coupon-row">
-            <input id="couponCode" placeholder="Código do cupom" />
+    <!-- Page 2: Participants Page -->
+    <section class="form-page" id="participantsPage">
+      <div class="form-area">
+        <div class="participants-section">
+          <div class="form-controls">
+            <button id="addParticipant" class="btn">+ Adicionar Participante</button>
           </div>
-          <div id="couponMsg" class="text-muted" style="margin-top:6px;font-size:13px"></div>
+          <div id="participantsContainer"></div>
+          <div class="navigation-buttons">
+            <button id="backToWelcomeBtn" class="btn btn-secondary">← Voltar</button>
+            <button id="goToPaymentBtn" class="btn">Avançar para Pagamento →</button>
+          </div>
         </div>
-        <div style="margin-top:14px"><strong>Total a Pagar: R$ <span id="totalPay">0.00</span></strong></div>
-        <div style="margin-top:12px;display:flex;gap:8px">
-          <button id="previewBtn" class="btn">Visualizar Reserva</button>
-          <button id="submitBtn" class="btn">Enviar Reserva</button>
+        <aside class="summary">
+          <h3>Resumo</h3>
+          <div>Subtotal Hospedagem: R$ <span id="subtotalHosp">0.00</span></div>
+          <div>Subtotal Evento: R$ <span id="subtotalEvent">0.00</span></div>
+          <div style="margin-top:14px"><strong>Total a Pagar: R$ <span id="totalPay">0.00</span></strong></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Page 3: Payment Page -->
+    <section class="form-page" id="paymentPage">
+      <div class="form-area">
+        <div class="payment-section">
+          <h2>Resumo e Pagamento</h2>
+          <div id="responsavelInfo" class="responsavel-info">
+            <h3>Responsável pelo Pagamento</h3>
+            <div id="responsavelDetails">Selecione um responsável na página de participantes</div>
+          </div>
+          <div id="participantsSummary" class="participants-summary">
+            <h3>Detalhamento por Pessoa</h3>
+            <!-- Will be populated by JS -->
+          </div>
+          <div class="payment-options">
+            <h3>Forma de Pagamento</h3>
+            <select id="paymentMethodSelect"></select>
+          </div>
+          <div class="coupon-section">
+            <h3>Cupom de Desconto</h3>
+            <div class="coupon-row">
+              <input id="couponCode" placeholder="Código do cupom" />
+              <button id="applyCouponBtn" class="btn">Aplicar</button>
+            </div>
+            <div id="couponMsg" class="text-muted" style="margin-top:6px;font-size:13px"></div>
+          </div>
+          <div class="terms-section">
+            <label>
+              <input type="checkbox" id="termsCheckbox" />
+              Li e concordo com os <a href="#" id="termsLink">Termos e Condições</a>
+            </label>
+          </div>
+          <div class="navigation-buttons">
+            <button id="backToParticipantsBtn" class="btn btn-secondary">← Voltar</button>
+            <button id="submitBtn" class="btn">Confirmar Inscrição</button>
+          </div>
+          <div id="previewArea" style="display:none;margin-top:12px;background:#fafafa;padding:10px;border-radius:8px;border:1px solid #eee;max-height:320px;overflow:auto;font-family:monospace;font-size:13px"></div>
         </div>
-        <div id="previewArea" style="display:none;margin-top:12px;background:#fafafa;padding:10px;border-radius:8px;border:1px solid #eee;max-height:320px;overflow:auto;font-family:monospace;font-size:13px"></div>
-      </aside>
+        <aside class="summary">
+          <h3>Resumo</h3>
+          <div>Subtotal Hospedagem: R$ <span id="subtotalHospPayment">0.00</span></div>
+          <div>Subtotal Evento: R$ <span id="subtotalEventPayment">0.00</span></div>
+          <div id="discountRow" style="display:none">Desconto Cupom: -R$ <span id="discountAmount">0.00</span></div>
+          <div style="margin-top:14px"><strong>Total a Pagar: R$ <span id="totalPayPayment">0.00</span></strong></div>
+        </aside>
+      </div>
     </section>
   </main>
 
-  <script src="js/priceCalculator.js"></script>
-  <script src="js/cpfValidation.js"></script>
-  <script src="js/script.js"></script>
+  <script src="priceCalculator.js"></script>
+  <script src="cpfValidation.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
