@@ -1,737 +1,631 @@
-/**
- * Script principal do formulário de inscrição
- * Gerencia a navegação entre etapas, validação de campos e cálculo de preços
- */
-
 // Variáveis globais
+let currentEvent = null;
+let participants = [];
 let currentStep = 1;
-let calculator = null;
-let eventData = null;
+let appliedCoupon = null;
+let selectedPaymentMethod = null;
 
-// Inicializa o formulário quando o documento estiver pronto
+// Inicialização
 $(document).ready(function() {
-    // Carrega os dados do evento
-    loadEventData();
-    
-    // Inicializa máscaras para campos
-    initializeMasks();
-    
-    // Configura navegação entre etapas
-    setupNavigation();
-    
-    // Configura validações de formulário
-    setupValidations();
-    
-    // Verifica parâmetros da URL para pré-preenchimento
-    checkUrlParams();
+    console.log('Formulário iniciado');
+    initializeForm();
 });
 
-// Carrega os dados do evento do arquivo JSON
-function loadEventData() {
-    $.getJSON('events.json', function(data) {
-        eventData = data;
+// Função principal de inicialização
+function initializeForm() {
+    // Detectar parâmetro de evento na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
+    
+    // Carregar dados do evento
+    loadEventData(eventoId);
+    
+    // Configurar event listeners
+    setupEventListeners();
+    
+    // Configurar máscaras de input
+    setupInputMasks();
+}
+
+// Carregar dados do evento
+function loadEventData(eventoId) {
+    console.log(`Carregando evento: ${eventoId}`);
+    
+    // Mostrar estado de loading
+    showLoadingState();
+    
+    // Carregar eventos.json
+    fetch('eventos.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao carregar dados dos eventos');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const evento = data.eventos.find(e => e.id === eventoId);
+            
+            if (!evento) {
+                throw new Error(`Evento ${eventoId} não encontrado`);
+            }
+            
+            currentEvent = evento;
+            console.log('Evento carregado:', currentEvent);
+            
+            // Configurar interface com dados do evento
+            setupEventInterface();
+            
+            // Ocultar loading e mostrar conteúdo
+            hideLoadingState();
+            
+        })
+        .catch(error => {
+            console.error('Erro ao carregar evento:', error);
+            showErrorState(error.message);
+        });
+}
+
+// Configurar interface com dados do evento
+function setupEventInterface() {
+    // Configurar header se disponível
+    if (currentEvent.header) {
+        setupEventHeader();
+    }
+    
+    // Preencher informações básicas
+    $('#event-title').text(currentEvent.nome);
+    $('#event-description').text(currentEvent.descricao);
+    
+    if (currentEvent.observacoes_adicionais) {
+        $('#event-observations').text(currentEvent.observacoes_adicionais).show();
+    } else {
+        $('#event-observations').hide();
+    }
+    
+    // Configurar link dos termos
+    $('#terms-link').attr('href', currentEvent.politicas_evento_url);
+    
+    // Mostrar botão de avançar
+    $('#start-form-btn').show();
+}
+
+// Configurar header do evento
+function setupEventHeader() {
+    const header = currentEvent.header;
+    
+    // Configurar banner
+    if (header.banner_url) {
+        $('.header-banner').css('background-image', `url(${header.banner_url})`);
+    }
+    
+    // Configurar logo(s)
+    const logoContainer = $('.logo-container');
+    logoContainer.empty();
+    
+    if (header.partner_logos && header.partner_logos.length === 2 && 
+        (header.logo_duplo || currentEvent.tipo_formulario === 'hospedagem_e_evento')) {
         
-        // Inicializa o calculador de preços
-        calculator = new PriceCalculator(eventData);
-        
-        // Preenche os selects com dados do evento
-        populateSelects();
-        
-        // Adiciona o primeiro participante
+        // Logo duplo para parceiros
+        logoContainer.append(`
+            <img src="${header.partner_logos[0]}" alt="Logo Principal" class="partner-logo logo-main">
+            <img src="${header.partner_logos[1]}" alt="Logo Parceiro" class="partner-logo logo-partner">
+        `);
+    } else {
+        // Logo único
+        const logoUrl = header.logo_url || 'https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png';
+        logoContainer.append(`<img src="${logoUrl}" alt="Logo Fazenda Serrinha" class="logo">`);
+    }
+}
+
+// Estados de loading e erro
+function showLoadingState() {
+    $('.loading-state').show();
+    $('.welcome-section').hide();
+    $('#start-form-btn').hide();
+    $('.error-state').hide();
+}
+
+function hideLoadingState() {
+    $('.loading-state').hide();
+    $('.welcome-section').show();
+    $('.error-state').hide();
+}
+
+function showErrorState(message) {
+    $('.loading-state').hide();
+    $('.welcome-section').hide();
+    $('#start-form-btn').hide();
+    $('.error-state').show();
+    $('.error-state p').text(message);
+}
+
+// Configurar event listeners
+function setupEventListeners() {
+    // Botão iniciar formulário
+    $('#start-form-btn').on('click', function() {
+        goToStep(2);
+    });
+    
+    // Botão adicionar participante
+    $('#add-participant-btn').on('click', addParticipant);
+    
+    // Navegação entre etapas
+    $('.back-btn').on('click', function() {
+        const currentStepNum = getCurrentStepNumber();
+        if (currentStepNum > 1) {
+            goToStep(currentStepNum - 1);
+        }
+    });
+    
+    $('.next-btn').on('click', function() {
+        if (validateCurrentStep()) {
+            const currentStepNum = getCurrentStepNumber();
+            goToStep(currentStepNum + 1);
+        }
+    });
+    
+    // Botão finalizar
+    $('.submit-btn').on('click', submitForm);
+    
+    // Cupom de desconto
+    $('#coupon-code').on('input', debounce(validateCoupon, 500));
+    
+    // Forma de pagamento
+    $('#payment-method').on('change', updatePaymentMethod);
+}
+
+// Configurar máscaras de input
+function setupInputMasks() {
+    // Será configurado quando os participantes forem adicionados
+}
+
+// Navegação entre etapas
+function goToStep(stepNumber) {
+    // Ocultar todas as etapas
+    $('.form-content').hide();
+    
+    // Mostrar etapa específica
+    $(`#step-${stepNumber}`).show();
+    
+    // Atualizar step atual
+    currentStep = stepNumber;
+    
+    // Configurações específicas por etapa
+    switch(stepNumber) {
+        case 2:
+            setupParticipantsStep();
+            break;
+        case 3:
+            setupSummaryStep();
+            break;
+        case 4:
+            setupConfirmationStep();
+            break;
+    }
+    
+    // Scroll para o topo
+    $('html, body').animate({ scrollTop: 0 }, 300);
+}
+
+function getCurrentStepNumber() {
+    return currentStep;
+}
+
+// Configurar etapa de participantes
+function setupParticipantsStep() {
+    // Adicionar primeiro participante se não existir
+    if (participants.length === 0) {
         addParticipant();
-    }).fail(function() {
-        showError('Erro ao carregar dados do evento. Por favor, recarregue a página.');
-    });
-}
-
-// Inicializa máscaras para campos de formulário
-function initializeMasks() {
-    $('.date-mask').mask('00/00/0000');
-    $('.phone-mask').mask('(00) 00000-0000');
-    $('.cep-mask').mask('00000-000');
-}
-
-// Configura a navegação entre etapas do formulário
-function setupNavigation() {
-    // Botões de próximo
-    $('.btn-next').click(function() {
-        const currentStepElement = $(`.step-${currentStep}`);
-        
-        // Valida a etapa atual antes de prosseguir
-        if (validateStep(currentStep)) {
-            // Se for a etapa de participantes, processa os dados antes de avançar
-            if (currentStep === 2) {
-                processParticipantsData();
-                updatePriceSummary();
-            }
-            
-            // Esconde a etapa atual e mostra a próxima
-            currentStepElement.hide();
-            currentStep++;
-            $(`.step-${currentStep}`).show();
-            
-            // Atualiza o indicador de progresso
-            updateProgressIndicator();
-            
-            // Rola para o topo da página
-            window.scrollTo(0, 0);
-        }
-    });
-    
-    // Botões de voltar
-    $('.btn-prev').click(function() {
-        const currentStepElement = $(`.step-${currentStep}`);
-        
-        // Esconde a etapa atual e mostra a anterior
-        currentStepElement.hide();
-        currentStep--;
-        $(`.step-${currentStep}`).show();
-        
-        // Atualiza o indicador de progresso
-        updateProgressIndicator();
-        
-        // Rola para o topo da página
-        window.scrollTo(0, 0);
-    });
-    
-    // Inicialmente, mostra apenas a primeira etapa
-    $('.step').hide();
-    $('.step-1').show();
-    
-    // Inicializa o indicador de progresso
-    updateProgressIndicator();
-}
-
-// Atualiza o indicador de progresso
-function updateProgressIndicator() {
-    $('.progress-step').removeClass('active completed');
-    
-    // Marca as etapas anteriores como concluídas
-    for (let i = 1; i < currentStep; i++) {
-        $(`.progress-step[data-step="${i}"]`).addClass('completed');
     }
     
-    // Marca a etapa atual como ativa
-    $(`.progress-step[data-step="${currentStep}"]`).addClass('active');
+    // Configurar formas de pagamento
+    setupPaymentMethods();
 }
 
-// Configura validações de formulário
-function setupValidations() {
-    // Validação em tempo real para campos obrigatórios
-    $(document).on('blur', '.required', function() {
-        validateField($(this));
+// Adicionar participante
+function addParticipant() {
+    const participantNumber = participants.length + 1;
+    const template = $('#participant-template').html();
+    
+    // Criar novo participante
+    const participantHtml = template.replace(/PARTICIPANTE 1/g, `PARTICIPANTE ${participantNumber}`);
+    const $participant = $(participantHtml);
+    
+    // Configurar ID único
+    const participantId = `participant-${participantNumber}`;
+    $participant.attr('data-participant-id', participantId);
+    
+    // Configurar número do participante
+    $participant.find('.participant-number').text(participantNumber);
+    
+    // Mostrar botão remover se não for o primeiro
+    if (participantNumber > 1) {
+        $participant.find('.btn-remove-participant').show();
+    }
+    
+    // Configurar seções baseadas no tipo de formulário
+    setupParticipantSections($participant);
+    
+    // Adicionar ao container
+    $('#participants-container').append($participant);
+    
+    // Configurar máscaras para este participante
+    setupParticipantMasks($participant);
+    
+    // Configurar event listeners para este participante
+    setupParticipantEventListeners($participant);
+    
+    // Adicionar aos dados
+    participants.push({
+        id: participantId,
+        number: participantNumber,
+        data: {},
+        element: $participant
     });
     
-    // Validação de e-mail
-    $(document).on('blur', '.email-field', function() {
-        validateEmail($(this));
-    });
+    // Atualizar seção de responsável pelo pagamento
+    updateResponsiblePayerSection();
     
-    // Validação de data
-    $(document).on('blur', '.date-mask', function() {
-        validateDate($(this));
-    });
-    
-    // Validação de CPF já implementada no cpfValidation.js
-    
-    // Validação de CEP com preenchimento automático
-    $(document).on('blur', '.cep-mask', function() {
-        const cepInput = $(this);
-        const cep = cepInput.val().replace(/\D/g, '');
-        
-        if (cep.length === 8) {
-            // Consulta o CEP via API ViaCEP
-            $.getJSON(`https://viacep.com.br/ws/${cep}/json/`, function(data) {
-                if (!data.erro) {
-                    // Preenche os campos de endereço
-                    const participantForm = cepInput.closest('.participant-form');
-                    participantForm.find('.street-field').val(data.logradouro);
-                    participantForm.find('.neighborhood-field').val(data.bairro);
-                    participantForm.find('.city-field').val(data.localidade);
-                    participantForm.find('.state-field').val(data.uf);
-                } else {
-                    showFieldError(cepInput, 'CEP não encontrado');
-                }
-            }).fail(function() {
-                showFieldError(cepInput, 'Erro ao consultar CEP');
-            });
-        }
-    });
-    
-    // Validação e aplicação de cupom
-    $('#apply-coupon').click(function() {
-        const couponCode = $('#coupon-code').val().trim();
-        
-        if (couponCode) {
-            const result = calculator.applyCoupon(couponCode);
-            
-            if (result.success) {
-                $('#coupon-message').removeClass('error').addClass('success').text(result.message);
-                updatePriceSummary();
-            } else {
-                $('#coupon-message').removeClass('success').addClass('error').text(result.message);
-            }
-        } else {
-            $('#coupon-message').removeClass('success').addClass('error').text('Digite um código de cupom');
-        }
-    });
-    
-    // Remover cupom
-    $('#remove-coupon').click(function() {
-        calculator.removeCoupon();
-        $('#coupon-code').val('');
-        $('#coupon-message').text('');
-        updatePriceSummary();
-    });
+    console.log(`Participante ${participantNumber} adicionado`);
 }
 
-// Valida um campo específico
-function validateField(field) {
-    const value = field.val().trim();
-    const errorMessage = field.siblings('.error-message');
+// Configurar seções do participante baseado no tipo de formulário
+function setupParticipantSections($participant) {
+    const tipoFormulario = currentEvent.tipo_formulario;
     
-    if (field.hasClass('required') && value === '') {
-        errorMessage.text('Este campo é obrigatório');
-        field.addClass('invalid-input');
-        return false;
+    // Mostrar/ocultar seções baseado no tipo
+    if (tipoFormulario === 'hospedagem_apenas' || tipoFormulario === 'hospedagem_e_evento') {
+        $participant.find('.lodging-section').show();
+        setupLodgingOptions($participant);
+    }
+    
+    if (tipoFormulario === 'evento_apenas' || tipoFormulario === 'hospedagem_e_evento') {
+        $participant.find('.event-section').show();
+        setupEventOptions($participant);
+    }
+}
+
+// Configurar opções de hospedagem
+function setupLodgingOptions($participant) {
+    const $stayPeriodSelect = $participant.find('.stay-period-select');
+    const $stayPeriodInfo = $participant.find('.stay-period-info');
+    const $accommodationSelect = $participant.find('.accommodation-select');
+    const $accommodationInfo = $participant.find('.accommodation-info');
+    
+    // Períodos de estadia
+    const periodos = currentEvent.periodos_estadia_opcoes;
+    
+    if (periodos.length === 1) {
+        // Apenas uma opção - mostrar como texto
+        $stayPeriodSelect.hide();
+        $stayPeriodInfo.text(periodos[0].label).show();
+        updateCheckInOutInfo($participant, periodos[0]);
     } else {
-        errorMessage.text('');
-        field.removeClass('invalid-input');
-        return true;
+        // Múltiplas opções - mostrar dropdown
+        $stayPeriodSelect.empty().append('<option value="">Selecione o período</option>');
+        periodos.forEach(periodo => {
+            $stayPeriodSelect.append(`<option value="${periodo.id}">${periodo.label}</option>`);
+        });
+        $stayPeriodSelect.show();
+        $stayPeriodInfo.hide();
     }
-}
-
-// Valida um campo de e-mail
-function validateEmail(field) {
-    const value = field.val().trim();
-    const errorMessage = field.siblings('.error-message');
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     
-    if (value !== '' && !emailRegex.test(value)) {
-        errorMessage.text('E-mail inválido');
-        field.addClass('invalid-input');
-        return false;
-    } else {
-        return validateField(field);
-    }
-}
-
-// Valida um campo de data
-function validateDate(field) {
-    const value = field.val().trim();
-    const errorMessage = field.siblings('.error-message');
+    // Tipos de acomodação
+    const acomodacoes = currentEvent.tipos_acomodacao;
     
-    if (value !== '') {
-        // Verifica o formato da data (DD/MM/AAAA)
-        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])[/](0[1-9]|1[012])[/](19|20)\d\d$/;
-        
-        if (!dateRegex.test(value)) {
-            errorMessage.text('Data inválida');
-            field.addClass('invalid-input');
-            return false;
-        }
-        
-        // Converte para objeto Date e verifica se é uma data válida
-        const parts = value.split('/');
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1; // Mês em JavaScript é 0-11
-        const year = parseInt(parts[2], 10);
-        const date = new Date(year, month, day);
-        
-        if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
-            errorMessage.text('Data inválida');
-            field.addClass('invalid-input');
-            return false;
-        }
-        
-        // Verifica se a data de nascimento não é futura
-        if (field.hasClass('birth-date')) {
-            const today = new Date();
-            if (date > today) {
-                errorMessage.text('Data de nascimento não pode ser futura');
-                field.addClass('invalid-input');
-                return false;
-            }
-        }
-        
-        errorMessage.text('');
-        field.removeClass('invalid-input');
-        return true;
+    if (acomodacoes.length === 1) {
+        // Apenas uma opção - mostrar como texto
+        $accommodationSelect.hide();
+        $accommodationInfo.text(`${acomodacoes[0].label} - ${acomodacoes[0].descricao}`).show();
     } else {
-        return validateField(field);
+        // Múltiplas opções - mostrar dropdown
+        $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
+        acomodacoes.forEach(acomodacao => {
+            $accommodationSelect.append(`<option value="${acomodacao.id}">${acomodacao.label}</option>`);
+        });
+        $accommodationSelect.show();
+        $accommodationInfo.hide();
     }
 }
 
-// Mostra erro em um campo específico
-function showFieldError(field, message) {
-    const errorMessage = field.siblings('.error-message');
-    errorMessage.text(message);
-    field.addClass('invalid-input');
+// Configurar opções de evento
+function setupEventOptions($participant) {
+    const $eventSelect = $participant.find('.event-option-select');
+    const $eventInfo = $participant.find('.event-option-info');
+    
+    let eventOptions = [];
+    
+    if (currentEvent.tipo_formulario === 'evento_apenas') {
+        eventOptions = currentEvent.valores_evento_opcoes;
+    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+        // Será atualizado quando o período for selecionado
+        eventOptions = [];
+    }
+    
+    if (eventOptions.length === 1) {
+        // Apenas uma opção - mostrar como texto
+        $eventSelect.hide();
+        $eventInfo.text(`${eventOptions[0].label} - ${eventOptions[0].descricao}`).show();
+    } else if (eventOptions.length > 1) {
+        // Múltiplas opções - mostrar dropdown
+        $eventSelect.empty().append('<option value="">Selecione a participação</option>');
+        eventOptions.forEach(opcao => {
+            $eventSelect.append(`<option value="${opcao.id}">${opcao.label}</option>`);
+        });
+        $eventSelect.show();
+        $eventInfo.hide();
+    }
 }
 
-// Mostra mensagem de erro geral
-function showError(message) {
-    $('#error-message').text(message).show();
-    setTimeout(function() {
-        $('#error-message').fadeOut();
-    }, 5000);
+// Atualizar informações de check-in/out
+function updateCheckInOutInfo($participant, periodo) {
+    const dataInicio = new Date(periodo.data_inicio);
+    const dataFim = new Date(periodo.data_fim);
+    
+    const formatDateTime = (date) => {
+        return date.toLocaleDateString('pt-BR') + ' ' + 
+               date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    };
+    
+    $participant.find('.checkin-datetime').text(formatDateTime(dataInicio));
+    $participant.find('.checkout-datetime').text(formatDateTime(dataFim));
 }
 
-// Valida uma etapa inteira do formulário
-function validateStep(step) {
+// Configurar máscaras para participante
+function setupParticipantMasks($participant) {
+    $participant.find('.phone-mask').mask('(00) 00000-0000');
+    $participant.find('.cpf-mask').mask('000.000.000-00');
+}
+
+// Configurar event listeners para participante
+function setupParticipantEventListeners($participant) {
+    // Remover participante
+    $participant.find('.btn-remove-participant').on('click', function() {
+        removeParticipant($participant);
+    });
+    
+    // Validação de CPF
+    $participant.find('.cpf-mask').on('blur', function() {
+        validateCPF($(this));
+    });
+    
+    // Mudanças que afetam cálculos
+    $participant.find('.stay-period-select, .accommodation-select, .event-option-select, .dob-input').on('change', function() {
+        updateParticipantCalculations($participant);
+        updateEventOptionsForPeriod($participant);
+    });
+    
+    // Responsável pelo pagamento
+    $participant.find('.responsible-payer').on('change', function() {
+        if ($(this).is(':checked')) {
+            // Desmarcar outros responsáveis
+            $('.responsible-payer').not(this).prop('checked', false);
+        }
+    });
+}
+
+// Remover participante
+function removeParticipant($participant) {
+    const participantId = $participant.attr('data-participant-id');
+    
+    // Remover dos dados
+    participants = participants.filter(p => p.id !== participantId);
+    
+    // Remover do DOM
+    $participant.remove();
+    
+    // Renumerar participantes
+    renumberParticipants();
+    
+    // Atualizar seção de responsável pelo pagamento
+    updateResponsiblePayerSection();
+    
+    console.log(`Participante ${participantId} removido`);
+}
+
+// Renumerar participantes
+function renumberParticipants() {
+    $('#participants-container .participant-block').each(function(index) {
+        const newNumber = index + 1;
+        $(this).find('.participant-number').text(newNumber);
+        
+        // Atualizar dados
+        if (participants[index]) {
+            participants[index].number = newNumber;
+        }
+    });
+}
+
+// Atualizar seção de responsável pelo pagamento
+function updateResponsiblePayerSection() {
+    const $sections = $('.responsible-payer-section');
+    
+    if (participants.length > 1) {
+        $sections.show();
+    } else {
+        $sections.hide();
+        // Se só há um participante, ele é automaticamente o responsável
+        if (participants.length === 1) {
+            participants[0].element.find('.responsible-payer').prop('checked', true);
+        }
+    }
+}
+
+// Atualizar opções de evento baseado no período selecionado
+function updateEventOptionsForPeriod($participant) {
+    if (currentEvent.tipo_formulario !== 'hospedagem_e_evento') return;
+    
+    const selectedPeriodId = $participant.find('.stay-period-select').val();
+    if (!selectedPeriodId) return;
+    
+    const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+    if (!periodo || !periodo.valores_evento_opcoes) return;
+    
+    const $eventSelect = $participant.find('.event-option-select');
+    const $eventInfo = $participant.find('.event-option-info');
+    const eventOptions = periodo.valores_evento_opcoes;
+    
+    if (eventOptions.length === 1) {
+        // Apenas uma opção - mostrar como texto
+        $eventSelect.hide();
+        $eventInfo.text(`${eventOptions[0].label} - ${eventOptions[0].descricao}`).show();
+    } else {
+        // Múltiplas opções - mostrar dropdown
+        $eventSelect.empty().append('<option value="">Selecione a participação</option>');
+        eventOptions.forEach(opcao => {
+            $eventSelect.append(`<option value="${opcao.id}">${opcao.label}</option>`);
+        });
+        $eventSelect.show();
+        $eventInfo.hide();
+    }
+}
+
+// Configurar formas de pagamento
+function setupPaymentMethods() {
+    const $paymentSelect = $('#payment-method');
+    const $paymentDescription = $('#payment-method-description');
+    const formasPagamento = currentEvent.formas_pagamento_opcoes;
+    
+    $paymentSelect.empty().append('<option value="">Selecione a forma de pagamento</option>');
+    
+    formasPagamento.forEach(forma => {
+        $paymentSelect.append(`<option value="${forma.id}">${forma.label}</option>`);
+    });
+    
+    // Se apenas uma opção, selecionar automaticamente
+    if (formasPagamento.length === 1) {
+        $paymentSelect.val(formasPagamento[0].id);
+        $paymentDescription.text(formasPagamento[0].descricao);
+        selectedPaymentMethod = formasPagamento[0];
+    }
+}
+
+// Atualizar método de pagamento
+function updatePaymentMethod() {
+    const selectedId = $('#payment-method').val();
+    const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
+    
+    if (forma) {
+        $('#payment-method-description').text(forma.descricao);
+        selectedPaymentMethod = forma;
+        
+        // Recalcular totais com nova taxa de gateway
+        updateAllCalculations();
+    }
+}
+
+// Função utilitária debounce
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Validação de etapa atual
+function validateCurrentStep() {
+    switch(currentStep) {
+        case 2:
+            return validateParticipantsStep();
+        case 3:
+            return validateSummaryStep();
+        default:
+            return true;
+    }
+}
+
+// Validar etapa de participantes
+function validateParticipantsStep() {
     let isValid = true;
     
-    // Valida todos os campos obrigatórios na etapa atual
-    $(`.step-${step} .required`).each(function() {
-        if (!validateField($(this))) {
-            isValid = false;
-        }
-    });
-    
-    // Valida campos de e-mail na etapa atual
-    $(`.step-${step} .email-field`).each(function() {
-        if (!validateEmail($(this))) {
-            isValid = false;
-        }
-    });
-    
-    // Valida campos de data na etapa atual
-    $(`.step-${step} .date-mask`).each(function() {
-        if (!validateDate($(this))) {
-            isValid = false;
-        }
-    });
-    
-    // Valida campos de CPF na etapa atual
-    $(`.step-${step} .cpf-mask`).each(function() {
-        const cpfInput = $(this);
-        const cpfValue = cpfInput.val();
-        const errorMessage = cpfInput.siblings('.error-message');
+    // Validar cada participante
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
         
-        if (cpfValue.length > 0 && !validarCPF(cpfValue)) {
-            errorMessage.text('CPF inválido. Por favor, verifique.');
-            cpfInput.addClass('invalid-input');
+        // Campos obrigatórios
+        const requiredFields = [
+            '.full-name',
+            '.phone-mask',
+            '.cpf-mask',
+            '.email-input',
+            '.dob-input'
+        ];
+        
+        requiredFields.forEach(selector => {
+            const $field = $participant.find(selector);
+            if (!$field.val().trim()) {
+                $field.addClass('error');
+                isValid = false;
+            } else {
+                $field.removeClass('error');
+            }
+        });
+        
+        // Validar CPF
+        const $cpfField = $participant.find('.cpf-mask');
+        if (!validateCPF($cpfField)) {
             isValid = false;
+        }
+        
+        // Validar seleções baseadas no tipo de formulário
+        if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            const $stayPeriod = $participant.find('.stay-period-select');
+            const $accommodation = $participant.find('.accommodation-select');
+            
+            if ($stayPeriod.is(':visible') && !$stayPeriod.val()) {
+                $stayPeriod.addClass('error');
+                isValid = false;
+            }
+            
+            if ($accommodation.is(':visible') && !$accommodation.val()) {
+                $accommodation.addClass('error');
+                isValid = false;
+            }
+        }
+        
+        if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            const $eventOption = $participant.find('.event-option-select');
+            
+            if ($eventOption.is(':visible') && !$eventOption.val()) {
+                $eventOption.addClass('error');
+                isValid = false;
+            }
         }
     });
     
-    // Se a etapa não for válida, mostra uma mensagem de erro
-    if (!isValid) {
-        showError('Por favor, corrija os campos destacados antes de prosseguir.');
+    // Validar responsável pelo pagamento se múltiplos participantes
+    if (participants.length > 1) {
+        const hasResponsible = $('.responsible-payer:checked').length > 0;
+        if (!hasResponsible) {
+            alert('Por favor, selecione um responsável pelo pagamento.');
+            isValid = false;
+        }
     }
     
     return isValid;
 }
 
-// Preenche os selects com dados do evento
-function populateSelects() {
-    if (!eventData) return;
-    
-    // Template para o select de períodos
-    const periodTemplate = $('#period-template');
-    const periodSelect = periodTemplate.html();
-    
-    // Adiciona as opções de períodos
-    let periodOptions = '<option value="">Selecione o período</option>';
-    eventData.periodos.forEach(function(period) {
-        periodOptions += `<option value="${period.id}">${period.nome} (${period.data_inicio} a ${period.data_fim})</option>`;
-    });
-    
-    // Atualiza o template com as opções
-    const updatedPeriodSelect = periodSelect.replace('<!-- period-options -->', periodOptions);
-    $('#period-template').html(updatedPeriodSelect);
-    
-    // Template para o select de acomodações
-    const accommodationTemplate = $('#accommodation-template');
-    const accommodationSelect = accommodationTemplate.html();
-    
-    // Adiciona as opções de acomodações
-    let accommodationOptions = '<option value="">Selecione a acomodação</option>';
-    eventData.acomodacoes.forEach(function(accommodation) {
-        accommodationOptions += `<option value="${accommodation.id}">${accommodation.nome} - ${accommodation.descricao}</option>`;
-    });
-    
-    // Atualiza o template com as opções
-    const updatedAccommodationSelect = accommodationSelect.replace('<!-- accommodation-options -->', accommodationOptions);
-    $('#accommodation-template').html(updatedAccommodationSelect);
-    
-    // Template para o select de opções de evento
-    const eventOptionTemplate = $('#event-option-template');
-    const eventOptionSelect = eventOptionTemplate.html();
-    
-    // Adiciona as opções de participação no evento
-    let eventOptions = '<option value="">Selecione a opção de participação</option>';
-    eventData.opcoes_evento.forEach(function(option) {
-        eventOptions += `<option value="${option.id}">${option.nome} - ${option.descricao}</option>`;
-    });
-    
-    // Atualiza o template com as opções
-    const updatedEventOptionSelect = eventOptionSelect.replace('<!-- event-options -->', eventOptions);
-    $('#event-option-template').html(updatedEventOptionSelect);
-}
-
-// Adiciona um novo participante ao formulário
-function addParticipant() {
-    const participantsContainer = $('#participants-container');
-    const participantCount = participantsContainer.children('.participant-form').length;
-    const newIndex = participantCount + 1;
-    
-    // Clona o template do participante
-    const participantTemplate = $('#participant-template').html();
-    const newParticipant = participantTemplate
-        .replace(/\{index\}/g, newIndex)
-        .replace('Participante {number}', `Participante ${newIndex}`);
-    
-    // Adiciona o novo participante ao container
-    participantsContainer.append(newParticipant);
-    
-    // Inicializa as máscaras para os novos campos
-    $(`#participant-${newIndex} .date-mask`).mask('00/00/0000');
-    $(`#participant-${newIndex} .phone-mask`).mask('(00) 00000-0000');
-    $(`#participant-${newIndex} .cpf-mask`).mask('000.000.000-00');
-    $(`#participant-${newIndex} .cep-mask`).mask('00000-000');
-    
-    // Atualiza os selects com as opções do evento
-    updateParticipantSelects(newIndex);
-    
-    // Atualiza os botões de remover participante
-    updateRemoveButtons();
-    
-    // Configura os eventos de cálculo de preço
-    setupPriceCalculation(newIndex);
-}
-
-// Atualiza os selects de um participante específico
-function updateParticipantSelects(index) {
-    // Período
-    const periodTemplate = $('#period-template').html();
-    $(`#participant-${index} .period-select-container`).html(periodTemplate);
-    
-    // Acomodação
-    const accommodationTemplate = $('#accommodation-template').html();
-    $(`#participant-${index} .accommodation-select-container`).html(accommodationTemplate);
-    
-    // Opção de evento
-    const eventOptionTemplate = $('#event-option-template').html();
-    $(`#participant-${index} .event-option-select-container`).html(eventOptionTemplate);
-}
-
-// Atualiza os botões de remover participante
-function updateRemoveButtons() {
-    const participantForms = $('.participant-form');
-    
-    // Esconde todos os botões de remover
-    $('.btn-remove-participant').hide();
-    
-    // Se houver mais de um participante, mostra os botões de remover
-    if (participantForms.length > 1) {
-        $('.btn-remove-participant').show();
-    }
-}
-
-// Remove um participante do formulário
-function removeParticipant(index) {
-    $(`#participant-${index}`).remove();
-    
-    // Renumera os participantes restantes
-    $('.participant-form').each(function(i) {
-        const newIndex = i + 1;
-        const currentIndex = parseInt($(this).attr('id').replace('participant-', ''));
-        
-        if (currentIndex !== newIndex) {
-            // Atualiza o ID e o título
-            $(this).attr('id', `participant-${newIndex}`);
-            $(this).find('.participant-title').text(`Participante ${newIndex}`);
-            
-            // Atualiza os IDs e names dos campos
-            $(this).find('[id*="participant-"]').each(function() {
-                const newId = $(this).attr('id').replace(`participant-${currentIndex}`, `participant-${newIndex}`);
-                $(this).attr('id', newId);
-            });
-            
-            $(this).find('[name*="participant-"]').each(function() {
-                const newName = $(this).attr('name').replace(`participant-${currentIndex}`, `participant-${newIndex}`);
-                $(this).attr('name', newName);
-            });
-            
-            // Atualiza o botão de remover
-            $(this).find('.btn-remove-participant').attr('onclick', `removeParticipant(${newIndex})`);
-        }
-    });
-    
-    // Atualiza os botões de remover
-    updateRemoveButtons();
-    
-    // Atualiza o cálculo de preço
-    processParticipantsData();
-    updatePriceSummary();
-}
-
-// Configura os eventos de cálculo de preço para um participante
-function setupPriceCalculation(index) {
-    // Atualiza o preço quando o período, acomodação, opção de evento ou data de nascimento mudar
-    $(`#participant-${index} .period-select, #participant-${index} .accommodation-select, #participant-${index} .event-option-select, #participant-${index} .birth-date`).change(function() {
-        // Atualiza os dados do participante no calculador
-        processParticipantData(index);
-        
-        // Atualiza o resumo de preços
-        updatePriceSummary();
-    });
-}
-
-// Processa os dados de um participante específico
-function processParticipantData(index) {
-    if (!calculator) return;
-    
-    const participantForm = $(`#participant-${index}`);
-    const periodId = participantForm.find('.period-select').val();
-    const accommodationType = participantForm.find('.accommodation-select').val();
-    const participationType = participantForm.find('.event-option-select').val();
-    const birthDateStr = participantForm.find('.birth-date').val();
-    
-    // Converte a data de nascimento para o formato ISO
-    let birthDate = null;
-    if (birthDateStr) {
-        const parts = birthDateStr.split('/');
-        if (parts.length === 3) {
-            birthDate = `${parts[2]}-${parts[1]}-${parts[0]}`; // AAAA-MM-DD
-        }
+// Validar etapa de resumo
+function validateSummaryStep() {
+    // Verificar se forma de pagamento foi selecionada
+    if (!selectedPaymentMethod) {
+        $('#payment-method').addClass('error');
+        alert('Por favor, selecione uma forma de pagamento.');
+        return false;
     }
     
-    // Cria o objeto do participante
-    const participant = {
-        name: participantForm.find('.participant-name').val(),
-        birthDate: birthDate,
-        periodId: periodId,
-        accommodationType: accommodationType,
-        participationType: participationType
-    };
-    
-    // Atualiza ou adiciona o participante no calculador
-    if (index - 1 < calculator.participants.length) {
-        calculator.updateParticipant(index - 1, participant);
-    } else {
-        calculator.addParticipant(participant);
+    // Verificar se termos foram aceitos
+    if (!$('#terms-conditions').is(':checked')) {
+        alert('Por favor, aceite os termos e condições.');
+        return false;
     }
     
-    return participant;
+    return true;
 }
 
-// Processa os dados de todos os participantes
-function processParticipantsData() {
-    if (!calculator) return;
-    
-    // Limpa os participantes existentes
-    calculator.participants = [];
-    
-    // Processa cada participante
-    $('.participant-form').each(function() {
-        const index = parseInt($(this).attr('id').replace('participant-', ''));
-        processParticipantData(index);
-    });
-}
-
-// Atualiza o resumo de preços
-function updatePriceSummary() {
-    if (!calculator) return;
-    
-    const totals = calculator.calculateTotal();
-    
-    // Atualiza os valores no resumo
-    $('#accommodation-total').text(`R$ ${totals.accommodationTotal.toFixed(2)}`);
-    $('#event-total').text(`R$ ${totals.eventTotal.toFixed(2)}`);
-    
-    // Atualiza o desconto do cupom se houver
-    if (totals.couponDiscount > 0) {
-        $('#coupon-discount-row').show();
-        $('#coupon-discount').text(`R$ ${totals.couponDiscount.toFixed(2)}`);
-    } else {
-        $('#coupon-discount-row').hide();
-    }
-    
-    // Atualiza o total geral
-    $('#total-price').text(`R$ ${totals.total.toFixed(2)}`);
-    
-    // Atualiza o resumo de participantes
-    updateParticipantsSummary();
-}
-
-// Atualiza o resumo de participantes
-function updateParticipantsSummary() {
-    if (!calculator || !calculator.participants.length) return;
-    
-    const participantsSummary = $('#participants-summary');
-    participantsSummary.empty();
-    
-    // Adiciona cada participante ao resumo
-    calculator.participants.forEach(function(participant, index) {
-        if (!participant.name) return;
-        
-        // Encontra os detalhes do período, acomodação e opção de evento
-        const period = eventData.periodos.find(p => p.id === participant.periodId);
-        const accommodation = eventData.acomodacoes.find(a => a.id === participant.accommodationType);
-        const eventOption = eventData.opcoes_evento.find(o => o.id === participant.participationType);
-        
-        // Calcula os preços individuais
-        const accommodationPrice = calculator.calculateAccommodationPrice(
-            participant.accommodationType,
-            participant.periodId,
-            participant.birthDate
-        );
-        
-        const eventPrice = calculator.calculateEventPrice(
-            participant.participationType,
-            participant.periodId,
-            participant.birthDate
-        );
-        
-        // Cria o HTML do resumo do participante
-        let html = `
-            <div class="participant-summary">
-                <h4>Participante ${index + 1}: ${participant.name}</h4>
-                <div class="summary-details">
-        `;
-        
-        if (period) {
-            html += `<p><strong>Período:</strong> ${period.nome}</p>`;
-        }
-        
-        if (accommodation) {
-            html += `<p><strong>Acomodação:</strong> ${accommodation.nome} - R$ ${accommodationPrice.toFixed(2)}</p>`;
-        }
-        
-        if (eventOption) {
-            html += `<p><strong>Opção de Evento:</strong> ${eventOption.nome} - R$ ${eventPrice.toFixed(2)}</p>`;
-        }
-        
-        html += `
-                    <p><strong>Subtotal:</strong> R$ ${(accommodationPrice + eventPrice).toFixed(2)}</p>
-                </div>
-            </div>
-        `;
-        
-        participantsSummary.append(html);
-    });
-}
-
-// Verifica parâmetros da URL para pré-preenchimento
-function checkUrlParams() {
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Pré-preenche o nome do responsável
-    if (urlParams.has('nome')) {
-        $('#responsible-name').val(urlParams.get('nome'));
-    }
-    
-    // Pré-preenche o e-mail do responsável
-    if (urlParams.has('email')) {
-        $('#responsible-email').val(urlParams.get('email'));
-    }
-    
-    // Pré-preenche o telefone do responsável
-    if (urlParams.has('telefone')) {
-        $('#responsible-phone').val(urlParams.get('telefone'));
-    }
-    
-    // Pré-preenche o período
-    if (urlParams.has('periodo')) {
-        const periodId = urlParams.get('periodo');
-        // O select será preenchido quando os dados do evento forem carregados
-        // Armazena o valor para ser usado após o carregamento
-        window.prefilledPeriod = periodId;
-    }
-}
-
-// Função para enviar o formulário
-function submitForm() {
-    // Valida a etapa final antes de enviar
-    if (!validateStep(currentStep)) {
-        return;
-    }
-    
-    // Coleta todos os dados do formulário
-    const formData = {
-        responsible: {
-            name: $('#responsible-name').val(),
-            email: $('#responsible-email').val(),
-            phone: $('#responsible-phone').val()
-        },
-        participants: [],
-        payment: {
-            method: $('input[name="payment-method"]:checked').val(),
-            installments: $('#installments').val(),
-            couponCode: calculator.couponCode
-        },
-        totals: calculator.calculateTotal()
-    };
-    
-    // Coleta os dados de cada participante
-    $('.participant-form').each(function() {
-        const index = parseInt($(this).attr('id').replace('participant-', ''));
-        const participantForm = $(`#participant-${index}`);
-        
-        const participant = {
-            name: participantForm.find('.participant-name').val(),
-            email: participantForm.find('.participant-email').val(),
-            phone: participantForm.find('.participant-phone').val(),
-            cpf: participantForm.find('.cpf-mask').val(),
-            birthDate: participantForm.find('.birth-date').val(),
-            address: {
-                cep: participantForm.find('.cep-mask').val(),
-                street: participantForm.find('.street-field').val(),
-                number: participantForm.find('.number-field').val(),
-                complement: participantForm.find('.complement-field').val(),
-                neighborhood: participantForm.find('.neighborhood-field').val(),
-                city: participantForm.find('.city-field').val(),
-                state: participantForm.find('.state-field').val()
-            },
-            period: participantForm.find('.period-select').val(),
-            accommodation: participantForm.find('.accommodation-select').val(),
-            eventOption: participantForm.find('.event-option-select').val()
-        };
-        
-        formData.participants.push(participant);
-    });
-    
-    // Exibe mensagem de sucesso e oculta o formulário
-    $('.form-container').hide();
-    $('.success-message').show();
-    
-    // Rola para o topo da página
-    window.scrollTo(0, 0);
-    
-    // Aqui você pode adicionar o código para enviar os dados para o servidor
-    console.log('Dados do formulário:', formData);
-    
-    // Exemplo de envio via AJAX (descomentado para implementação real)
-    /*
-    $.ajax({
-        url: 'https://api.example.com/submit-registration',
-        type: 'POST',
-        data: JSON.stringify(formData),
-        contentType: 'application/json',
-        success: function(response) {
-            // Exibe mensagem de sucesso e oculta o formulário
-            $('.form-container').hide();
-            $('.success-message').show();
-            
-            // Rola para o topo da página
-            window.scrollTo(0, 0);
-        },
-        error: function(xhr, status, error) {
-            showError('Erro ao enviar o formulário. Por favor, tente novamente.');
-            console.error('Erro:', error);
-        }
-    });
-    */
-}
-
-// Botão para adicionar participante
-$('#add-participant-btn').click(function() {
-    addParticipant();
-});
-
-// Botão para enviar o formulário
-$('#submit-form-btn').click(function() {
-    submitForm();
-});
+console.log('Script principal carregado');
