@@ -762,3 +762,225 @@ body {
     border-color: var(--success-color);
     box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
 }
+
+
+/* Estilos para resumo e cálculos */
+.responsible-payer-summary {
+    background: linear-gradient(135deg, #e8f4fd, #f0f8ff);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.responsible-payer-summary h3 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+.payer-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.payer-info p {
+    margin: 0;
+    font-size: 0.95em;
+    color: var(--text-primary);
+}
+
+.payer-info strong {
+    color: var(--primary-color);
+}
+
+.participants-summary {
+    margin: 30px 0;
+}
+
+.participants-summary h3 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+    font-size: 1.3em;
+    text-align: center;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.participant-summary-item {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: var(--transition);
+}
+
+.participant-summary-item:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-light);
+}
+
+.participant-summary-item h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 10px;
+}
+
+.participant-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.participant-details p {
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: var(--text-primary);
+}
+
+.participant-details strong {
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+/* Valores destacados */
+.participant-details p:contains("Valor") {
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+/* Estados de validação melhorados */
+.form-control.calculating {
+    border-color: var(--warning-color);
+    background: linear-gradient(90deg, #fff 0%, #fffbf0 100%);
+}
+
+.price-display.updating {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    border-color: var(--warning-color);
+}
+
+.price-display.updated {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    border-color: var(--success-color);
+    animation: priceUpdate 0.5s ease-out;
+}
+
+@keyframes priceUpdate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Feedback de cupom melhorado */
+.coupon-section {
+    position: relative;
+}
+
+.coupon-section input.success {
+    border-color: var(--success-color);
+    background: linear-gradient(90deg, #fff 0%, #f0fff4 100%);
+}
+
+.coupon-section input.error {
+    border-color: var(--error-color);
+    background: linear-gradient(90deg, #fff 0%, #fff5f5 100%);
+}
+
+#coupon-feedback {
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 0.9em;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+#coupon-feedback.success-message {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+#coupon-feedback.error-message {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+/* Totais com animação */
+.totals-summary .total-line {
+    transition: var(--transition);
+}
+
+.totals-summary .total-line.updating {
+    background: rgba(243, 156, 18, 0.1);
+    transform: scale(1.01);
+}
+
+.totals-summary .total-line.final.updating {
+    background: rgba(44, 85, 48, 0.1);
+}
+
+/* Loading states para cálculos */
+.calculating-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border-color);
+    border-left-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 8px;
+}
+
+/* Responsividade para resumo */
+@media (max-width: 768px) {
+    .payer-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .participant-details {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .participant-summary-item {
+        padding: 15px;
+    }
+}
+
+/* Melhorias de acessibilidade para cálculos */
+.price-value[aria-live="polite"] {
+    /* Anunciar mudanças de preço para leitores de tela */
+}
+
+.calculation-status {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* Estados de hover para elementos de resumo */
+.participant-summary-item:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+}
+
+.totals-summary:focus-within {
+    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+}
