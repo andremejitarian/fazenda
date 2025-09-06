@@ -1,146 +1,255 @@
-// priceCalculator.js — funções para cálculos de hospedagem/evento e aplicação de cupons
-(function(){
-  function calculateAge(birthdate){
-    if(!birthdate) return null;
-    const bd = new Date(birthdate);
-    const today = new Date();
-    let age = today.getFullYear() - bd.getFullYear();
-    const m = today.getMonth() - bd.getMonth();
-    if(m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
-    return age;
-  }
+/**
+ * Módulo de cálculo de preços
+ * Implementa funções para calcular preços de hospedagem e evento com base em regras de idade
+ */
 
-  function applyAgeRules(valueAdult, age, rules){
-    if(!rules || rules.length === 0) return valueAdult;
-    for(const r of rules){
-      const min = r.faixa_min_anos || 0;
-      const max = typeof r.faixa_max_anos === 'number' ? r.faixa_max_anos : Infinity;
-      if(age >= min && age <= max){
-        return valueAdult * (r.percentual_valor_adulto || 1);
-      }
+// Classe para gerenciar cálculos de preço
+class PriceCalculator {
+    constructor(eventData) {
+        this.eventData = eventData;
+        this.participants = [];
+        this.couponCode = null;
+        this.couponDiscount = 0;
+        this.couponType = null;
+        this.couponTarget = null;
     }
-    return valueAdult;
-  }
 
-  function calculateAccommodation(valorDiariaPorPessoa, numDiarias, age, regrasHospedagem){
-    const base = (valorDiariaPorPessoa || 0) * (numDiarias || 1);
-    return applyAgeRules(base, age, regrasHospedagem);
-  }
-
-  function calculateEventValue(valorEvento, age, regrasEvento){
-    return applyAgeRules(valorEvento, age, regrasEvento);
-  }
-
-  // calc totals: participantes: [{age, baseHosp, baseEvent}], formaPagamento {taxa_gateway_percentual}, regrasIdade: {hospedagem:[], evento:[]}
-  // returns { participants: [{valorHospedagem, valorEvento}], subtotalHospedagem, subtotalEvento, desconto, total }
-  function calcTotals(participantes, formaPagamento, cupom, regrasIdade){
-    // defensive
-    regrasIdade = regrasIdade || { hospedagem: [], evento: [] };
-
-    // prepare result participants array
-    const resultParts = participantes.map(p=>({}));
-
-    // helper to apply reservation-level rules for one pricing type
-    function applyRulesForType(typeKey){
-      const rules = (regrasIdade && regrasIdade[typeKey]) || [];
-      const baseField = (typeKey === 'hospedagem') ? 'baseHosp' : 'baseEvent';
-      const outField = (typeKey === 'hospedagem') ? 'valorHospedagem' : 'valorEvento';
-
-      // Build list of participants with their age and base value
-  const list = participantes.map((p, idx)=>({ idx, age: p.age, base: ( (typeof p[baseField] !== 'undefined') ? p[baseField] : ( (typeof p.valorHospedagem !== 'undefined' && baseField==='baseHosp') ? p.valorHospedagem : (typeof p.valorEvento !== 'undefined' && baseField==='baseEvent' ? p.valorEvento : 0) ) ) || 0 }));
-
-      // For each rule, process matching participants
-      // We'll default to matching the first rule per participant (rules should be non-overlapping in PRD).
-      // First handle rules that have limite_gratuidade_por_reserva, because they require cross-participant counting.
-      const gratuityRules = rules.filter(r=>typeof r.limite_gratuidade_por_reserva === 'number' && r.limite_gratuidade_por_reserva > 0);
-      const normalRules = rules.filter(r=>!(typeof r.limite_gratuidade_por_reserva === 'number' && r.limite_gratuidade_por_reserva > 0));
-
-      // process gratuity rules
-      for(const r of gratuityRules){
-        const min = r.faixa_min_anos || 0;
-        const max = typeof r.faixa_max_anos === 'number' ? r.faixa_max_anos : Infinity;
-        // collect matching participants
-        const matching = list.filter(item=>typeof item.age === 'number' && item.age >= min && item.age <= max);
-        if(matching.length === 0) continue;
-        // sort matching by age ascending (youngest first) to deterministically assign gratuities
-        matching.sort((a,b)=>a.age - b.age);
-        const limit = r.limite_gratuidade_por_reserva || 0;
-        // first `limit` are free
-        const free = matching.slice(0, limit);
-        const extras = matching.slice(limit);
-        // assign free
-        free.forEach(f=>{ resultParts[f.idx][outField] = 0; });
-        // assign extras: if regra_excedente_gratuito present, use its percentual_valor_adulto; otherwise fall back to rule.percentual_valor_adulto
-        const excedentePercent = (r.regra_excedente_gratuito && typeof r.regra_excedente_gratuito.percentual_valor_adulto === 'number') ? r.regra_excedente_gratuito.percentual_valor_adulto : (r.percentual_valor_adulto || 0);
-        extras.forEach(e=>{ resultParts[e.idx][outField] = +( (e.base || 0) * excedentePercent ).toFixed(2); });
-      }
-
-      // process normal rules and any participants not yet assigned for this type
-      for(const r of normalRules){
-        const min = r.faixa_min_anos || 0;
-        const max = typeof r.faixa_max_anos === 'number' ? r.faixa_max_anos : Infinity;
-        participantes.forEach((p, idx)=>{
-          // skip if already assigned by gratuity rule
-          if(typeof resultParts[idx][outField] === 'number') return;
-          if(typeof p.age !== 'number'){
-            // if age unknown, treat as adult (100%)
-            return;
-          }
-          if(p.age >= min && p.age <= max){
-            const baseVal = (typeof p[baseField] !== 'undefined') ? p[baseField] : ( (outField==='valorHospedagem') ? (p.valorHospedagem || 0) : (p.valorEvento || 0) );
-            resultParts[idx][outField] = +( (baseVal || 0) * (r.percentual_valor_adulto || 1) ).toFixed(2);
-          }
-        });
-      }
-
-      // for any participants still unassigned, apply default adult price
-      participantes.forEach((p, idx)=>{
-        if(typeof resultParts[idx][outField] !== 'number'){
-          resultParts[idx][outField] = +( (p[baseField] || 0) * 1 ).toFixed(2);
+    // Calcula a idade com base na data de nascimento
+    calculateAge(birthDate) {
+        const today = new Date();
+        const birthDateObj = new Date(birthDate);
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        const monthDiff = today.getMonth() - birthDateObj.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
+            age--;
         }
-      });
+        
+        return age;
     }
 
-    // apply for hospedagem and evento
-    applyRulesForType('hospedagem');
-    applyRulesForType('evento');
+    // Calcula o preço da hospedagem com base no tipo de acomodação, período e idade
+    calculateAccommodationPrice(accommodationType, periodId, birthDate) {
+        if (!accommodationType || !periodId || !this.eventData) {
+            return 0;
+        }
 
-    // now compute subtotals
-    const totals = {subtotalHospedagem:0, subtotalEvento:0, desconto:0, total:0, participants: resultParts};
-    resultParts.forEach(p=>{ totals.subtotalHospedagem += (p.valorHospedagem || 0); totals.subtotalEvento += (p.valorEvento || 0); });
-    // determine discount based on cupom.aplicacao
-    let desconto = 0;
-  const baseHosp = totals.subtotalHospedagem;
-  const baseEvent = totals.subtotalEvento;
-  const baseTotal = baseHosp + baseEvent;
-    if(cupom){
-      const tipo = cupom.tipo_desconto;
-      const aplic = (cupom.aplicacao || 'total'); // 'total' | 'hospedagem' | 'evento'
-      if(tipo === 'percentual'){
-        if(aplic === 'hospedagem') desconto = baseHosp * (cupom.valor_desconto || 0);
-        else if(aplic === 'evento') desconto = baseEvent * (cupom.valor_desconto || 0);
-        else desconto = baseTotal * (cupom.valor_desconto || 0);
-      } else if(tipo === 'fixo'){
-        // fixed discount: apply to target pool, but not exceed that pool
-        if(aplic === 'hospedagem') desconto = Math.min(cupom.valor_desconto || 0, baseHosp);
-        else if(aplic === 'evento') desconto = Math.min(cupom.valor_desconto || 0, baseEvent);
-        else desconto = Math.min(cupom.valor_desconto || 0, baseTotal);
-      }
+        // Encontra o período selecionado
+        const period = this.eventData.periodos.find(p => p.id === periodId);
+        if (!period) return 0;
+
+        // Encontra a acomodação selecionada
+        const accommodation = this.eventData.acomodacoes.find(a => a.id === accommodationType);
+        if (!accommodation) return 0;
+
+        // Obtém o preço base da acomodação para o período
+        let basePrice = accommodation.preco_por_periodo[periodId] || 0;
+
+        // Aplica regras de idade se existirem
+        if (birthDate && this.eventData.regras_idade && this.eventData.regras_idade.hospedagem) {
+            const age = this.calculateAge(birthDate);
+            const ageRules = this.eventData.regras_idade.hospedagem;
+
+            // Verifica cada regra de idade
+            for (const rule of ageRules) {
+                if (age >= rule.idade_min && age <= rule.idade_max) {
+                    if (rule.tipo_desconto === 'percentual') {
+                        basePrice = basePrice * (1 - rule.valor_desconto / 100);
+                    } else if (rule.tipo_desconto === 'fixo') {
+                        basePrice = basePrice - rule.valor_desconto;
+                    } else if (rule.tipo_desconto === 'valor_fixo') {
+                        basePrice = rule.valor_desconto;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return Math.max(0, basePrice); // Garante que o preço não seja negativo
     }
-    totals.subtotalHospedagem = +totals.subtotalHospedagem.toFixed(2);
-    totals.subtotalEvento = +totals.subtotalEvento.toFixed(2);
-    totals.desconto = +desconto.toFixed(2);
-    const afterDiscount = Math.max(0, baseTotal - desconto);
-    const taxa = (formaPagamento && formaPagamento.taxa_gateway_percentual) ? formaPagamento.taxa_gateway_percentual : 0;
-    totals.total = +((afterDiscount * (1 + taxa)).toFixed(2));
-    return totals;
-  }
 
-  window.priceCalculator = {
-    calculateAge,
-    applyAgeRules,
-    calculateAccommodation,
-    calculateEventValue,
-    calcTotals
-  };
-})();
+    // Calcula o preço do evento com base no tipo de participação, período e idade
+    calculateEventPrice(participationType, periodId, birthDate) {
+        if (!participationType || !this.eventData) {
+            return 0;
+        }
+
+        // Encontra a opção de participação selecionada
+        const participation = this.eventData.opcoes_evento.find(o => o.id === participationType);
+        if (!participation) return 0;
+
+        // Obtém o preço base da participação
+        // Se o preço for vinculado ao período, usa o preço específico do período
+        let basePrice = 0;
+        if (participation.preco_por_periodo && periodId) {
+            basePrice = participation.preco_por_periodo[periodId] || participation.preco || 0;
+        } else {
+            basePrice = participation.preco || 0;
+        }
+
+        // Aplica regras de idade se existirem
+        if (birthDate && this.eventData.regras_idade && this.eventData.regras_idade.evento) {
+            const age = this.calculateAge(birthDate);
+            const ageRules = this.eventData.regras_idade.evento;
+
+            // Verifica cada regra de idade
+            for (const rule of ageRules) {
+                if (age >= rule.idade_min && age <= rule.idade_max) {
+                    if (rule.tipo_desconto === 'percentual') {
+                        basePrice = basePrice * (1 - rule.valor_desconto / 100);
+                    } else if (rule.tipo_desconto === 'fixo') {
+                        basePrice = basePrice - rule.valor_desconto;
+                    } else if (rule.tipo_desconto === 'valor_fixo') {
+                        basePrice = rule.valor_desconto;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return Math.max(0, basePrice); // Garante que o preço não seja negativo
+    }
+
+    // Adiciona um participante ao cálculo
+    addParticipant(participant) {
+        this.participants.push(participant);
+    }
+
+    // Remove um participante do cálculo
+    removeParticipant(index) {
+        if (index >= 0 && index < this.participants.length) {
+            this.participants.splice(index, 1);
+        }
+    }
+
+    // Atualiza os dados de um participante
+    updateParticipant(index, participant) {
+        if (index >= 0 && index < this.participants.length) {
+            this.participants[index] = participant;
+        }
+    }
+
+    // Aplica um cupom de desconto
+    applyCoupon(code) {
+        if (!this.eventData || !this.eventData.cupons) {
+            return { success: false, message: 'Não há cupons disponíveis para este evento.' };
+        }
+
+        // Encontra o cupom pelo código
+        const coupon = this.eventData.cupons.find(c => c.codigo.toLowerCase() === code.toLowerCase());
+        
+        if (!coupon) {
+            return { success: false, message: 'Cupom inválido ou inexistente.' };
+        }
+
+        // Verifica se o cupom está ativo
+        if (!coupon.ativo) {
+            return { success: false, message: 'Este cupom não está mais ativo.' };
+        }
+
+        // Verifica a data de validade do cupom
+        if (coupon.data_validade) {
+            const today = new Date();
+            const expiryDate = new Date(coupon.data_validade);
+            if (today > expiryDate) {
+                return { success: false, message: 'Este cupom está expirado.' };
+            }
+        }
+
+        // Armazena as informações do cupom
+        this.couponCode = code;
+        this.couponType = coupon.tipo_desconto;
+        this.couponTarget = coupon.aplicacao;
+        this.couponDiscount = coupon.valor_desconto;
+
+        return { 
+            success: true, 
+            message: 'Cupom aplicado com sucesso!',
+            discount: this.calculateCouponDiscount()
+        };
+    }
+
+    // Remove o cupom aplicado
+    removeCoupon() {
+        this.couponCode = null;
+        this.couponDiscount = 0;
+        this.couponType = null;
+        this.couponTarget = null;
+    }
+
+    // Calcula o desconto do cupom
+    calculateCouponDiscount() {
+        if (!this.couponCode || this.couponDiscount <= 0) {
+            return 0;
+        }
+
+        const subtotals = this.calculateSubtotals();
+        let baseAmount = 0;
+
+        // Determina o valor base para aplicação do desconto
+        if (this.couponTarget === 'total') {
+            baseAmount = subtotals.accommodationTotal + subtotals.eventTotal;
+        } else if (this.couponTarget === 'hospedagem') {
+            baseAmount = subtotals.accommodationTotal;
+        } else if (this.couponTarget === 'evento') {
+            baseAmount = subtotals.eventTotal;
+        }
+
+        // Calcula o desconto com base no tipo
+        if (this.couponType === 'percentual') {
+            return baseAmount * (this.couponDiscount / 100);
+        } else if (this.couponType === 'fixo') {
+            return Math.min(baseAmount, this.couponDiscount); // Não permite desconto maior que o valor base
+        }
+
+        return 0;
+    }
+
+    // Calcula os subtotais de hospedagem e evento
+    calculateSubtotals() {
+        let accommodationTotal = 0;
+        let eventTotal = 0;
+
+        for (const participant of this.participants) {
+            if (participant.accommodationType && participant.periodId) {
+                accommodationTotal += this.calculateAccommodationPrice(
+                    participant.accommodationType,
+                    participant.periodId,
+                    participant.birthDate
+                );
+            }
+
+            if (participant.participationType) {
+                eventTotal += this.calculateEventPrice(
+                    participant.participationType,
+                    participant.periodId, // Usa o mesmo período da hospedagem se aplicável
+                    participant.birthDate
+                );
+            }
+        }
+
+        return {
+            accommodationTotal,
+            eventTotal
+        };
+    }
+
+    // Calcula o total geral incluindo descontos
+    calculateTotal() {
+        const subtotals = this.calculateSubtotals();
+        const couponDiscount = this.calculateCouponDiscount();
+
+        // Calcula o total
+        const total = subtotals.accommodationTotal + subtotals.eventTotal - couponDiscount;
+
+        return {
+            accommodationTotal: subtotals.accommodationTotal,
+            eventTotal: subtotals.eventTotal,
+            couponDiscount: couponDiscount,
+            total: Math.max(0, total) // Garante que o total não seja negativo
+        };
+    }
+}
+
+// Exporta a classe para uso global
+window.PriceCalculator = PriceCalculator;
