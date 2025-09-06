@@ -3,13 +3,14 @@
   const STATE = {
     evento: null,
     participantes: [],
-    responsavel: null
+    responsavel: null,
+    currentPage: 0 // 0: Welcome, 1: Participants, 2: Payment
   };
 
   // localStorage helpers
   const STORAGE_KEY = 'fazenda_reserva_state_v1';
   function saveState(){
-    try{ const copy = {participantes: STATE.participantes, appliedCupom: STATE.appliedCupom, eventoId: STATE.evento && STATE.evento.id, responsavel: STATE.responsavel};
+    try{ const copy = {participantes: STATE.participantes, appliedCupom: STATE.appliedCupom, eventoId: STATE.evento && STATE.evento.id, responsavel: STATE.responsavel, currentPage: STATE.currentPage};
       localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
     }catch(e){console.warn('saveState failed', e)}
   }
@@ -20,6 +21,7 @@
       if(parsed && Array.isArray(parsed.participantes)) STATE.participantes = parsed.participantes;
       if(parsed && parsed.appliedCupom) STATE.appliedCupom = parsed.appliedCupom;
       if(parsed && typeof parsed.responsavel !== 'undefined') STATE.responsavel = parsed.responsavel;
+      if(parsed && typeof parsed.currentPage !== 'undefined') STATE.currentPage = parsed.currentPage;
     }catch(e){console.warn('loadState failed', e)}
   }
 
@@ -57,6 +59,46 @@
   }
 
   function el(id){ return document.getElementById(id); }
+  
+  // Navigation functions
+  function showPage(pageIndex) {
+     // Save current page in state
+     STATE.currentPage = pageIndex;
+     saveState();
+     
+     // Hide all pages and show the current one
+     const pages = document.querySelectorAll('.form-page');
+     pages.forEach((page, index) => {
+       if (index === pageIndex) {
+         page.classList.add('active');
+       } else {
+         page.classList.remove('active');
+       }
+     });
+   }
+  
+  // Progress indicator functionality removed
+  
+  function goToNextPage() {
+    if (validateCurrentPage() && STATE.currentPage < 2) {
+      showPage(STATE.currentPage + 1);
+    }
+  }
+  
+  function goToPreviousPage() {
+    if (STATE.currentPage > 0) {
+      showPage(STATE.currentPage - 1);
+    }
+  }
+  
+  function validateCurrentPage() {
+    // Basic validation logic
+    if (STATE.currentPage === 1 && STATE.participantes.length === 0) {
+      alert('Adicione pelo menos um participante');
+      return false;
+    }
+    return true;
+  }
 
   function renderHeader(event){
     const banner = el('banner');
@@ -530,10 +572,30 @@
     console.error('Erro carregando eventos.json', err);
   });
 
-  // hook start button to scroll to form
+  // hook start button to scroll to form and navigation buttons
   const start = el('startBtn');
   if(start) start.addEventListener('click', ()=>{
     document.getElementById('formArea').scrollIntoView({behavior:'smooth'});
+    // If we have page navigation, go to first page
+    if(document.querySelector('.form-page')) {
+      showPage(0);
+    }
   });
+  
+  // Add event listeners for navigation buttons
+  const nextButtons = document.querySelectorAll('.btn-next');
+  nextButtons.forEach(btn => {
+    btn.addEventListener('click', goToNextPage);
+  });
+  
+  const prevButtons = document.querySelectorAll('.btn-prev');
+  prevButtons.forEach(btn => {
+    btn.addEventListener('click', goToPreviousPage);
+  });
+  
+  // Initialize page display based on saved state
+  if(document.querySelector('.form-page')) {
+    showPage(STATE.currentPage || 0);
+  }
 
 })();

@@ -6,6 +6,8 @@
   --accent:#111827;
   --primary: #000000;
   --radius:12px;
+  --secondary: #6b7280;
+  --success: #10b981;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:var(--accent);background:var(--bg)}
@@ -85,8 +87,32 @@ html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Seg
 .text-muted{color:var(--muted)}
 .center{display:flex;align-items:center;justify-content:center}
 
+/* Multi-page form structure */
+.form-page {
+  display: none;
+  margin: 28px 0 80px;
+}
+
+.form-page.active {
+  display: block;
+}
+
+/* Progress indicator removed */
+
+/* Navigation buttons */
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: white;
+}
+
 /* Form area and participant styles */
-.form-area{margin:28px 0 80px;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.form-area{margin:0;display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
 .form-controls{margin-bottom:8px}
 .participant-block{background:var(--card-bg);border-radius:10px;padding:14px;border:1px solid rgba(2,6,23,0.06);box-shadow:0 6px 18px rgba(2,6,23,0.04);margin-bottom:12px}
 .participant-block .participant-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
@@ -97,6 +123,52 @@ html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Seg
 .participant-totals{display:flex;gap:18px;justify-content:flex-start;color:var(--accent);font-weight:600}
 .summary{background:var(--card-bg);padding:14px;border-radius:10px;border:1px solid rgba(2,6,23,0.06)}
 
+/* Payment page styles */
+.payment-section {
+  background: var(--card-bg);
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid rgba(2,6,23,0.06);
+  box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+}
+
+.payment-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.payment-section h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.responsavel-info,
+.participants-summary,
+.payment-options,
+.coupon-section,
+.terms-section {
+  margin-bottom: 24px;
+}
+
+.coupon-row {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-row input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #e6e9ee;
+}
+
+.terms-section label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Responsive styles */
 @media (max-width:900px){
   .form-area{grid-template-columns:1fr;}
   .participant-block .grid{grid-template-columns:1fr}
