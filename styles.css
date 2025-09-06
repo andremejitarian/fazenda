@@ -1,0 +1,365 @@
+/* Estilos para o Formulário de Inscrição da Fazenda Serrinha */
+
+/* Reset e Estilos Gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Header e Banner */
+header {
+    position: relative;
+    width: 100%;
+    margin-bottom: 30px;
+    display: block;
+}
+
+.banner-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;
+    display: block;
+    position: relative;
+}
+
+#event-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    z-index: 10;
+}
+
+#event-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Estilos para os passos do formulário */
+.form-step {
+    display: none;
+    padding: 30px;
+}
+
+.form-step.active {
+    display: block;
+}
+
+h1 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: left;
+    padding-bottom: 10px;
+    border-bottom: none;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin: 15px 0;
+}
+
+h3 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin: 10px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* Estilos para o passo 1 - Informações do Evento */
+.event-info {
+    margin-bottom: 30px;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0;
+    border-left: none;
+}
+
+.welcome {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+#event-name {
+    font-size: 22px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    display: none; /* Escondemos o nome do evento pois já está no título */
+}
+
+#event-description {
+    font-size: 16px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    display: none; /* Escondemos a descrição do evento pois já está no welcome */
+}
+
+.observations {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-style: italic;
+    display: none; /* Escondemos as observações adicionais */
+}
+
+/* Estilos para o passo 2 - Dados dos Participantes */
+#participants-container {
+    margin-bottom: 20px;
+}
+
+.participant-template {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.participant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+.accommodation-section, .event-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.price-display {
+    margin-top: 10px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.payment-responsible {
+    margin-top: 20px;
+}
+
+/* Estilos para o passo 3 - Resumo e Pagamento */
+.payment-responsible-summary, 
+.participants-summary, 
+.payment-method, 
+.coupon-section, 
+.totals-section, 
+.terms-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+#responsible-info, 
+#participants-summary-container {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+}
+
+.total-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: 10px;
+}
+
+/* Estilos para o passo 4 - Confirmação */
+.confirmation-message {
+    text-align: center;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.confirmation-message h2 {
+    color: #27ae60;
+    margin-bottom: 20px;
+}
+
+#registration-id {
+    font-weight: 700;
+    color: #3498db;
+}
+
+/* Botões */
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #000;
+    color: white;
+    border-radius: 25px;
+    padding: 12px 25px;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background-color: #333;
+}
+
+.btn-secondary {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #27ae60;
+}
+
+.btn-back {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-back:hover {
+    background-color: #7f8c8d;
+}
+
+.remove-participant {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.remove-participant:hover {
+    background-color: #c0392b;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#start-registration, 
+#add-participant, 
+#confirm-registration, 
+#proceed-to-payment {
+    display: block;
+    width: 100%;
+    margin: 20px auto;
+    padding: 15px;
+    font-size: 18px;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 20px;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .logo-container {
+        width: 80px;
+        height: 80px;
+        left: 15px;
+    }
+    
+    h1 {
+        font-size: 20px;
+    }
+    
+    h2 {
+        font-size: 18px;
+    }
+    
+    .navigation-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn-back, .btn-primary {
+        width: 100%;
+    }
+}
