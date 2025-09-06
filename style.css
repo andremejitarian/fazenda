@@ -99,6 +99,17 @@ html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Seg
 
 /* Progress indicator removed */
 
+/* Loading message styles */
+.loading-message {
+  color: #e74c3c;
+  font-weight: 500;
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fdeaea;
+  border-radius: 5px;
+  text-align: center;
+}
+
 /* Navigation buttons */
 .navigation-buttons {
   display: flex;
