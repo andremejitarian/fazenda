@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Formulário - Fazenda Serrinha</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Garantir que a mensagem de carregamento seja ocultada inicialmente */
+    #loadingMessage { display: none !important; }
+    #startBtn { display: block !important; }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -26,9 +31,9 @@
       <div class="hero-card" id="heroCard">
         <h1 id="eventTitle">Carregando...</h1>
         <p id="eventDescription">Aguarde enquanto carregamos os detalhes do evento.</p>
-        <p id="loadingMessage" class="loading-message">Carregando... Aguarde enquanto carregamos os detalhes do evento.</p>
+        <div id="loadingMessage" class="loading-message">Carregando... Aguarde enquanto carregamos os detalhes do evento.</div>
         <div class="hero-actions">
-          <button id="startBtn" class="btn" style="display: none;">Avançar para Participantes →</button>
+          <button id="startBtn" class="btn">Avançar para Participantes →</button>
         </div>
       </div>
     </section>
