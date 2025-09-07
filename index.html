@@ -9,12 +9,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- jQuery Mask CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <!-- Scripts -->
-    <script src="js/script.js" defer></script>
 </head>
 <body>
     <!-- Banner Header -->
-    <div class="header-banner" style="background-image: url('https://fazendaserrinha.com.br/wp-content/uploads/2023/10/aereas-12.jpg');">
+    <div class="header-banner" style="background-image: url('https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg');">
     </div>
 
     <!-- Container Principal -->
@@ -262,13 +260,17 @@
             </div>
         </div>
     </template>
-<!-- Adicionar antes do fechamento do </body> -->
-<script src="js/webhookIntegration.js" defer></script>
 
-<!-- Adicionar indicador de conectividade (opcional) -->
-<div class="connectivity-indicator testing" id="connectivity-indicator" style="display: none;">
-    <span class="webhook-status-icon"></span>
-    <span class="connectivity-text">Testando conexão...</span>
-</div>
+    <!-- Indicador de Conectividade -->
+    <div class="connectivity-indicator testing" id="connectivity-indicator" style="display: none;">
+        <span class="webhook-status-icon"></span>
+        <span class="connectivity-text">Testando conexão...</span>
+    </div>
+
+    <!-- Scripts na ordem correta -->
+    <script src="js/cpfValidation.js"></script>
+    <script src="js/priceCalculator.js"></script>
+    <script src="js/webhookIntegration.js"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
