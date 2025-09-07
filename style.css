@@ -381,22 +381,22 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
+    background: none;
     padding: 15px 20px;
     border-radius: 8px;
     margin-top: 15px;
-    border: 1px solid var(--accent-color);
+    border: none;
 }
 
 .price-label {
     font-weight: 600;
-    color: var(--primary-color);
+    color: var(--text-primary);
 }
 
 .price-value {
     font-size: 1.2em;
     font-weight: 700;
-    color: var(--success-color);
+    color: var(--text-primary);
 }
 
 /* Info Text */
