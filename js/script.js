@@ -4,6 +4,9 @@ let participants = [];
 let currentStep = 1;
 let appliedCoupon = null;
 let selectedPaymentMethod = null;
+let webhookConnected = false;
+let submissionInProgress = false;
+let paymentLinkGenerated = false;
 
 // Inicialização
 $(document).ready(function() {
@@ -17,8 +20,16 @@ function initializeForm() {
     const urlParams = new URLSearchParams(window.location.search);
     const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
     
-    // Carregar dados do evento
-    loadEventData(eventoId);
+    // Inicializar integração com webhooks
+    initializeWebhookIntegration();
+    
+    // Testar conectividade
+    testWebhookConnectivity().then(connected => {
+        webhookConnected = connected;
+    });
+    
+    // Carregar dados do evento (com tentativa de webhook primeiro)
+    loadEventDataWithWebhook(eventoId);
     
     // Configurar event listeners
     setupEventListeners();
@@ -27,42 +38,62 @@ function initializeForm() {
     setupInputMasks();
 }
 
-// Carregar dados do evento
-function loadEventData(eventoId) {
+// Nova função para carregar dados com webhook
+async function loadEventDataWithWebhook(eventoId) {
     console.log(`Carregando evento: ${eventoId}`);
     
     // Mostrar estado de loading
     showLoadingState();
     
-    // Carregar eventos.json
-    fetch('eventos.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar dados dos eventos');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const evento = data.eventos.find(e => e.id === eventoId);
-            
-            if (!evento) {
-                throw new Error(`Evento ${eventoId} não encontrado`);
-            }
-            
-            currentEvent = evento;
-            console.log('Evento carregado:', currentEvent);
-            
-            // Configurar interface com dados do evento
-            setupEventInterface();
-            
-            // Ocultar loading e mostrar conteúdo
-            hideLoadingState();
-            
-        })
-        .catch(error => {
-            console.error('Erro ao carregar evento:', error);
-            showErrorState(error.message);
-        });
+    try {
+        // Tentar carregar via webhook primeiro
+        let eventoData = null;
+        
+        if (webhookIntegration) {
+            eventoData = await webhookIntegration.preloadEventData(eventoId);
+        }
+        
+        // Se webhook falhou, carregar do JSON local
+        if (!eventoData) {
+            console.log('Carregando do arquivo JSON local...');
+            eventoData = await loadEventFromJSON(eventoId);
+        }
+        
+        if (!eventoData) {
+            throw new Error(`Evento ${eventoId} não encontrado`);
+        }
+        
+        currentEvent = eventoData;
+        console.log('Evento carregado:', currentEvent);
+        
+        // Configurar interface com dados do evento
+        setupEventInterface();
+        
+        // Ocultar loading e mostrar conteúdo
+        hideLoadingState();
+        
+    } catch (error) {
+        console.error('Erro ao carregar evento:', error);
+        showErrorState(error.message);
+    }
+}
+
+// Função para carregar do JSON local (fallback)
+async function loadEventFromJSON(eventoId) {
+    try {
+        const response = await fetch('eventos.json');
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados dos eventos');
+        }
+        
+        const data = await response.json();
+        const evento = data.eventos.find(e => e.id === eventoId);
+        
+        return evento;
+    } catch (error) {
+        console.error('Erro ao carregar JSON local:', error);
+        return null;
+    }
 }
 
 // Configurar interface com dados do evento
@@ -84,6 +115,9 @@ function setupEventInterface() {
     
     // Configurar link dos termos
     $('#terms-link').attr('href', currentEvent.politicas_evento_url);
+    
+    // Inicializar calculador de preços
+    initializePriceCalculator(currentEvent);
     
     // Mostrar botão de avançar
     $('#start-form-btn').show();
@@ -509,6 +543,11 @@ function updatePaymentMethod() {
         $('#payment-method-description').text(forma.descricao);
         selectedPaymentMethod = forma;
         
+        // Atualizar calculador
+        if (priceCalculator) {
+            priceCalculator.setPaymentMethod(forma);
+        }
+        
         // Recalcular totais com nova taxa de gateway
         updateAllCalculations();
     }
@@ -624,7 +663,9 @@ function validateSummaryStep() {
         alert('Por favor, aceite os termos e condições.');
         return false;
     }
-    // Adicionar estas funções ao final do script.js existente
+    
+    return true;
+}
 
 // Configurar etapa de resumo
 function setupSummaryStep() {
@@ -763,69 +804,108 @@ function getEventOptionLabel(eventOptionId, stayPeriodId) {
     return eventOption ? eventOption.label : 'Opção não encontrada';
 }
 
-// Atualizar método de pagamento (sobrescrever função existente)
-function updatePaymentMethod() {
-    const selectedId = $('#payment-method').val();
-    const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
-    
-    if (forma) {
-        $('#payment-method-description').text(forma.descricao);
-        selectedPaymentMethod = forma;
-        
-        // Atualizar calculador
-        if (priceCalculator) {
-            priceCalculator.setPaymentMethod(forma);
-        }
-        
-        // Recalcular totais com nova taxa de gateway
-        updateAllCalculations();
-    }
-}
-
-// Configurar interface com dados do evento (atualizar função existente)
-function setupEventInterface() {
-    // Configurar header se disponível
-    if (currentEvent.header) {
-        setupEventHeader();
-    }
-    
-    // Preencher informações básicas
-    $('#event-title').text(currentEvent.nome);
-    $('#event-description').text(currentEvent.descricao);
-    
-    if (currentEvent.observacoes_adicionais) {
-        $('#event-observations').text(currentEvent.observacoes_adicionais).show();
-    } else {
-        $('#event-observations').hide();
-    }
-    
-    // Configurar link dos termos
-    $('#terms-link').attr('href', currentEvent.politicas_evento_url);
-    
-    // Inicializar calculador de preços
-    initializePriceCalculator(currentEvent);
-    
-    // Mostrar botão de avançar
-    $('#start-form-btn').show();
-}
-
 // Submeter formulário
-function submitForm() {
-    if (!validateSummaryStep()) {
+async function submitForm() {
+    if (!validateSummaryStep() || submissionInProgress) {
         return;
     }
     
-    // Gerar ID único da inscrição
-    const inscricaoId = generateInscricaoId();
+    submissionInProgress = true;
     
-    // Preparar dados para envio
-    const formData = prepareFormData(inscricaoId);
+    try {
+        // Mostrar estado de carregamento
+        showSubmissionLoading();
+        
+        // Gerar ID único da inscrição
+        const inscricaoId = generateInscricaoId();
+        
+        // Preparar dados para envio
+        const formData = prepareFormData(inscricaoId);
+        
+        console.log('Dados preparados para envio:', formData);
+        
+        // Tentar enviar via webhook
+        let submissionResult = null;
+        
+        if (webhookIntegration && webhookConnected) {
+            submissionResult = await webhookIntegration.submitForm(formData);
+        } else {
+            // Simular envio offline
+            submissionResult = await simulateOfflineSubmission(formData);
+        }
+        
+        if (submissionResult.success) {
+            console.log('Formulário enviado com sucesso');
+            
+            // Ir para tela de confirmação
+            showConfirmation(inscricaoId, formData, submissionResult.data);
+        } else {
+            throw new Error(submissionResult.error || 'Erro desconhecido no envio');
+        }
+        
+    } catch (error) {
+        console.error('Erro na submissão:', error);
+        showSubmissionError(error.message);
+    } finally {
+        submissionInProgress = false;
+        hideSubmissionLoading();
+    }
+}
+
+// Mostrar estado de carregamento da submissão
+function showSubmissionLoading() {
+    const $submitBtn = $('.submit-btn');
+    $submitBtn.prop('disabled', true);
+    $submitBtn.html(`
+        <span class="calculating-indicator"></span>
+        Enviando inscrição...
+    `);
+}
+
+// Ocultar estado de carregamento da submissão
+function hideSubmissionLoading() {
+    const $submitBtn = $('.submit-btn');
+    $submitBtn.prop('disabled', false);
+    $submitBtn.html('Confirmar Inscrição e Prosseguir');
+}
+
+// Mostrar erro na submissão
+function showSubmissionError(errorMessage) {
+    const errorHtml = `
+        <div class="submission-error">
+            <div class="error-icon">⚠️</div>
+            <h3>Erro no Envio</h3>
+            <p>${errorMessage}</p>
+            <p>Por favor, verifique sua conexão e tente novamente.</p>
+            <button class="btn btn-primary" onclick="submitForm()">Tentar Novamente</button>
+        </div>
+    `;
     
-    // Simular envio (substituir por chamada real ao webhook)
-    console.log('Dados do formulário:', formData);
+    // Mostrar modal ou seção de erro
+    if ($('.submission-error').length === 0) {
+        $('#step-3').append(errorHtml);
+    }
     
-    // Ir para tela de confirmação
-    showConfirmation(inscricaoId, formData);
+    // Scroll para o erro
+    $('.submission-error')[0].scrollIntoView({ behavior: 'smooth' });
+}
+
+// Simular envio offline (fallback)
+function simulateOfflineSubmission(formData) {
+    console.log('Modo offline: simulando envio...');
+    
+    // Simular delay de rede
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve({
+                success: true,
+                data: {
+                    message: 'Inscrição recebida (modo offline)',
+                    link: '#pagamento-offline'
+                }
+            });
+        }, 2000);
+    });
 }
 
 // Gerar ID único da inscrição
@@ -883,28 +963,471 @@ function prepareFormData(inscricaoId) {
 }
 
 // Mostrar confirmação
-function showConfirmation(inscricaoId, formData) {
+function showConfirmation(inscricaoId, formData, responseData) {
     // Preencher dados da confirmação
     $('#confirmation-id').text(`#${inscricaoId}`);
     $('#confirmation-total').text(priceCalculator.formatCurrency(formData.totais.total));
     $('#confirmation-payment-method').text(formData.forma_pagamento.label);
     
+    // Configurar link de pagamento se disponível
+    if (responseData && responseData.link) {
+        setupPaymentLink(responseData.link, formData);
+    }
+    
     // Ir para tela de confirmação
     goToStep(4);
+    
+    // Salvar dados localmente para recuperação
+    saveFormDataLocally(inscricaoId, formData);
+}
+
+// Configurar link de pagamento
+function setupPaymentLink(paymentLink, formData) {
+    const $paymentBtn = $('.payment-link-btn');
+    
+    if (paymentLink && paymentLink !== '#pagamento-offline') {
+        $paymentBtn.show();
+        $paymentBtn.off('click').on('click', function() {
+            // Abrir link em nova aba
+            window.open(paymentLink, '_blank');
+            
+            // Mostrar opções adicionais
+            showPaymentOptions(paymentLink);
+        });
+    } else {
+        // Modo offline ou erro no link
+        $paymentBtn.show().text('Gerar Link de Pagamento');
+        $paymentBtn.off('click').on('click', function() {
+            generatePaymentLinkManually(formData);
+        });
+    }
+}
+
+// Gerar link de pagamento manualmente
+async function generatePaymentLinkManually(formData) {
+    if (paymentLinkGenerated) return;
+    
+    paymentLinkGenerated = true;
+    
+    try {
+        // Mostrar carregamento
+        const $paymentBtn = $('.payment-link-btn');
+        $paymentBtn.prop('disabled', true).html(`
+            <span class="calculating-indicator"></span>
+            Gerando link...
+        `);
+        
+        // Tentar gerar via webhook
+        let linkResult = null;
+        
+        if (webhookIntegration && webhookConnected) {
+            linkResult = await webhookIntegration.generatePaymentLink(formData);
+        }
+        
+        if (linkResult && linkResult.success) {
+            // Link gerado com sucesso
+            $paymentBtn.prop('disabled', false).text('Ir para Pagamento');
+            $paymentBtn.off('click').on('click', function() {
+                window.open(linkResult.link, '_blank');
+                showPaymentOptions(linkResult.link);
+            });
+            
+            showPaymentSuccess(linkResult);
+        } else {
+            throw new Error(linkResult?.error || 'Erro ao gerar link de pagamento');
+        }
+        
+    } catch (error) {
+        console.error('Erro ao gerar link:', error);
+        showPaymentLinkError(error.message);
+    } finally {
+        paymentLinkGenerated = false;
+    }
+}
+
+// Mostrar opções de pagamento
+function showPaymentOptions(paymentLink) {
+    const optionsHtml = `
+        <div class="payment-options">
+            <h4>Opções de Pagamento</h4>
+            <div class="payment-actions">
+                <button class="btn btn-secondary" onclick="copyPaymentLink('${paymentLink}')">
+                    📋 Copiar Link
+                </button>
+                <button class="btn btn-secondary" onclick="sharePaymentLink('${paymentLink}')">
+                    📤 Compartilhar
+                </button>
+            </div>
+            <div class="qr-code-container" id="qr-code-container">
+                <!-- QR Code seria gerado aqui -->
+            </div>
+        </div>
+    `;
+    
+    if ($('.payment-options').length === 0) {
+        $('.payment-link-btn').after(optionsHtml);
+    }
+}
+
+// Copiar link de pagamento
+function copyPaymentLink(link) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(link).then(() => {
+            showToast('Link copiado para a área de transferência!', 'success');
+        }).catch(() => {
+            fallbackCopyText(link);
+        });
+    } else {
+        fallbackCopyText(link);
+    }
+}
+
+// Fallback para copiar texto
+function fallbackCopyText(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showToast('Link copiado!', 'success');
+    } catch (err) {
+        console.error('Erro ao copiar:', err);
+        showToast('Erro ao copiar link', 'error');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Compartilhar link de pagamento
+function sharePaymentLink(link) {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Link de Pagamento - Fazenda Serrinha',
+            text: 'Complete seu pagamento através deste link:',
+            url: link
+        }).catch(err => console.log('Erro ao compartilhar:', err));
+    } else {
+        // Fallback: copiar link
+        copyPaymentLink(link);
+    }
+}
+
+// Mostrar sucesso na geração do link
+function showPaymentSuccess(linkResult) {
+    const successHtml = `
+        <div class="payment-success">
+            <div class="success-icon">✅</div>
+            <p>Link de pagamento gerado com sucesso!</p>
+            ${linkResult.expiresAt ? `<p class="expires-info">Válido até: ${new Date(linkResult.expiresAt).toLocaleString('pt-BR')}</p>` : ''}
+        </div>
+    `;
+    
+    $('.payment-link-btn').after(successHtml);
+}
+
+// Mostrar erro na geração do link
+function showPaymentLinkError(errorMessage) {
+    const $paymentBtn = $('.payment-link-btn');
+    $paymentBtn.prop('disabled', false).text('Tentar Novamente');
+    
+    const errorHtml = `
+        <div class="payment-link-error">
+            <div class="error-icon">❌</div>
+            <p>Erro ao gerar link de pagamento:</p>
+            <p class="error-message">${errorMessage}</p>
+            <p>Entre em contato conosco para finalizar o pagamento.</p>
+        </div>
+    `;
+    
+    if ($('.payment-link-error').length === 0) {
+        $('.payment-link-btn').after(errorHtml);
+    }
+}
+
+// Salvar dados localmente para recuperação
+function saveFormDataLocally(inscricaoId, formData) {
+    try {
+        const dataToSave = {
+            inscricaoId,
+            formData,
+            timestamp: new Date().toISOString(),
+            evento: currentEvent.id
+        };
+        
+        localStorage.setItem(`fazenda_serrinha_${inscricaoId}`, JSON.stringify(dataToSave));
+        console.log(`Dados salvos localmente para inscrição ${inscricaoId}`);
+    } catch (error) {
+        console.warn('Erro ao salvar dados localmente:', error);
+    }
+}
+
+// Mostrar toast de notificação
+function showToast(message, type = 'info') {
+    const toastHtml = `
+        <div class="toast toast-${type}">
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    // Remover toasts existentes
+    $('.toast').remove();
+    
+    // Adicionar novo toast
+    $('body').append(toastHtml);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        $('.toast').fadeOut(300, function() {
+            $(this).remove();
+        });
+    }, 5000);
 }
 
 // Configurar etapa de confirmação
 function setupConfirmationStep() {
-    // Aqui seria feita a integração com o webhook de pagamento
-    // Por enquanto, apenas simular
+    // Verificar se há dados salvos para recuperação
+    checkForSavedData();
     
-    setTimeout(() => {
-        $('.payment-link-btn').show().text('Ir para Pagamento');
-    }, 1000);
+    // Configurar botões de ação
+    setupConfirmationActions();
 }
 
-console.log('Funções de cálculo e resumo adicionadas');
-    return true;
+// Verificar dados salvos
+function checkForSavedData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const inscricaoId = urlParams.get('inscricao');
+    
+    if (inscricaoId) {
+        const savedData = localStorage.getItem(`fazenda_serrinha_${inscricaoId}`);
+        if (savedData) {
+            try {
+                const data = JSON.parse(savedData);
+                console.log('Dados recuperados:', data);
+                
+                // Preencher dados da confirmação
+                $('#confirmation-id').text(`#${data.inscricaoId}`);
+                $('#confirmation-total').text(data.formData.totais.total);
+                $('#confirmation-payment-method').text(data.formData.forma_pagamento.label);
+            } catch (error) {
+                console.error('Erro ao recuperar dados:', error);
+            }
+        }
+    }
 }
 
-console.log('Script principal carregado');
+// Configurar ações da confirmação
+function setupConfirmationActions() {
+    // Botão de nova inscrição
+    if ($('.new-registration-btn').length === 0) {
+        $('.payment-link-btn').after(`
+            <button class="btn btn-secondary new-registration-btn" style="margin-top: 20px;">
+                Nova Inscrição
+            </button>
+        `);
+    }
+    
+    $('.new-registration-btn').off('click').on('click', function() {
+        // Limpar dados e reiniciar
+        clearFormData();
+        location.reload();
+    });
+}
+
+// Limpar dados do formulário
+function clearFormData() {
+    // Limpar localStorage
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('fazenda_serrinha_')) {
+            localStorage.removeItem(key);
+        }
+    });
+    
+    // Resetar variáveis globais
+    currentEvent = null;
+    participants = [];
+    currentStep = 1;
+    appliedCoupon = null;
+    selectedPaymentMethod = null;
+    submissionInProgress = false;
+    paymentLinkGenerated = false;
+    
+        console.log('Dados do formulário limpos');
+}
+
+// Extrair dados do participante do formulário
+function extractParticipantData($participant) {
+    return {
+        fullName: $participant.find('.full-name').val(),
+        phone: $participant.find('.phone-mask').val(),
+        cpf: $participant.find('.cpf-mask').val(),
+        email: $participant.find('.email-input').val(),
+        birthDate: $participant.find('.dob-input').val(),
+        stayPeriod: $participant.find('.stay-period-select').val() || 
+                   (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null),
+        accommodation: $participant.find('.accommodation-select').val() || 
+                      (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
+        eventOption: $participant.find('.event-option-select').val() || 
+                    (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
+        isResponsiblePayer: $participant.find('.responsible-payer').is(':checked')
+    };
+}
+
+// Obter opções de evento para um participante específico
+function getEventOptionsForParticipant($participant) {
+    if (currentEvent.tipo_formulario === 'evento_apenas') {
+        return currentEvent.valores_evento_opcoes;
+    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+        const stayPeriodId = $participant.find('.stay-period-select').val() || 
+                           (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+        
+        if (stayPeriodId) {
+            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
+            return periodo ? (periodo.valores_evento_opcoes || []) : [];
+        }
+    }
+    return [];
+}
+
+// Atualizar participante no calculador
+function updateParticipantInCalculator(participantId, participantData) {
+    if (!priceCalculator) return;
+
+    // Encontrar índice do participante
+    const participantIndex = priceCalculator.participants.findIndex(p => p.id === participantId);
+    
+    if (participantIndex >= 0) {
+        // Atualizar participante existente
+        priceCalculator.participants[participantIndex] = {
+            id: participantId,
+            ...participantData
+        };
+    } else {
+        // Adicionar novo participante
+        priceCalculator.participants.push({
+            id: participantId,
+            ...participantData
+        });
+    }
+}
+
+// Atualizar cálculos de um participante específico
+function updateParticipantCalculations($participant) {
+    if (!priceCalculator) return;
+
+    const participantData = extractParticipantData($participant);
+    const participantId = $participant.attr('data-participant-id');
+    
+    // Atualizar dados do participante no calculador
+    updateParticipantInCalculator(participantId, participantData);
+    
+    // Calcular valores individuais
+    const lodgingValue = priceCalculator.calculateLodgingValue(participantData);
+    const eventValue = priceCalculator.calculateEventValue(participantData);
+    
+    // Atualizar display dos valores
+    $participant.find('.lodging-value').text(priceCalculator.formatCurrency(lodgingValue));
+    $participant.find('.event-value').text(priceCalculator.formatCurrency(eventValue));
+    
+    // Atualizar totais gerais se estivermos na tela de resumo
+    if (currentStep === 3) {
+        updateSummaryTotals();
+    }
+    
+    console.log(`Cálculos atualizados para participante ${participantId}:`, {
+        lodging: lodgingValue,
+        event: eventValue
+    });
+}
+
+// Atualizar todos os cálculos
+function updateAllCalculations() {
+    if (!priceCalculator) return;
+
+    // Atualizar dados de todos os participantes
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        const participantId = $participant.attr('data-participant-id');
+        
+        updateParticipantInCalculator(participantId, participantData);
+        
+        // Atualizar displays individuais
+        const lodgingValue = priceCalculator.calculateLodgingValue(participantData);
+        const eventValue = priceCalculator.calculateEventValue(participantData);
+        
+        $participant.find('.lodging-value').text(priceCalculator.formatCurrency(lodgingValue));
+        $participant.find('.event-value').text(priceCalculator.formatCurrency(eventValue));
+    });
+    
+    // Atualizar totais se estivermos na tela de resumo
+    if (currentStep === 3) {
+        updateSummaryTotals();
+    }
+}
+
+// Atualizar totais na tela de resumo
+function updateSummaryTotals() {
+    if (!priceCalculator) return;
+
+    const summary = priceCalculator.getCalculationSummary();
+    
+    // Atualizar displays
+    $('#subtotal-hospedagem').text(summary.formatted.lodgingSubtotal);
+    $('#subtotal-evento').text(summary.formatted.eventSubtotal);
+    $('#discount-value').text('-' + summary.formatted.discount);
+    $('#final-total').text(summary.formatted.finalTotal);
+    
+    // Mostrar/ocultar linhas baseado no tipo de formulário
+    const tipoFormulario = currentEvent.tipo_formulario;
+    
+    if (tipoFormulario === 'hospedagem_apenas') {
+        $('#subtotal-evento').parent().hide();
+    } else if (tipoFormulario === 'evento_apenas') {
+        $('#subtotal-hospedagem').parent().hide();
+    }
+    
+    console.log('Totais atualizados:', summary);
+}
+
+// Aplicar cupom de desconto
+function applyCoupon(couponCode) {
+    if (!priceCalculator) return;
+
+    const validation = priceCalculator.validateCoupon(couponCode);
+    const $feedback = $('#coupon-feedback');
+    
+    if (validation.valid) {
+        priceCalculator.setCoupon(validation.coupon);
+        $feedback.text(validation.message).removeClass('error-message').addClass('success-message');
+        $('#coupon-code').removeClass('error').addClass('success');
+        
+        // Atualizar totais
+        updateSummaryTotals();
+        
+        console.log('Cupom aplicado:', validation.coupon);
+    } else {
+        priceCalculator.setCoupon(null);
+        
+        if (validation.message) {
+            $feedback.text(validation.message).removeClass('success-message').addClass('error-message');
+            $('#coupon-code').addClass('error').removeClass('success');
+        } else {
+            $feedback.text('').removeClass('success-message error-message');
+            $('#coupon-code').removeClass('error success');
+        }
+        
+        // Atualizar totais
+        updateSummaryTotals();
+    }
+}
+
+// Validar cupom (chamada pelo event listener)
+function validateCoupon() {
+    const couponCode = $('#coupon-code').val();
+    applyCoupon(couponCode);
+}
+
+console.log('Script principal carregado com integração completa');
