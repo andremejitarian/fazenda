@@ -1431,3 +1431,195 @@ function validateCoupon() {
 }
 
 console.log('Script principal carregado com integração completa');
+
+// Extrair dados do participante do formulário
+function extractParticipantData($participant) {
+    return {
+        fullName: $participant.find('.full-name').val(),
+        phone: $participant.find('.phone-mask').val(),
+        cpf: $participant.find('.cpf-mask').val(),
+        email: $participant.find('.email-input').val(),
+        birthDate: $participant.find('.dob-input').val(),
+        stayPeriod: $participant.find('.stay-period-select').val() || 
+                   (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null),
+        accommodation: $participant.find('.accommodation-select').val() || 
+                      (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
+        eventOption: $participant.find('.event-option-select').val() || 
+                    (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
+        isResponsiblePayer: $participant.find('.responsible-payer').is(':checked')
+    };
+}
+
+// Obter opções de evento para um participante específico
+function getEventOptionsForParticipant($participant) {
+    if (currentEvent.tipo_formulario === 'evento_apenas') {
+        return currentEvent.valores_evento_opcoes;
+    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+        const stayPeriodId = $participant.find('.stay-period-select').val() || 
+                           (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+        
+        if (stayPeriodId) {
+            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
+            return periodo ? (periodo.valores_evento_opcoes || []) : [];
+        }
+    }
+    return [];
+}
+
+// Atualizar participante no calculador
+function updateParticipantInCalculator(participantId, participantData) {
+    if (!window.priceCalculator) return;
+
+    // Encontrar índice do participante
+    const participantIndex = window.priceCalculator.participants.findIndex(p => p.id === participantId);
+    
+    if (participantIndex >= 0) {
+        // Atualizar participante existente
+        window.priceCalculator.participants[participantIndex] = {
+            id: participantId,
+            ...participantData
+        };
+    } else {
+        // Adicionar novo participante
+        window.priceCalculator.participants.push({
+            id: participantId,
+            ...participantData
+        });
+    }
+}
+
+// Atualizar cálculos de um participante específico
+function updateParticipantCalculations($participant) {
+    if (!window.priceCalculator) return;
+
+    const participantData = extractParticipantData($participant);
+    const participantId = $participant.attr('data-participant-id');
+    
+    // Atualizar dados do participante no calculador
+    updateParticipantInCalculator(participantId, participantData);
+    
+    // Calcular valores individuais
+    const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+    const eventValue = window.priceCalculator.calculateEventValue(participantData);
+    
+    // Atualizar display dos valores
+    $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
+    $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
+    
+    // Atualizar totais gerais se estivermos na tela de resumo
+    if (currentStep === 3) {
+        updateSummaryTotals();
+    }
+    
+    console.log(`Cálculos atualizados para participante ${participantId}:`, {
+        lodging: lodgingValue,
+        event: eventValue
+    });
+}
+
+// Atualizar todos os cálculos
+function updateAllCalculations() {
+    if (!window.priceCalculator) return;
+
+    // Atualizar dados de todos os participantes
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        const participantId = $participant.attr('data-participant-id');
+        
+        updateParticipantInCalculator(participantId, participantData);
+        
+        // Atualizar displays individuais
+        const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+        const eventValue = window.priceCalculator.calculateEventValue(participantData);
+        
+        $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
+        $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
+    });
+    
+    // Atualizar totais se estivermos na tela de resumo
+    if (currentStep === 3) {
+        updateSummaryTotals();
+    }
+}
+
+// Atualizar totais na tela de resumo
+function updateSummaryTotals() {
+    if (!window.priceCalculator) return;
+
+    const summary = window.priceCalculator.getCalculationSummary();
+    
+    // Atualizar displays
+    $('#subtotal-hospedagem').text(summary.formatted.lodgingSubtotal);
+    $('#subtotal-evento').text(summary.formatted.eventSubtotal);
+    $('#discount-value').text('-' + summary.formatted.discount);
+    $('#final-total').text(summary.formatted.finalTotal);
+    
+    // Mostrar/ocultar linhas baseado no tipo de formulário
+    const tipoFormulario = currentEvent.tipo_formulario;
+    
+    if (tipoFormulario === 'hospedagem_apenas') {
+        $('#subtotal-evento').parent().hide();
+    } else if (tipoFormulario === 'evento_apenas') {
+        $('#subtotal-hospedagem').parent().hide();
+    }
+    
+    console.log('Totais atualizados:', summary);
+}
+
+// Aplicar cupom de desconto
+function applyCoupon(couponCode) {
+    if (!window.priceCalculator) return;
+
+    const validation = window.priceCalculator.validateCoupon(couponCode);
+    const $feedback = $('#coupon-feedback');
+    
+    if (validation.valid) {
+        window.priceCalculator.setCoupon(validation.coupon);
+        $feedback.text(validation.message).removeClass('error-message').addClass('success-message');
+        $('#coupon-code').removeClass('error').addClass('success');
+        
+        // Atualizar totais
+        updateSummaryTotals();
+        
+        console.log('Cupom aplicado:', validation.coupon);
+    } else {
+        window.priceCalculator.setCoupon(null);
+        
+        if (validation.message) {
+            $feedback.text(validation.message).removeClass('success-message').addClass('error-message');
+            $('#coupon-code').addClass('error').removeClass('success');
+        } else {
+            $feedback.text('').removeClass('success-message error-message');
+            $('#coupon-code').removeClass('error success');
+        }
+        
+        // Atualizar totais
+        updateSummaryTotals();
+    }
+}
+
+// Validar cupom (chamada pelo event listener)
+function validateCoupon() {
+    const couponCode = $('#coupon-code').val();
+    applyCoupon(couponCode);
+}
+
+// Atualizar método de pagamento (versão corrigida)
+function updatePaymentMethod() {
+    const selectedId = $('#payment-method').val();
+    const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
+    
+    if (forma) {
+        $('#payment-method-description').text(forma.descricao);
+        selectedPaymentMethod = forma;
+        
+        // Atualizar calculador se disponível
+        if (window.priceCalculator && typeof window.priceCalculator.setPaymentMethod === 'function') {
+            window.priceCalculator.setPaymentMethod(forma);
+        }
+        
+        // Recalcular totais com nova taxa de gateway
+        updateAllCalculations();
+    }
+}
