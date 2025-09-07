@@ -680,11 +680,11 @@ body {
     }
     
     .partner-logo.logo-main {
-        transform: translate(-60%, -50%);
+        transform: translate(calc(-50% - 15px), -50%);
     }
     
     .partner-logo.logo-partner {
-        transform: translate(-40%, -50%);
+        transform: translate(calc(-50% + 15px), -50%);
     }
 }
 
