@@ -694,11 +694,11 @@ body {
     }
     
     .partner-logo.logo-main {
-        transform: translate(-70%, -50%); /* ← Base */
+        transform: translate(-75%, -50%); /* ← Posição base (esquerda e embaixo) */
     }
     
     .partner-logo.logo-partner {
-        transform: translate(-30%, -65%); /* ← Acima e à direita */
+        transform: translate(-10%, -85%); /* ← ACIMA E À DIREITA */
     }
 }
 
