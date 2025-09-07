@@ -78,12 +78,12 @@ body {
     left: 20px;  /* ← ADICIONE ESTA LINHA */
     width: 150px;
     height: 150px;
-    background: var(--card-background);
+    background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--shadow-medium);
+    box-shadow: none;
     z-index: 2;
 }
 
@@ -649,6 +649,8 @@ body {
         height: 120px;
         top: -60px;
         left: 20px;
+        background: transparent; /* ← Garantir transparência no mobile */
+        box-shadow: none;
     }
     
     .logo {
