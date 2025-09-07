@@ -255,12 +255,6 @@ body {
     padding: 16px 32px;
 }
 
-.btn-arrow {
-    font-size: 1.2em;
-    margin-left: 5px;
-    transition: var(--transition);
-}
-
 .btn-advance:hover .btn-arrow {
     transform: translateX(3px);
 }
