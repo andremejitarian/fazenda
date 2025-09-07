@@ -423,11 +423,17 @@ function setupParticipantEventListeners($participant) {
         validateCPF($(this));
     });
     
-    // Mudanças que afetam cálculos
-    $participant.find('.stay-period-select, .accommodation-select, .event-option-select, .dob-input').on('change', function() {
-        updateParticipantCalculations($participant);
-        updateEventOptionsForPeriod($participant);
-    });
+// Listener para mudanças que afetam os cálculos diretamente (sem repopular dropdowns)
+$participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .dob-input, .accommodation-select, .event-option-select').on('change', function() {
+    updateParticipantCalculations($participant);
+});
+
+// Listener APENAS para o período de estadia, que deve repopular as opções de evento
+$participant.find('.stay-period-select').on('change', function() {
+    updateEventOptionsForPeriod($participant);
+    // Após a atualização das opções de evento, recalcule os valores
+    updateParticipantCalculations($participant);
+});
     
     // Responsável pelo pagamento
     $participant.find('.responsible-payer').on('change', function() {
