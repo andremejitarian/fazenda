@@ -97,27 +97,27 @@ body {
 /* Logo Duplo para Parceiros */
 .partner-logo {
     position: absolute;
-    width: 90px;
-    height: 90px;
+    width: 85px;
+    height: 85px;
     border-radius: 50%;
-    object-fit: contain;
+    object-fit: cover;
     background: var(--card-background);
     border: 3px solid var(--card-background);
     box-shadow: var(--shadow-light);
 }
 
 .partner-logo.logo-main {
-    z-index: 3; /* Logo principal sempre por cima */
+    z-index: 3; /* ← Logo principal atrás */
     left: 50%;
     top: 50%;
-    transform: translate(calc(-50% - 20px), -50%); /* ← AJUSTADO */
+    transform: translate(-75%, -50%); /* ← Posição base (esquerda e embaixo) */
 }
 
 .partner-logo.logo-partner {
-    z-index: 2; /* Logo parceiro por baixo */
+    z-index: 4; /* ← Logo parceiro na frente */
     left: 50%;
     top: 50%;
-    transform: translate(calc(-50% + 20px), -50%); /* ← AJUSTADO */
+    transform: translate(-35%, -65%); /* ← ACIMA E À DIREITA */
 }
 
 /* Seções do Formulário */
@@ -654,8 +654,8 @@ body {
     }
     
     .logo {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
     }
     
     .welcome-section h1 {
@@ -682,11 +682,11 @@ body {
     }
     
     .partner-logo.logo-main {
-        transform: translate(calc(-50% - 15px), -50%);
+        transform: translate(-70%, -50%); /* ← Base */
     }
     
     .partner-logo.logo-partner {
-        transform: translate(calc(-50% + 15px), -50%);
+        transform: translate(-30%, -65%); /* ← Acima e à direita */
     }
 }
 
