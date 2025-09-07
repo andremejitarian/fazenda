@@ -270,9 +270,9 @@ body {
     font-size: 1.8em;
     font-weight: 700;
     color: var(--primary-color);
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     text-align: center;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: none;
     padding-bottom: 15px;
 }
 
