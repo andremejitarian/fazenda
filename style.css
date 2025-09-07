@@ -107,17 +107,17 @@ body {
 }
 
 .partner-logo.logo-main {
-    z-index: 3;
+    z-index: 3; /* Logo principal sempre por cima */
     left: 50%;
     top: 50%;
-    transform: translate(-65%, -50%);
+    transform: translate(calc(-50% - 20px), -50%); /* ← AJUSTADO */
 }
 
 .partner-logo.logo-partner {
-    z-index: 2;
+    z-index: 2; /* Logo parceiro por baixo */
     left: 50%;
     top: 50%;
-    transform: translate(-35%, -50%);
+    transform: translate(calc(-50% + 20px), -50%); /* ← AJUSTADO */
 }
 
 /* Seções do Formulário */
