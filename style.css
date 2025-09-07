@@ -76,8 +76,7 @@ body {
 .logo-container {
     position: absolute;
     top: -75px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: -35px;  /* ← ADICIONE ESTA LINHA */
     width: 150px;
     height: 150px;
     background: var(--card-background);
