@@ -707,7 +707,7 @@ function generateParticipantsSummary() {
     if (responsiblePayerData) {
         summaryHtml += `
             <div class="responsible-payer-summary">
-                <h3>👤 Responsável pelo Pagamento</h3>
+                <h3>Responsável pelo Pagamento</h3>
                 <div class="payer-info">
                     <p><strong>Nome:</strong> ${responsiblePayerData.fullName}</p>
                     <p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>
@@ -740,7 +740,7 @@ function generateParticipantsSummary() {
         
         summaryHtml += `
             <div class="participant-summary-item">
-                <h4>👤 Participante ${participantNumber}: ${participantData.fullName}</h4>
+                <h4>Participante ${participantNumber}: ${participantData.fullName}</h4>
                 <div class="participant-details">
         `;
         
