@@ -1,21 +1,28 @@
 /* Importação de Fontes */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Variáveis CSS */
 :root {
-    --primary-color: #2c5530;
-    --secondary-color: #4a7c59;
-    --accent-color: #6b9b76;
+    /* Novas Cores Neutras */
+    --color-black: #000000;
+    --color-dark-gray: #212121;
+    --color-medium-gray: #666666;
+    --color-light-gray: #e0e0e0;
+    
+    /* Redefinindo variáveis existentes */
+    --primary-color: var(--color-black);
+    --secondary-color: var(--color-dark-gray);
+    --accent-color: var(--color-medium-gray);
     --background-color: #f8faf9;
     --card-background: #ffffff;
-    --text-primary: #2c3e50;
-    --text-secondary: #7f8c8d;
-    --border-color: #e1e8e4;
+    --text-primary: var(--color-dark-gray);
+    --text-secondary: var(--color-medium-gray);
+    --border-color: var(--color-light-gray);
     --success-color: #27ae60;
     --error-color: #e74c3c;
     --warning-color: #f39c12;
-    --shadow-light: 0 2px 10px rgba(44, 85, 48, 0.1);
-    --shadow-medium: 0 4px 20px rgba(44, 85, 48, 0.15);
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
     --border-radius: 12px;
     --transition: all 0.3s ease;
 }
@@ -139,7 +146,7 @@ body {
 
 .welcome-section p {
     font-size: 1.1em;
-    color: var(--text-secondary);
+    color: var(--color-dark-gray); /* Preto mais suave que o título */
     margin-bottom: 15px;
     line-height: 1.6;
 }
@@ -209,25 +216,26 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--color-black);
     color: white;
     box-shadow: var(--shadow-light);
 }
 
 .btn-primary:hover {
+    background: var(--color-dark-gray);
     transform: translateY(-2px);
     box-shadow: var(--shadow-medium);
 }
 
 .btn-secondary {
     background: var(--background-color);
-    color: var(--primary-color);
+    color: var(--color-dark-gray);
     border: 2px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-    border-color: var(--primary-color);
-    background: var(--primary-color);
+    border-color: var(--color-dark-gray);
+    background: var(--color-dark-gray);
     color: white;
 }
 
@@ -333,8 +341,8 @@ body {
 
 .form-control:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+    border-color: var(--color-dark-gray);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-control::placeholder {
@@ -443,8 +451,8 @@ body {
 }
 
 .checkbox-container input:checked + .checkmark {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: var(--color-black);
+    border-color: var(--color-black);
 }
 
 .checkbox-container input:checked + .checkmark::after {
@@ -473,13 +481,13 @@ body {
     margin: 30px 0;
     padding: 16px;
     font-size: 1.1em;
-    border: 2px dashed var(--accent-color);
+    border: 2px dashed var(--color-medium-gray);
     background: transparent;
-    color: var(--accent-color);
+    color: var(--color-medium-gray);
 }
 
 .btn-add-participant:hover {
-    background: var(--accent-color);
+    background: var(--color-dark-gray);
     color: white;
     border-style: solid;
 }
@@ -658,9 +666,13 @@ body {
         height: 70px;
     }
     
-    .welcome-section h1 {
-        font-size: 1.8em;
-    }
+.welcome-section h1 {
+    font-size: 2.2em;
+    font-weight: 900; /* Mais forte como na imagem */
+    color: var(--color-black); /* Preto puro para o título */
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
     
     .form-row {
         grid-template-columns: 1fr;
@@ -731,13 +743,13 @@ body {
 
 /* Estados de Hover e Focus */
 .participant-block:focus-within {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.1);
+    border-color: var(--color-dark-gray);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(44, 85, 48, 0.3);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Melhorias de Acessibilidade */
@@ -1345,7 +1357,7 @@ body {
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    background: var(--color-black); /* Fundo preto sólido */
     border-radius: 2px;
     transition: width 0.3s ease;
 }
