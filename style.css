@@ -278,7 +278,7 @@ body {
 
 /* Blocos de Participantes */
 .participant-block {
-    background: var(--background-color);
+    background: none;
     border: none;
     border-radius: var(--border-radius);
     padding: 30px;
