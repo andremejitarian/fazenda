@@ -496,18 +496,7 @@ function updateEventOptionsForPeriod($participant) {
     if (currentEvent.tipo_formulario !== 'hospedagem_e_evento') return;
     
     const selectedPeriodId = $participant.find('.stay-period-select').val();
-    if (!selectedPeriodId) {
-        // Se nenhum período selecionado, limpar as informações de check-in/out
-        $participant.find('.checkin-datetime').text('');
-        $participant.find('.checkout-datetime').text('');
-        return;
-    }
-    
-    const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
-    if (!periodo) return;
-    
-    // ADICIONAR ESTA LINHA: Atualizar informações de check-in/out
-    updateCheckInOutInfo($participant, periodo);
+    if (!selectedPeriodId) return;
     
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
     if (!periodo || !periodo.valores_evento_opcoes) return;
