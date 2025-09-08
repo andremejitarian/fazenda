@@ -773,8 +773,8 @@ body {
 
 /* Estilos para resumo e cálculos */
 .responsible-payer-summary {
-    background: linear-gradient(135deg, #e8f4fd, #f0f8ff);
-    border: 2px solid var(--primary-color);
+    background: none;
+    border: none;
     border-radius: var(--border-radius);
     padding: 25px;
     margin-bottom: 30px;
