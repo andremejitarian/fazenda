@@ -167,8 +167,8 @@
     {
       "id": "G002",
       "header": {
-        "banner_url": "https://fazendaserrinha.com.br/wp-content/uploads/2023/10/aereas-12.jpg",
-        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Workshop de Yoga (Apenas Evento)",
       "descricao": "Workshop intensivo de Yoga e Meditação, sem hospedagem inclusa.",
@@ -244,8 +244,8 @@
     {
       "id": "G003",
       "header": {
-        "banner_url": "https://fazendaserrinha.com.br/wp-content/uploads/2023/10/aereas-12.jpg",
-        "logo_url": "https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png"
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Reserva de Hospedagem",
       "descricao": "Hospedagem avulsa em nossos quartos aconchegantes.",
@@ -291,14 +291,14 @@
           "id": "cartao_credito",
           "label": "Cartão de Crédito em até 6x",
           "tipo": "Cartao",
-          "descricao": "Pagamento em até 6x.",
-          "taxa_gateway_percentual": 0.04
+          "descricao": " ",
+          "taxa_gateway_percentual": 0.00
         },
         {
           "id": "pix_vista2",
           "label": "PIX à Vista com 5% de desconto",
           "tipo": "PIX",
-          "descricao": "Pagamento no PIX com 5% de desconto",
+          "descricao": " ",
           "taxa_gateway_percentual": -0.05
         }
       ],
