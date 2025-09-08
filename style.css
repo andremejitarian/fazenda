@@ -785,6 +785,7 @@ body {
     margin-bottom: 20px;
     font-size: 1.3em;
     text-align: center;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .payer-info {
