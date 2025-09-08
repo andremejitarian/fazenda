@@ -342,6 +342,16 @@ function setupLodgingOptions($participant) {
         });
         $stayPeriodSelect.show();
         $stayPeriodInfo.hide();
+
+        // Se já houver um período selecionado (por markup, estado salvo, etc.), inicializa as datas:
+        const selectedPeriodId = $stayPeriodSelect.val();
+        if (selectedPeriodId) {
+            const periodoInicial = periodos.find(p => String(p.id) === String(selectedPeriodId));
+            if (periodoInicial) {
+                updateCheckInOutInfo($participant, periodoInicial);
+            }
+        }
+
     }
     
     // Tipos de acomodação
@@ -393,16 +403,28 @@ function setupEventOptions($participant) {
 
 // Atualizar informações de check-in/out
 function updateCheckInOutInfo($participant, periodo) {
+    if (!periodo || !periodo.data_inicio || !periodo.data_fim) {
+        $participant.find('.checkin-datetime').text('');
+        $participant.find('.checkout-datetime').text('');
+        return;
+    }
+
     const dataInicio = new Date(periodo.data_inicio);
     const dataFim = new Date(periodo.data_fim);
-    
+
     const formatDateTime = (date) => {
-        return date.toLocaleDateString('pt-BR') + ' ' + 
-               date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        // Ajuste simples para exibição em pt-BR
+        const data = date.toLocaleDateString('pt-BR');
+        const hora = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `${data} ${hora}`;
     };
-    
-    $participant.find('.checkin-datetime').text(formatDateTime(dataInicio));
-    $participant.find('.checkout-datetime').text(formatDateTime(dataFim));
+
+    // Se alguma data for inválida, evita mostrar "Invalid Date"
+    const inicioOk = !isNaN(dataInicio.getTime());
+    const fimOk = !isNaN(dataFim.getTime());
+
+    $participant.find('.checkin-datetime').text(inicioOk ? formatDateTime(dataInicio) : '');
+    $participant.find('.checkout-datetime').text(fimOk ? formatDateTime(dataFim) : '');
 }
 
 // Configurar máscaras para participante
@@ -429,11 +451,26 @@ $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .dob-input,
 });
 
 // Listener APENAS para o período de estadia, que deve repopular as opções de evento
-$participant.find('.stay-period-select').on('change', function() {
-    updateEventOptionsForPeriod($participant);
-    // Após a atualização das opções de evento, recalcule os valores
-    updateParticipantCalculations($participant);
-});
+    $participant.find('.stay-period-select').on('change', function() {
+        const selectedPeriodId = $(this).val();
+        const periodoSelecionado = currentEvent.periodos_estadia_opcoes
+            .find(p => String(p.id) === String(selectedPeriodId));
+
+        if (periodoSelecionado) {
+            updateCheckInOutInfo($participant, periodoSelecionado);
+        } else {
+            // Se o usuário volta para "Selecione o período", limpe as datas
+            $participant.find('.checkin-datetime').text('');
+            $participant.find('.checkout-datetime').text('');
+        }
+
+        // Mantém o fluxo atual
+        updateEventOptionsForPeriod($participant);
+        updateParticipantCalculations($participant);
+
+        // Se existir uma função global para recalcular tudo, pode chamar aqui:
+        // if (typeof updateAllCalculations === 'function') updateAllCalculations();
+    });
     
     // Responsável pelo pagamento
     $participant.find('.responsible-payer').on('change', function() {
