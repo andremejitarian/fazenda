@@ -798,10 +798,18 @@ body {
     margin: 0;
     font-size: 0.95em;
     color: var(--text-primary);
+
+    /* Alinhamento título/valor dentro de cada linha */
+    display: grid; /* transforma o <p> em um grid */
+    grid-template-columns: max-content 1fr; /* 1ª coluna: largura do título, 2ª: ocupa o restante */
+    gap: 6px; /* espaçamento entre título e valor */
+    align-items: baseline; /* alinha linhas de base do texto para ficar visualmente nivelado */
 }
 
 .payer-info strong {
     color: var(--primary-color);
+    text-align: left;         /* garante alinhamento à esquerda do título */
+    white-space: nowrap;      /* evita quebra de linha no título (CPF:, Nome:, etc.) */
 }
 
 .participants-summary {
