@@ -289,14 +289,14 @@
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_credito",
-          "label": "Cartão de Crédito",
+          "label": "Cartão de Crédito em até 6x",
           "tipo": "Cartao",
           "descricao": "Pagamento em até 6x.",
           "taxa_gateway_percentual": 0.04
         },
         {
           "id": "pix_vista2",
-          "label": "PIX à Vista",
+          "label": "PIX à Vista com 5% de desconto",
           "tipo": "PIX",
           "descricao": "Pagamento no PIX com 5% de desconto",
           "taxa_gateway_percentual": -0.05
