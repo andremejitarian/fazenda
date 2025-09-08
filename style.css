@@ -826,7 +826,7 @@ body {
 
 .participant-summary-item {
     background: var(--background-color);
-    border: 1px solid var(--border-color);
+    border: none;
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 20px;
