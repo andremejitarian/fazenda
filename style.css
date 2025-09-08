@@ -813,7 +813,7 @@ body {
     margin-bottom: 25px;
     font-size: 1.3em;
     text-align: center;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 15px;
 }
 
