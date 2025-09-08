@@ -783,7 +783,7 @@ body {
 .responsible-payer-summary h3 {
     color: var(--primary-color);
     margin-bottom: 20px;
-    font-size: 1.3em;
+    font-size: 1.1em;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
 }
