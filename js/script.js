@@ -764,7 +764,7 @@ function generateParticipantsSummary() {
     // Detalhamento por participante
     summaryHtml += `
         <div class="participants-summary">
-            <h3>📋 Detalhamento por Participante</h3>
+            <h3>Detalhamento por Participante</h3>
     `;
     
     $('#participants-container .participant-block').each(function(index) {
