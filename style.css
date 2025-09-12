@@ -82,7 +82,7 @@ body {
 .logo-container {
     position: absolute;
     top: -60px;
-    left: 30px;  /* ← ADICIONE ESTA LINHA */
+    left: 50px;  /* ← ADICIONE ESTA LINHA */
     width: 110px;
     height: 110px;
     background: transparent;
