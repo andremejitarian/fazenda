@@ -521,18 +521,41 @@ function renumberParticipants() {
 }
 
 // Atualizar seção de responsável pelo pagamento
-// ✅ CORREÇÃO: Manter apenas a lógica do pagamento
 function updateResponsiblePayerSection() {
-    const $sections = $('.responsible-payer-section');
-    
-    if (participants.length > 1) {
-        $sections.show();
-    } else {
-        $sections.hide();
-        // Se só há um participante, ele é automaticamente o responsável
-        if (participants.length === 1) {
-            participants[0].element.find('.responsible-payer').prop('checked', true);
+    // Para cada participante, verificar se deve mostrar a seção
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const $section = $participant.find('.responsible-payer-section');
+        const birthDate = $participant.find('.dob-input').val();
+        
+        // Verificar se este participante é menor de idade
+        let isMinor = false;
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            isMinor = (age !== null && age < 18);
         }
+        
+        // Se há mais de um participante E este participante NÃO é menor, mostrar a seção
+        if (participants.length > 1 && !isMinor) {
+            $section.show();
+        } else {
+            $section.hide();
+            // Limpar seleção se este participante era responsável
+            $participant.find('.responsible-payer').prop('checked', false);
+        }
+    });
+    
+    // Se só há um participante adulto, ele é automaticamente o responsável
+    const adultParticipants = $('#participants-container .participant-block').filter(function() {
+        const birthDate = $(this).find('.dob-input').val();
+        if (!birthDate) return true; // Considera adulto se não há data
+        
+        const age = calculateAge(birthDate);
+        return age === null || age >= 18;
+    });
+    
+    if (adultParticipants.length === 1) {
+        adultParticipants.find('.responsible-payer').prop('checked', true);
     }
 }
 
