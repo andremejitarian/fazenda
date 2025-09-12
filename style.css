@@ -63,7 +63,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 315px 20px 40px;
+    padding: 140px 20px 40px;
 }
 
 /* Card do Formulário */
@@ -638,7 +638,7 @@ body {
 /* Responsividade */
 @media (max-width: 768px) {
     .container {
-        padding: 320px 15px 30px;
+        padding: 120px 15px 30px;
     }
     
     .form-card {
