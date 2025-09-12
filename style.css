@@ -87,6 +87,7 @@ body {
     height: 150px;
     background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border-radius: 50%;
+    overflow: hidden;        /* importante para recortar em círculo */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -97,7 +98,7 @@ body {
 .logo {
     width: 100px;
     height: 100px;
-    object-fit: contain;
+    object-fit: cover;       /* evita achatamento e mantém o recorte circular perfeito e antes era contain */
     border-radius: 50%;
 }
 
