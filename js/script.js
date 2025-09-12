@@ -785,15 +785,28 @@ function hasMinors() {
 
 // Atualizar seção de responsável pela criança
 function updateResponsibleChildSection() {
-    const $sections = $('.responsible-child-section');
-    
-    if (hasMinors()) {
-        $sections.show();
-    } else {
-        $sections.hide();
-        // Limpar seleções quando não há menores
-        $('.responsible-child').prop('checked', false);
-    }
+    // Para cada participante, verificar se deve mostrar a seção
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const $section = $participant.find('.responsible-child-section');
+        const birthDate = $participant.find('.dob-input').val();
+        
+        // Verificar se este participante é menor de idade
+        let isMinor = false;
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            isMinor = (age !== null && age < 18);
+        }
+        
+        // Se há menores no formulário E este participante NÃO é menor, mostrar a seção
+        if (hasMinors() && !isMinor) {
+            $section.show();
+        } else {
+            $section.hide();
+            // Limpar seleção se este participante era responsável
+            $participant.find('.responsible-child').prop('checked', false);
+        }
+    });
 }
 
 // Atualizar ambas as seções de responsáveis
