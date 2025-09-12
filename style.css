@@ -125,7 +125,7 @@ body {
     z-index: 4; /* ← Logo parceiro na frente */
     left: 50%;
     top: 50%;
-    transform: translate(-4%, -96%); /* ← ACIMA E À DIREITA */
+    transform: translate(-5%, -96%); /* ← ACIMA E À DIREITA */
 }
 
 /* Seções do Formulário */
