@@ -96,9 +96,9 @@ body {
 }
 
 .logo {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;       /* evita achatamento e mantém o recorte circular perfeito e antes era contain */
+    width: 140px;
+    height: 140px;
+    object-fit: contain;       /* evita achatamento e mantém o recorte circular perfeito e antes era cover */
     border-radius: 50%;
 }
 
@@ -658,8 +658,9 @@ body {
     }
     
     .logo {
-        width: 70px;
-        height: 70px;
+        width: 110px;
+        height: 110px;
+        object-fit: contain; /* Alterado de 'cover' para 'contain' */
     }
     
 .welcome-section h1 {
