@@ -82,10 +82,10 @@ body {
 .logo-container {
     position: absolute;
     top: -60px;
-    left: 20px;  /* ← ADICIONE ESTA LINHA */
+    left: 30px;  /* ← ADICIONE ESTA LINHA */
     width: 130px;
     height: 130px;
-    background: none; /* ← ALTERADO DE var(--card-background) PARA transparent */
+    background: var(--card-background);
     border-radius: 50%;
     display: flex;
     align-items: center;
