@@ -81,10 +81,10 @@ body {
 /* Logo Container */
 .logo-container {
     position: absolute;
-    top: -40px;
+    top: -60px;
     left: 20px;  /* ← ADICIONE ESTA LINHA */
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
     background: none; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border-radius: 50%;
     display: flex;
@@ -95,8 +95,8 @@ body {
 }
 
 .logo {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;       /* evita achatamento e mantém o recorte circular perfeito e antes era cover */
     border-radius: 50%;
 }
