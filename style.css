@@ -81,7 +81,7 @@ body {
 /* Logo Container */
 .logo-container {
     position: absolute;
-    top: -50px;
+    top: -40px;
     left: 20px;  /* ← ADICIONE ESTA LINHA */
     width: 150px;
     height: 150px;
