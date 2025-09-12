@@ -108,7 +108,7 @@ body {
     width: 95px;
     height: 95px;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: contain;
     overflow: hidden;        /* importante para recortar em círculo */
     background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border: 3px solid var(--card-background);
