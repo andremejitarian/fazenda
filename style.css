@@ -105,14 +105,15 @@ body {
 /* Logo Duplo para Parceiros */
 .partner-logo {
     position: absolute;
-    width: 85px;
-    height: 85px;
+    width: 95px;
+    height: 95px;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: contain;   /* antes: cover (causa o corte interno) */
     overflow: hidden;        /* importante para recortar em círculo */
     background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border: 3px solid var(--card-background);
     box-shadow: var(--shadow-light);
+    display: block;        /* evita espaço extra do <img> inline */
 }
 
 .partner-logo.logo-main {
