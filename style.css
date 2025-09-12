@@ -74,14 +74,14 @@ body {
     box-shadow: var(--shadow-medium);
     width: 100%;
     max-width: 800px;
-    padding: 95px 40px 40px;
+    padding: 80px 40px 40px;
     margin-top: 60px;
 }
 
 /* Logo Container */
 .logo-container {
     position: absolute;
-    top: -20px;
+    top: -60px;
     left: 20px;  /* ← ADICIONE ESTA LINHA */
     width: 130px;
     height: 130px;
@@ -108,8 +108,8 @@ body {
     height: 95px;
     border-radius: 50%;
     object-fit: contain;
-    background: var(--card-background); /* ← ALTERADO DE var(--card-background) PARA transparent */
-    border: 3px solid var(--card-background);
+    background: var(---background); /* ← ALTERADO DE var(---background) PARA transparent */
+    border: 3px solid var(---background);
     box-shadow: var(--shadow-light);
 }
 
@@ -583,7 +583,7 @@ body {
     margin-bottom: 30px;
 }
 
-.confirmation-card {
+.confirmation- {
     background: linear-gradient(135deg, #e8f5e8, #f0f8f0);
     border: 2px solid var(--success-color);
     border-radius: var(--border-radius);
@@ -591,7 +591,7 @@ body {
     margin: 30px 0;
 }
 
-.confirmation-card h3 {
+.confirmation- h3 {
     color: var(--success-color);
     font-size: 1.8em;
     margin-bottom: 20px;
