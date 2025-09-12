@@ -74,14 +74,14 @@ body {
     box-shadow: var(--shadow-medium);
     width: 100%;
     max-width: 800px;
-    padding: 80px 40px 40px;
+    padding: 95px 40px 40px;
     margin-top: 60px;
 }
 
 /* Logo Container */
 .logo-container {
     position: absolute;
-    top: -60px;
+    top: -35px;
     left: 20px;  /* ← ADICIONE ESTA LINHA */
     width: 130px;
     height: 130px;
