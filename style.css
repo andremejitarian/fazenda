@@ -83,8 +83,8 @@ body {
     position: absolute;
     top: -60px;
     left: 30px;  /* ← ADICIONE ESTA LINHA */
-    width: 130px;
-    height: 130px;
+    width: 110px;
+    height: 110px;
     background: transparent;
     border-radius: 50%;
     display: flex;
@@ -95,8 +95,8 @@ body {
 }
 
 .logo {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     object-fit: contain;       /* evita achatamento e mantém o recorte circular perfeito e antes era cover */
     border-radius: 50%;
     background: var(--card-background);
@@ -105,8 +105,8 @@ body {
 /* Logo Duplo para Parceiros */
 .partner-logo {
     position: absolute;
-    width: 95px;
-    height: 95px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     object-fit: contain;
     background: var(--card-background); /* ← ALTERADO DE var(---background) PARA transparent */
