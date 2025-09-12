@@ -85,7 +85,7 @@ body {
     left: 20px;  /* ← ADICIONE ESTA LINHA */
     width: 150px;
     height: 150px;
-    background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
+    background: none; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border-radius: 50%;
     overflow: hidden;        /* importante para recortar em círculo */
     display: flex;
@@ -110,7 +110,7 @@ body {
     border-radius: 50%;
     object-fit: contain;
     overflow: hidden;        /* importante para recortar em círculo */
-    background: transparent; /* ← ALTERADO DE var(--card-background) PARA transparent */
+    background: none; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border: 3px solid var(--card-background);
     box-shadow: var(--shadow-light);
 }
