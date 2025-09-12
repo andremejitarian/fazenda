@@ -87,7 +87,6 @@ body {
     height: 150px;
     background: none; /* ← ALTERADO DE var(--card-background) PARA transparent */
     border-radius: 50%;
-    overflow: hidden;        /* importante para recortar em círculo */
     display: flex;
     align-items: center;
     justify-content: center;
