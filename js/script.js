@@ -297,8 +297,8 @@ function addParticipant() {
         element: $participant
     });
     
-    // Atualizar seção de responsável pelo pagamento
-    updateResponsiblePayerSection();
+    // Atualizar seções de responsáveis (pagamento e criança)
+    updateResponsibleSections();
     
     console.log(`Participante ${participantNumber} adicionado`);
 }
@@ -445,12 +445,18 @@ function setupParticipantEventListeners($participant) {
         validateCPF($(this));
     });
     
-// Listener para mudanças que afetam os cálculos diretamente (sem repopular dropdowns)
-$participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .dob-input, .accommodation-select, .event-option-select').on('change', function() {
-    updateParticipantCalculations($participant);
-});
+    // Data de nascimento - verificar idade para responsável pela criança
+    $participant.find('.dob-input').on('change', function() {
+        updateResponsibleSections();
+        updateParticipantCalculations($participant);
+    });
+    
+    // Listener para mudanças que afetam os cálculos diretamente
+    $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .accommodation-select, .event-option-select').on('change', function() {
+        updateParticipantCalculations($participant);
+    });
 
-// Listener APENAS para o período de estadia, que deve repopular as opções de evento
+    // Listener APENAS para o período de estadia
     $participant.find('.stay-period-select').on('change', function() {
         const selectedPeriodId = $(this).val();
         const periodoSelecionado = currentEvent.periodos_estadia_opcoes
@@ -459,24 +465,25 @@ $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .dob-input,
         if (periodoSelecionado) {
             updateCheckInOutInfo($participant, periodoSelecionado);
         } else {
-            // Se o usuário volta para "Selecione o período", limpe as datas
             $participant.find('.checkin-datetime').text('');
             $participant.find('.checkout-datetime').text('');
         }
 
-        // Mantém o fluxo atual
         updateEventOptionsForPeriod($participant);
         updateParticipantCalculations($participant);
-
-        // Se existir uma função global para recalcular tudo, pode chamar aqui:
-        // if (typeof updateAllCalculations === 'function') updateAllCalculations();
     });
     
     // Responsável pelo pagamento
     $participant.find('.responsible-payer').on('change', function() {
         if ($(this).is(':checked')) {
-            // Desmarcar outros responsáveis
             $('.responsible-payer').not(this).prop('checked', false);
+        }
+    });
+    
+    // Responsável pela criança
+    $participant.find('.responsible-child').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('.responsible-child').not(this).prop('checked', false);
         }
     });
 }
@@ -494,8 +501,8 @@ function removeParticipant($participant) {
     // Renumerar participantes
     renumberParticipants();
     
-    // Atualizar seção de responsável pelo pagamento
-    updateResponsiblePayerSection();
+    // Atualizar seções de responsáveis (pagamento e criança)
+    updateResponsibleSections();
     
     console.log(`Participante ${participantId} removido`);
 }
@@ -514,6 +521,7 @@ function renumberParticipants() {
 }
 
 // Atualizar seção de responsável pelo pagamento
+// ✅ CORREÇÃO: Manter apenas a lógica do pagamento
 function updateResponsiblePayerSection() {
     const $sections = $('.responsible-payer-section');
     
@@ -688,6 +696,15 @@ function validateParticipantsStep() {
             isValid = false;
         }
     }
+
+// Validar responsável pela criança se houver menores
+if (hasMinors()) {
+    const hasResponsibleChild = $('.responsible-child:checked').length > 0;
+    if (!hasResponsibleChild) {
+        alert('Por favor, selecione um responsável pela criança.');
+        isValid = false;
+    }
+}
     
     return isValid;
 }
@@ -730,6 +747,62 @@ function setupSummaryStep() {
     }
 }
 
+// Função para calcular idade
+function calculateAge(birthDate) {
+    if (!birthDate) return null;
+    
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+    
+    return age;
+}
+
+// Função para verificar se há menores de idade
+function hasMinors() {
+    let hasMinor = false;
+    
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const birthDate = $participant.find('.dob-input').val();
+        
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            if (age !== null && age < 18) {
+                hasMinor = true;
+                return false; // break do loop
+            }
+        }
+    });
+    
+    return hasMinor;
+}
+
+// Atualizar seção de responsável pela criança
+function updateResponsibleChildSection() {
+    const $sections = $('.responsible-child-section');
+    
+    if (hasMinors()) {
+        $sections.show();
+    } else {
+        $sections.hide();
+        // Limpar seleções quando não há menores
+        $('.responsible-child').prop('checked', false);
+    }
+}
+
+// Atualizar ambas as seções de responsáveis
+function updateResponsibleSections() {
+    updateResponsiblePayerSection();
+    updateResponsibleChildSection();
+}
+
+
 // Gerar resumo dos participantes
 function generateParticipantsSummary() {
     const $summaryContent = $('#summary-content');
@@ -760,6 +833,28 @@ function generateParticipantsSummary() {
             </div>
         `;
     }
+
+    // Seção do responsável pela criança
+    if (hasMinors()) {
+        const $responsibleChild = $('.responsible-child:checked').closest('.participant-block');
+        let responsibleChildData = null;
+        
+        if ($responsibleChild.length > 0) {
+            responsibleChildData = extractParticipantData($responsibleChild);
+            
+            summaryHtml += `
+                <div class="responsible-child-summary">
+                    <h3>Responsável pela Criança</h3>
+                    <div class="child-responsible-info">
+                        <p><strong>Nome:</strong> ${responsibleChildData.fullName}</p>
+                        <p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>
+                        <p><strong>Email:</strong> ${responsibleChildData.email}</p>
+                        <p><strong>Telefone:</strong> ${responsibleChildData.phone}</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
     
     // Detalhamento por participante
     summaryHtml += `
@@ -773,8 +868,8 @@ function generateParticipantsSummary() {
         const participantNumber = index + 1;
         
         // Calcular valores individuais
-        const lodgingValue = priceCalculator ? priceCalculator.calculateLodgingValue(participantData) : 0;
-        const eventValue = priceCalculator ? priceCalculator.calculateEventValue(participantData) : 0;
+        const lodgingValue = window.priceCalculator ? window.priceCalculator.calculateLodgingValue(participantData) : 0;
+        const eventValue = window.priceCalculator ? window.priceCalculator.calculateEventValue(participantData) : 0;
         
         // Obter descrições das opções selecionadas
         const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
@@ -792,14 +887,14 @@ function generateParticipantsSummary() {
             summaryHtml += `
                 <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
                 <p><strong>Período:</strong> ${stayPeriodLabel}</p>
-                <p><strong>Valor da Hospedagem:</strong> ${priceCalculator.formatCurrency(lodgingValue)}</p>
+                <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}</p>
             `;
         }
         
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             summaryHtml += `
                 <p><strong>Evento:</strong> ${eventOptionLabel}</p>
-                <p><strong>Valor do Evento:</strong> ${priceCalculator.formatCurrency(eventValue)}</p>
+                <p><strong>Valor do Evento:</strong> ${window.priceCalculator.formatCurrency(eventValue)}</p>
             `;
         }
         
@@ -1314,7 +1409,8 @@ function extractParticipantData($participant) {
                       (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
         eventOption: $participant.find('.event-option-select').val() || 
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
-        isResponsiblePayer: $participant.find('.responsible-payer').is(':checked')
+        isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
+        isResponsibleChild: $participant.find('.responsible-child').is(':checked') // Nova propriedade
     };
 }
 
@@ -1358,7 +1454,7 @@ function updateParticipantInCalculator(participantId, participantData) {
 
 // Atualizar cálculos de um participante específico
 function updateParticipantCalculations($participant) {
-    if (!priceCalculator) return;
+    if (!window.priceCalculator) return;
 
     const participantData = extractParticipantData($participant);
     const participantId = $participant.attr('data-participant-id');
@@ -1474,24 +1570,6 @@ function validateCoupon() {
 }
 
 console.log('Script principal carregado com integração completa');
-
-// Extrair dados do participante do formulário
-function extractParticipantData($participant) {
-    return {
-        fullName: $participant.find('.full-name').val(),
-        phone: $participant.find('.phone-mask').val(),
-        cpf: $participant.find('.cpf-mask').val(),
-        email: $participant.find('.email-input').val(),
-        birthDate: $participant.find('.dob-input').val(),
-        stayPeriod: $participant.find('.stay-period-select').val() || 
-                   (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null),
-        accommodation: $participant.find('.accommodation-select').val() || 
-                      (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
-        eventOption: $participant.find('.event-option-select').val() || 
-                    (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
-        isResponsiblePayer: $participant.find('.responsible-payer').is(':checked')
-    };
-}
 
 // Obter opções de evento para um participante específico
 function getEventOptionsForParticipant($participant) {
