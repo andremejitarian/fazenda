@@ -85,7 +85,7 @@ body {
     left: 30px;  /* ← ADICIONE ESTA LINHA */
     width: 130px;
     height: 130px;
-    background: var(--card-background);
+    background: transparent;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -99,6 +99,7 @@ body {
     height: 120px;
     object-fit: contain;       /* evita achatamento e mantém o recorte circular perfeito e antes era cover */
     border-radius: 50%;
+    background: var(--card-background);
 }
 
 /* Logo Duplo para Parceiros */
@@ -108,7 +109,7 @@ body {
     height: 95px;
     border-radius: 50%;
     object-fit: contain;
-    background: var(---background); /* ← ALTERADO DE var(---background) PARA transparent */
+    background: var(--card-background); /* ← ALTERADO DE var(---background) PARA transparent */
     border: 3px solid var(---background);
     box-shadow: var(--shadow-light);
 }
