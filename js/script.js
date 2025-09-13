@@ -830,6 +830,22 @@ function updateResponsibleChildSection() {
             $participant.find('.responsible-child').prop('checked', false);
         }
     });
+    
+    // **NOVA LÓGICA DE SUGESTÃO AUTOMÁTICA**
+    // Se há menores e apenas um participante adulto, ele é automaticamente o responsável
+    if (hasMinors()) {
+        const adultParticipants = $('#participants-container .participant-block').filter(function() {
+            const birthDate = $(this).find('.dob-input').val();
+            if (!birthDate) return true; // Considera adulto se não há data
+            
+            const age = calculateAge(birthDate);
+            return age === null || age >= 18;
+        });
+        
+        if (adultParticipants.length === 1) {
+            adultParticipants.find('.responsible-child').prop('checked', true);
+        }
+    }
 }
 
 // Atualizar ambas as seções de responsáveis
