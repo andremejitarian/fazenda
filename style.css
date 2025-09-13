@@ -319,6 +319,7 @@ body {
 }
 
 .form-group label {
+    text-align: left;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 8px;
