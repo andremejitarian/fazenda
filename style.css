@@ -504,10 +504,10 @@ body {
 
 /* Resumo e Totais */
 .totals-summary {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: var(--background-color);
     border: none;
     border-radius: var(--border-radius);
-    padding: 25px;
+    padding: 20px;
     margin: 30px 0;
 }
 
@@ -515,7 +515,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 4px 0;
     font-size: 1.1em;
 }
 
@@ -527,8 +527,8 @@ body {
 .total-line.final {
     border-top: 1px solid var(--primary-color);
     margin-top: 15px;
-    padding-top: 15px;
-    font-size: 1.1em;
+    padding-top: 10px;
+    font-size: 1.2em;
     font-weight: 600;
     color: var(--primary-color);
 }
