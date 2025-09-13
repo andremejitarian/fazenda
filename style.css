@@ -846,7 +846,7 @@ body {
 
 .participant-summary-item h4 {
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     font-size: 1.1em;
     text-align: left;
     border-bottom: 1px dashed var(--border-color);
