@@ -356,7 +356,7 @@ body {
     color: var(--secondary-color);
     font-size: 1.2em;
     font-weight: 600;
-    text-align: center;
+    text-align: left;
 }
 
 .checkin-checkout-info {
@@ -607,7 +607,7 @@ body {
 .detail-item {
     display: flex;
     justify-content: space-between;
-    align-items: left;
+    align-items: center;
     padding: 10px 0;
     border-bottom: 1px solid rgba(39, 174, 96, 0.2);
 }
