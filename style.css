@@ -832,17 +832,12 @@ body {
 }
 
 .participant-summary-item {
-    background: var(--background-color);
+    background: none;
     border: none;
     border-radius: 8px;
-    padding: 20px;
+    padding: 20px 0;
     margin-bottom: 20px;
     transition: var(--transition);
-}
-
-.participant-summary-item:hover {
-    border-color: var(--accent-color);
-    box-shadow: var(--shadow-light);
 }
 
 .participant-summary-item h4 {
@@ -852,6 +847,8 @@ body {
     text-align: left;
     border-bottom: 1px dashed var(--border-color);
     padding-bottom: 10px;
+    padding-left: 0; /* ← ADICIONE ESTA LINHA para garantir alinhamento */
+    margin-left: 0;  /* ← ADICIONE ESTA LINHA para garantir alinhamento */
 }
 
 .participant-details {
