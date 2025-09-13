@@ -607,7 +607,7 @@ body {
 .detail-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: left;
     padding: 10px 0;
     border-bottom: 1px solid rgba(39, 174, 96, 0.2);
 }
