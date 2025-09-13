@@ -505,7 +505,7 @@ body {
 /* Resumo e Totais */
 .totals-summary {
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border: 2px solid var(--border-color);
+    border: none;
     border-radius: var(--border-radius);
     padding: 25px;
     margin: 30px 0;
@@ -525,11 +525,11 @@ body {
 }
 
 .total-line.final {
-    border-top: 2px solid var(--primary-color);
+    border-top: 1px solid var(--primary-color);
     margin-top: 15px;
     padding-top: 15px;
-    font-size: 1.3em;
-    font-weight: 700;
+    font-size: 1.1em;
+    font-weight: 600;
     color: var(--primary-color);
 }
 
