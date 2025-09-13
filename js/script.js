@@ -831,20 +831,32 @@ function updateResponsibleChildSection() {
         }
     });
     
-    // **NOVA LÓGICA DE SUGESTÃO AUTOMÁTICA**
-    // Se há menores e apenas um participante adulto, ele é automaticamente o responsável
+    // **NOVA LÓGICA: SEMPRE SUGERIR O PRIMEIRO ADULTO**
     if (hasMinors()) {
-        const adultParticipants = $('#participants-container .participant-block').filter(function() {
-            const birthDate = $(this).find('.dob-input').val();
-            if (!birthDate) return true; // Considera adulto se não há data
-            
-            const age = calculateAge(birthDate);
-            return age === null || age >= 18;
-        });
+        // Limpar todas as seleções primeiro
+        $('.responsible-child').prop('checked', false);
         
-        if (adultParticipants.length === 1) {
-            adultParticipants.find('.responsible-child').prop('checked', true);
-        }
+        // Encontrar o primeiro participante adulto na ordem do formulário
+        let firstAdultFound = false;
+        $('#participants-container .participant-block').each(function() {
+            if (firstAdultFound) return; // Parar no primeiro adulto encontrado
+            
+            const $participant = $(this);
+            const birthDate = $participant.find('.dob-input').val();
+            
+            // Verificar se é adulto
+            let isAdult = true; // Considera adulto se não há data de nascimento
+            if (birthDate) {
+                const age = calculateAge(birthDate);
+                isAdult = (age === null || age >= 18);
+            }
+            
+            if (isAdult) {
+                $participant.find('.responsible-child').prop('checked', true);
+                firstAdultFound = true;
+                console.log(`Primeiro adulto detectado como responsável pela criança: Participante ${$participant.find('.participant-number').text()}`);
+            }
+        });
     }
 }
 
