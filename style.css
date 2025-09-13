@@ -462,6 +462,7 @@ body {
     margin-top: 25px;
     padding-top: 20px;
     border-top: 2px dashed var(--border-color);
+    margin-bottom: 15px;
 }
 
 .responsible-payer-section .checkbox-container {
