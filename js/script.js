@@ -879,9 +879,9 @@ function generateParticipantsSummary() {
             responsibleChildData = extractParticipantData($responsibleChild);
             
             summaryHtml += `
-                <div class="responsible-child-summary">
+                <div class="responsible-payer-summary">
                     <h3>Responsável pela Criança</h3>
-                    <div class="child-responsible-info">
+                    <div class="payer-info">
                         <p><strong>Nome:</strong> ${responsibleChildData.fullName}</p>
                         <p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>
                         <p><strong>Email:</strong> ${responsibleChildData.email}</p>
