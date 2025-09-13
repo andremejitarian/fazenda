@@ -465,7 +465,7 @@ body {
 }
 
 .responsible-payer-section .checkbox-container {
-    justify-content: center;
+    /* justify-content: center; */ /* ← Remova ou comente esta linha */
     font-weight: 600;
     color: var(--primary-color);
 }
