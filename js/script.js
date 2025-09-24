@@ -8,6 +8,20 @@ let webhookConnected = false;
 let submissionInProgress = false;
 let paymentLinkGenerated = false;
 
+// Function to format ISO date-time string for display (e.g., "DD/MM/YYYY HH:MM")
+function formatDateTimeForDisplay(isoDateTimeString) {
+    if (!isoDateTimeString) return '';
+    const date = new Date(isoDateTimeString);
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+        console.warn('Invalid date string for formatting:', isoDateTimeString);
+        return '';
+    }
+    const data = date.toLocaleDateString('pt-BR');
+    const hora = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `${data} ${hora}`;
+}
+
 // Inicialização
 $(document).ready(function() {
     console.log('Formulário iniciado');
@@ -409,22 +423,12 @@ function updateCheckInOutInfo($participant, periodo) {
         return;
     }
 
-    const dataInicio = new Date(periodo.data_inicio);
-    const dataFim = new Date(periodo.data_fim);
+    // Usando a função utilitária global para consistência
+    const checkinFormatted = formatDateTimeForDisplay(periodo.data_inicio);
+    const checkoutFormatted = formatDateTimeForDisplay(periodo.data_fim);
 
-    const formatDateTime = (date) => {
-        // Ajuste simples para exibição em pt-BR
-        const data = date.toLocaleDateString('pt-BR');
-        const hora = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        return `${data} ${hora}`;
-    };
-
-    // Se alguma data for inválida, evita mostrar "Invalid Date"
-    const inicioOk = !isNaN(dataInicio.getTime());
-    const fimOk = !isNaN(dataFim.getTime());
-
-    $participant.find('.checkin-datetime').text(inicioOk ? formatDateTime(dataInicio) : '');
-    $participant.find('.checkout-datetime').text(fimOk ? formatDateTime(dataFim) : '');
+    $participant.find('.checkin-datetime').text(checkinFormatted);
+    $participant.find('.checkout-datetime').text(checkoutFormatted);
 }
 
 // Configurar máscaras para participante
@@ -939,6 +943,19 @@ function generateParticipantsSummary() {
         const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
         const accommodationLabel = getAccommodationLabel(participantData.accommodation);
         const eventOptionLabel = getEventOptionLabel(participantData.eventOption, participantData.stayPeriod);
+
+        let checkinInfo = '';
+        let checkoutInfo = '';
+
+        // Se um período de estadia foi selecionado E o tipo de formulário inclui hospedagem
+        if (participantData.stayPeriod &&
+            (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento')) {
+            const selectedPeriod = currentEvent.periodos_estadia_opcoes.find(p => p.id === participantData.stayPeriod);
+            if (selectedPeriod) {
+                checkinInfo = formatDateTimeForDisplay(selectedPeriod.data_inicio);
+                checkoutInfo = formatDateTimeForDisplay(selectedPeriod.data_fim);
+            }
+        }
         
         summaryHtml += `
             <div class="participant-summary-item">
@@ -951,6 +968,8 @@ function generateParticipantsSummary() {
             summaryHtml += `
                 <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
                 <p><strong>Período:</strong> ${stayPeriodLabel}</p>
+                ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
+                ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
                 <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}</p>
             `;
         }
