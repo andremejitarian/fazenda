@@ -1391,3 +1391,47 @@ body {
         transform: translateX(400%);
     }
 }
+
+/* Ajustes específicos para a seção de política */
+.responsible-payer-summary.policy-section {
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    margin: 25px 0;
+}
+
+.responsible-payer-summary .policy-content h4 {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-top: 0;
+    text-align: center; /* Centralizar o título principal */
+}
+
+.responsible-payer-summary .policy-content p {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.responsible-payer-summary .policy-content b {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.responsible-payer-summary .policy-content ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    padding-left: 0;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.responsible-payer-summary .policy-content li {
+    margin-bottom: 5px;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
