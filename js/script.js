@@ -773,9 +773,14 @@ function setupSummaryStep() {
         applyCoupon(currentCoupon);
     }
 
-    // --- NOVO: Carregar e exibir Política de Confirmação e Cancelamento ---
-    loadCancellationPolicy();
-    // FIM DO NOVO BLOCO
+    // --- MODIFICADO: Carregar política apenas se já houver uma forma de pagamento selecionada ---
+    if (selectedPaymentMethod) {
+        loadCancellationPolicy(selectedPaymentMethod.id);
+    } else {
+        // Se não há forma selecionada, ocultar a seção inicialmente
+        loadCancellationPolicy(null);
+    }
+    // FIM DO BLOCO MODIFICADO
     
 }
 
