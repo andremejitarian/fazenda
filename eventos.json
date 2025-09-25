@@ -93,7 +93,7 @@
           "tipo": "Cartao",
           "parcelas_maximas": 6,
           "juros": false,
-          "descricao": "Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO DE RESERVAS</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.035
         }
       ],
