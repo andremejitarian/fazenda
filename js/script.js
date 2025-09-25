@@ -609,14 +609,10 @@ function setupPaymentMethods() {
         $paymentSelect.val(formasPagamento[0].id);
         $paymentDescription.text(formasPagamento[0].descricao);
         selectedPaymentMethod = formasPagamento[0];
-        
-        // --- NOVO: Carregar política automaticamente se só há uma opção ---
-        loadCancellationPolicy(formasPagamento[0].id);
-        // FIM DO NOVO BLOCO
     }
 }
 
-// Atualizar método de pagamento (versão corrigida)
+// Atualizar método de pagamento
 function updatePaymentMethod() {
     const selectedId = $('#payment-method').val();
     const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
@@ -625,20 +621,13 @@ function updatePaymentMethod() {
         $('#payment-method-description').text(forma.descricao);
         selectedPaymentMethod = forma;
         
-        // Atualizar calculador se disponível
-        if (window.priceCalculator && typeof window.priceCalculator.setPaymentMethod === 'function') {
-            window.priceCalculator.setPaymentMethod(forma);
+        // Atualizar calculador
+        if (priceCalculator) {
+            priceCalculator.setPaymentMethod(forma);
         }
         
         // Recalcular totais com nova taxa de gateway
         updateAllCalculations();
-        
-        // --- NOVO: Atualizar política baseada na forma de pagamento selecionada ---
-        loadCancellationPolicy(selectedId);
-        // FIM DO NOVO BLOCO
-    } else {
-        // Se nenhuma forma foi selecionada, ocultar política
-        loadCancellationPolicy(null);
     }
 }
 
@@ -784,56 +773,40 @@ function setupSummaryStep() {
         applyCoupon(currentCoupon);
     }
 
-    // --- MODIFICADO: Carregar política apenas se já houver uma forma de pagamento selecionada ---
-    if (selectedPaymentMethod) {
-        loadCancellationPolicy(selectedPaymentMethod.id);
-    } else {
-        // Se não há forma selecionada, ocultar a seção inicialmente
-        loadCancellationPolicy(null);
-    }
-    // FIM DO BLOCO MODIFICADO
+    // --- NOVO: Carregar e exibir Política de Confirmação e Cancelamento ---
+    loadCancellationPolicy();
+    // FIM DO NOVO BLOCO
     
 }
 
-// FUNÇÃO MODIFICADA: Carregar política de cancelamento baseada na forma de pagamento selecionada
-function loadCancellationPolicy(selectedPaymentMethodId = null) {
+// NOVA FUNÇÃO: Carregar política de cancelamento
+function loadCancellationPolicy() {
     const $policySection = $('#cancellation-policy-section');
     const $policyContent = $policySection.find('.policy-content');
 
-    // Se não foi passado um ID específico, usar o método selecionado atualmente
-    const paymentMethodId = selectedPaymentMethodId || (selectedPaymentMethod ? selectedPaymentMethod.id : null);
-
-    if (paymentMethodId && currentEvent.formas_pagamento_opcoes) {
-        // Encontrar a forma de pagamento específica selecionada
-        const formaPagamentoSelecionada = currentEvent.formas_pagamento_opcoes.find(forma => 
-            forma.id === paymentMethodId
+    // Verificar se o evento tem formas de pagamento com política
+    if (currentEvent.formas_pagamento_opcoes && currentEvent.formas_pagamento_opcoes.length > 0) {
+        // Pegar a descrição da primeira forma de pagamento que contenha HTML
+        const formaPagamentoComPolitica = currentEvent.formas_pagamento_opcoes.find(forma => 
+            forma.descricao && forma.descricao.includes('<h4>POLÍTICA')
         );
 
-        if (formaPagamentoSelecionada && 
-            formaPagamentoSelecionada.descricao && 
-            formaPagamentoSelecionada.descricao.includes('<h4>POLÍTICA')) {
-            
+        if (formaPagamentoComPolitica && formaPagamentoComPolitica.descricao.trim() !== '') {
             // Adicionar classe específica para política
             $policySection.addClass('policy-section');
             
             // Usar .html() porque a descrição contém tags HTML
-            $policyContent.html(formaPagamentoSelecionada.descricao);
+            $policyContent.html(formaPagamentoComPolitica.descricao);
             $policySection.show();
-            
-            console.log(`Política carregada para forma de pagamento: ${formaPagamentoSelecionada.label}`);
         } else {
-            // Se a forma de pagamento selecionada não tem política, ocultar a seção
+            // Se não houver política, ocultar a seção
             $policySection.hide();
             $policyContent.empty();
-            $policySection.removeClass('policy-section');
-            
-            console.log(`Forma de pagamento "${formaPagamentoSelecionada?.label || paymentMethodId}" não possui política`);
         }
     } else {
-        // Se não há forma de pagamento selecionada, ocultar a seção
+        // Se não houver formas de pagamento, ocultar a seção
         $policySection.hide();
         $policyContent.empty();
-        $policySection.removeClass('policy-section');
     }
 }
 
