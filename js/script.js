@@ -609,10 +609,14 @@ function setupPaymentMethods() {
         $paymentSelect.val(formasPagamento[0].id);
         $paymentDescription.text(formasPagamento[0].descricao);
         selectedPaymentMethod = formasPagamento[0];
+        
+        // --- NOVO: Carregar política automaticamente se só há uma opção ---
+        loadCancellationPolicy(formasPagamento[0].id);
+        // FIM DO NOVO BLOCO
     }
 }
 
-// Atualizar método de pagamento
+// Atualizar método de pagamento (versão corrigida)
 function updatePaymentMethod() {
     const selectedId = $('#payment-method').val();
     const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
@@ -621,13 +625,20 @@ function updatePaymentMethod() {
         $('#payment-method-description').text(forma.descricao);
         selectedPaymentMethod = forma;
         
-        // Atualizar calculador
-        if (priceCalculator) {
-            priceCalculator.setPaymentMethod(forma);
+        // Atualizar calculador se disponível
+        if (window.priceCalculator && typeof window.priceCalculator.setPaymentMethod === 'function') {
+            window.priceCalculator.setPaymentMethod(forma);
         }
         
         // Recalcular totais com nova taxa de gateway
         updateAllCalculations();
+        
+        // --- NOVO: Atualizar política baseada na forma de pagamento selecionada ---
+        loadCancellationPolicy(selectedId);
+        // FIM DO NOVO BLOCO
+    } else {
+        // Se nenhuma forma foi selecionada, ocultar política
+        loadCancellationPolicy(null);
     }
 }
 
