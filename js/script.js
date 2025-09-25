@@ -772,6 +772,39 @@ function setupSummaryStep() {
     if (currentCoupon) {
         applyCoupon(currentCoupon);
     }
+
+    // --- NOVO: Carregar e exibir Política de Confirmação e Cancelamento ---
+    loadCancellationPolicy();
+    // FIM DO NOVO BLOCO
+    
+}
+
+// NOVA FUNÇÃO: Carregar política de cancelamento
+function loadCancellationPolicy() {
+    const $policySection = $('#cancellation-policy-section');
+    const $policyContent = $policySection.find('.policy-content');
+
+    // Verificar se o evento tem formas de pagamento com política
+    if (currentEvent.formas_pagamento_opcoes && currentEvent.formas_pagamento_opcoes.length > 0) {
+        // Pegar a descrição da primeira forma de pagamento que contenha HTML
+        const formaPagamentoComPolitica = currentEvent.formas_pagamento_opcoes.find(forma => 
+            forma.descricao && forma.descricao.includes('<h4>POLÍTICA')
+        );
+
+        if (formaPagamentoComPolitica && formaPagamentoComPolitica.descricao.trim() !== '') {
+            // Usar .html() porque a descrição contém tags HTML
+            $policyContent.html(formaPagamentoComPolitica.descricao);
+            $policySection.show();
+        } else {
+            // Se não houver política, ocultar a seção
+            $policySection.hide();
+            $policyContent.empty();
+        }
+    } else {
+        // Se não houver formas de pagamento, ocultar a seção
+        $policySection.hide();
+        $policyContent.empty();
+    }
 }
 
 // Função para calcular idade
