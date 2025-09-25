@@ -1394,7 +1394,7 @@ body {
 
 /* Ajustes específicos para a seção de política */
 .responsible-payer-summary.policy-section {
-    border: 1px solid var(--border-color);
+    border: none;
     background: var(--card-background);
     margin: 25px 0;
 }
@@ -1408,7 +1408,7 @@ body {
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     margin-top: 0;
-    text-align: center; /* Centralizar o título principal */
+    text-align: left; /* Centralizar o título principal */
 }
 
 .responsible-payer-summary .policy-content p {
