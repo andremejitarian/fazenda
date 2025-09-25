@@ -792,6 +792,9 @@ function loadCancellationPolicy() {
         );
 
         if (formaPagamentoComPolitica && formaPagamentoComPolitica.descricao.trim() !== '') {
+            // Adicionar classe específica para política
+            $policySection.addClass('policy-section');
+            
             // Usar .html() porque a descrição contém tags HTML
             $policyContent.html(formaPagamentoComPolitica.descricao);
             $policySection.show();
