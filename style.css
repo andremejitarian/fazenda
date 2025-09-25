@@ -1415,6 +1415,7 @@ body {
     margin-bottom: 10px;
     font-size: 0.95em;
     line-height: 1.6;
+    text-align: left;
 }
 
 .responsible-payer-summary .policy-content b {
