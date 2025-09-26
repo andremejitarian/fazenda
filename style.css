@@ -336,7 +336,7 @@ body {
     width: 100%; /* ← Garante que ocupa 100% do contêiner pai */
     box-sizing: border-box; /* ← Inclui padding e border na largura total */
     min-width: 0; /* ← Importante para layouts flexbox */
-    text-align: left !important; /* ← ADICIONE ESTA LINHA */
+    text-align: left;
 }
 
 .form-control:focus {
@@ -347,6 +347,7 @@ body {
 
 .form-control::placeholder {
     color: var(--text-secondary);
+    text-align: left;
 }
 
 /* Seções Condicionais */
