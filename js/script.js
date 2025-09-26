@@ -1792,30 +1792,6 @@ function updateAllCalculations() {
     }
 }
 
-// Atualizar totais na tela de resumo
-function updateSummaryTotals() {
-    if (!window.priceCalculator) return;
-
-    const summary = window.priceCalculator.getCalculationSummary();
-    
-    // Atualizar displays
-    $('#subtotal-hospedagem').text(summary.formatted.lodgingSubtotal);
-    $('#subtotal-evento').text(summary.formatted.eventSubtotal);
-    $('#discount-value').text('-' + summary.formatted.discount);
-    $('#final-total').text(summary.formatted.finalTotal);
-    
-    // Mostrar/ocultar linhas baseado no tipo de formulário
-    const tipoFormulario = currentEvent.tipo_formulario;
-    
-    if (tipoFormulario === 'hospedagem_apenas') {
-        $('#subtotal-evento').parent().hide();
-    } else if (tipoFormulario === 'evento_apenas') {
-        $('#subtotal-hospedagem').parent().hide();
-    }
-    
-    console.log('Totais atualizados:', summary);
-}
-
 // Aplicar cupom de desconto
 function applyCoupon(couponCode) {
     if (!window.priceCalculator) return;
