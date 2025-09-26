@@ -683,11 +683,14 @@ body {
 
     /* Correção específica para inputs de data no mobile */
     input[type="date"] {
-        width: 100% !important;
-        max-width: 100% !important;
+        width: calc(100% - 4px) !important; /* ← Subtrai a largura da borda */
+        max-width: calc(100% - 4px) !important;
         box-sizing: border-box !important;
-        padding: 10px 12px; /* Padding um pouco menor no mobile */
-        font-size: 16px; /* Evita zoom automático no iOS */
+        padding: 12px 16px !important;
+        font-size: 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        margin: 0 !important; /* ← Remove qualquer margem */
     }
 
     /* Garante que todos os form-controls se comportem bem no mobile */
