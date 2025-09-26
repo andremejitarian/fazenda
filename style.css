@@ -374,7 +374,7 @@ body {
 
 .checkin-info, .checkout-info {
     font-size: 0.95em;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     margin: 5px 0;
     text-align: left;
 }
