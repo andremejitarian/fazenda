@@ -706,6 +706,20 @@ body {
         margin: 30px 0;
         padding-left: 0; /* ← Remove padding no mobile */
     }
+
+    /* Força alinhamento à esquerda para todos os elementos dos participantes */
+    .participants-summary * {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+        text-align: left !important;
+    }
+    
+    /* Exceção para manter o grid funcionando */
+    .participant-details p {
+        display: grid !important;
+        grid-template-columns: max-content 1fr !important;
+        justify-items: start !important;
+    }
     
     .participant-summary-item {
         padding: 15px 0; /* ← Remove padding lateral no mobile */
