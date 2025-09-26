@@ -546,6 +546,7 @@ body {
     font-weight: 600;
     margin-bottom: 8px;
     color: var(--text-primary);
+    text-align: left;
 }
 
 .help-text {
