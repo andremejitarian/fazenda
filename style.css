@@ -1558,9 +1558,15 @@ body {
     line-height: 1.5;
 }
 
-/* Adicionado para alinhar o texto à esquerda nos campos de período e acomodação
-   quando há apenas uma opção e eles são exibidos como texto estático. */
+/* Estilos para campos de período e acomodação quando exibidos como texto estático */
 .stay-period-info,
 .accommodation-info {
     text-align: left;
+    border: none;
+    color: var(--text-primary);
+    background-color: var(--card-background); /* ou #f8f8f8 para cinza muito claro */
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 1em;
+    text-decoration: none;
 }
