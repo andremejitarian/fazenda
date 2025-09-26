@@ -432,13 +432,28 @@ body {
     font-size: 0.95em;
     line-height: 1.5;
     gap: 12px; /* ← Adicione esta linha para espaçamento consistente */
+
+    /* Adicione estas linhas para evitar hifenização */
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
+    
 }
 
 .checkbox-container .checkbox-text {
     flex: 1;
     text-align: left;
-    word-wrap: break-word;
-    hyphens: auto;
+    
+    /* Reforce a configuração anti-hífen */
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    word-break: normal;
+    overflow-wrap: break-word;
 }
 
 .checkbox-container input {
