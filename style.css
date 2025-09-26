@@ -336,6 +336,7 @@ body {
     width: 100%; /* ← Garante que ocupa 100% do contêiner pai */
     box-sizing: border-box; /* ← Inclui padding e border na largura total */
     min-width: 0; /* ← Importante para layouts flexbox */
+    text-align: left !important; /* ← ADICIONE ESTA LINHA */
 }
 
 .form-control:focus {
@@ -368,12 +369,14 @@ body {
     border-radius: 8px;
     margin: 15px 0;
     border-left: 4px solid var(--accent-color);
+    text-align: left;
 }
 
 .checkin-info, .checkout-info {
     font-size: 0.95em;
     color: var(--text-secondary);
     margin: 5px 0;
+    text-align: left;
 }
 
 .price-display {
@@ -691,6 +694,7 @@ body {
         border: 2px solid var(--border-color);
         border-radius: 8px;
         margin: 0 !important; /* ← Remove qualquer margem */
+        text-align: left;
     }
 
     /* Garante que todos os form-controls se comportem bem no mobile */
@@ -699,6 +703,7 @@ body {
         max-width: 100% !important;
         min-width: 0 !important;
         box-sizing: border-box !important;
+        text-align: left;
     }
     
     /* Correção para o contêiner do formulário */
@@ -708,7 +713,13 @@ body {
         overflow: hidden; /* Evita overflow horizontal */
     }
 
-
+    .checkin-checkout-info {
+        text-align: left;
+    }
+    
+    .checkin-info, .checkout-info {
+        text-align: left;
+    }
     
     .logo-container {
         width: 120px;
