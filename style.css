@@ -1558,3 +1558,10 @@ body {
     font-size: 0.95em;
     line-height: 1.5;
 }
+
+/* Adicionado para alinhar o texto à esquerda nos campos de período e acomodação
+   quando há apenas uma opção e eles são exibidos como texto estático. */
+.stay-period-info,
+.accommodation-info {
+    text-align: left;
+}
