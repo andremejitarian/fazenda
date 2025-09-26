@@ -369,7 +369,6 @@ body {
     padding: 15px;
     border-radius: 8px;
     margin: 15px 0;
-    border-left: 4px solid var(--accent-color);
     text-align: left;
 }
 
