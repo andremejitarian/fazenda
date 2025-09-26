@@ -538,7 +538,7 @@ body {
 
 /* Seções de Cupom e Pagamento */
 .coupon-section, .payment-method-section {
-    margin: 25px 0;
+    margin: 15px 0;
 }
 
 .coupon-section label, .payment-method-section label {
