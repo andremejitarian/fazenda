@@ -333,6 +333,9 @@ body {
     font-size: 1em;
     transition: var(--transition);
     background: white;
+
+        /* Adicione ou certifique-se de que width: 100% esteja aqui */
+    width: 100%; 
 }
 
 .form-control:focus {
