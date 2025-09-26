@@ -676,6 +676,9 @@ body {
     .form-card {
         padding: 60px 25px 30px;
         margin-top: 40px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     /* Correção específica para inputs de data no mobile */
@@ -686,6 +689,23 @@ body {
         padding: 10px 12px; /* Padding um pouco menor no mobile */
         font-size: 16px; /* Evita zoom automático no iOS */
     }
+
+    /* Garante que todos os form-controls se comportem bem no mobile */
+    .form-control {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Correção para o contêiner do formulário */
+    .form-group {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden; /* Evita overflow horizontal */
+    }
+
+
     
     .logo-container {
         width: 120px;
