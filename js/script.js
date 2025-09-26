@@ -1623,15 +1623,29 @@ function updateAllCalculations() {
 
 // Atualizar totais na tela de resumo
 function updateSummaryTotals() {
-    if (!priceCalculator) return;
+    if (!window.priceCalculator) return;
 
-    const summary = priceCalculator.getCalculationSummary();
+    const summary = window.priceCalculator.getCalculationSummary();
     
-    // Atualizar displays
+    // Atualizar displays para subtotais e total final
     $('#subtotal-hospedagem').text(summary.formatted.lodgingSubtotal);
     $('#subtotal-evento').text(summary.formatted.eventSubtotal);
-    $('#discount-value').text('-' + summary.formatted.discount);
     $('#final-total').text(summary.formatted.finalTotal);
+
+    // Elementos da linha de desconto
+    const $discountLine = $('#discount-line');
+    const $discountValue = $('#discount-value');
+
+    // Lógica para mostrar/ocultar a linha de desconto
+    if (summary.discount > 0) {
+        // Há desconto válido - mostrar a linha
+        $discountValue.text('-' + summary.formatted.discount);
+        $discountLine.show();
+    } else {
+        // Não há desconto - ocultar a linha
+        $discountValue.text('-R\$ 0,00');
+        $discountLine.hide();
+    }
     
     // Mostrar/ocultar linhas baseado no tipo de formulário
     const tipoFormulario = currentEvent.tipo_formulario;
