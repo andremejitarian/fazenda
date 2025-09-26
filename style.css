@@ -333,9 +333,9 @@ body {
     font-size: 1em;
     transition: var(--transition);
     background: white;
-
-        /* Adicione ou certifique-se de que width: 100% esteja aqui */
-    width: 100%; 
+    width: 100%; /* ← Garante que ocupa 100% do contêiner pai */
+    box-sizing: border-box; /* ← Inclui padding e border na largura total */
+    min-width: 0; /* ← Importante para layouts flexbox */
 }
 
 .form-control:focus {
@@ -676,6 +676,15 @@ body {
     .form-card {
         padding: 60px 25px 30px;
         margin-top: 40px;
+    }
+
+    /* Correção específica para inputs de data no mobile */
+    input[type="date"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 10px 12px; /* Padding um pouco menor no mobile */
+        font-size: 16px; /* Evita zoom automático no iOS */
     }
     
     .logo-container {
