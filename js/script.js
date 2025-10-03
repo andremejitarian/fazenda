@@ -477,6 +477,21 @@ function setupParticipantEventListeners($participant) {
         validateCPF($(this));
     });
     
+    // NOVA: Validação de email
+    $participant.find('.email-input').on('blur', function() {
+        validateEmail($(this));
+    });
+    
+    // NOVA: Validação de email em tempo real (opcional)
+    $participant.find('.email-input').on('input', debounce(function() {
+        const email = $(this).val().trim();
+        if (email.length > 0) {
+            validateEmail($(this));
+        } else {
+            $(this).removeClass('error valid');
+        }
+    }, 500));
+    
     // Data de nascimento - verificar idade para responsável pela criança
     $participant.find('.dob-input').on('change', function() {
         updateResponsibleSections();
@@ -684,7 +699,24 @@ function validateCurrentStep() {
     }
 }
 
-// Validar etapa de participantes
+// Função para validar email
+function validateEmail($emailField) {
+    const email = $emailField.val().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!email) {
+        $emailField.addClass('error').removeClass('valid');
+        return false;
+    }
+    
+    if (!emailRegex.test(email)) {
+        $emailField.addClass('error').removeClass('valid');
+        return false;
+    }
+    
+    $emailField.removeClass('error').addClass('valid');
+    return true;
+}
 
 // Validar etapa de participantes
 function validateParticipantsStep() {
@@ -722,6 +754,15 @@ function validateParticipantsStep() {
         if (!validateCPF($cpfField)) {
             if (!firstErrorField) {
                 firstErrorField = $cpfField;
+            }
+            isValid = false;
+        }
+        
+        // NOVA: Validar email
+        const $emailField = $participant.find('.email-input');
+        if (!validateEmail($emailField)) {
+            if (!firstErrorField) {
+                firstErrorField = $emailField;
             }
             isValid = false;
         }
@@ -797,7 +838,7 @@ function validateParticipantsStep() {
     if (!isValid && firstErrorField) {
         scrollToAndFocusElement(firstErrorField);
         
-        // Mostrar mensagem específica baseada no tipo de erro
+        // Mostrar feedback visual
         showValidationMessage(firstErrorField);
     }
     
@@ -844,6 +885,11 @@ function showValidationMessage($field) {
         $field.closest('.responsible-child-section').addClass('error');
     } else if ($field.closest('.terms-section').length > 0) {
         $field.closest('.terms-section').addClass('error');
+    }
+    
+    // Log específico para diferentes tipos de erro (opcional, para debug)
+    if ($field.hasClass('email-input')) {
+        console.log('Email inválido detectado:', $field.val());
     }
     
     // Remover classes de erro após alguns segundos
