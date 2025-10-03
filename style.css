@@ -1646,3 +1646,22 @@ html {
     border-color: var(--success-color);
     box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.15);
 }
+
+/* Feedback específico para email */
+.email-input.error {
+    border-color: var(--error-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.email-input.valid {
+    border-color: var(--success-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.15) !important;
+}
+
+/* Indicador visual para email válido */
+.email-input.valid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2327ae60' viewBox='0 0 16 16'%3E%3Cpath d='M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
