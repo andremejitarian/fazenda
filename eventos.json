@@ -84,7 +84,7 @@
           "id": "pix_vista",
           "label": "PIX à Vista",
           "tipo": "PIX",
-          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO DE RESERVAS</h4><p><b>Confirmação da Reserva:</b></p><ul><li>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.</li><li>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.</li><li>O saldo de <b>70%</b> deverá ser pago até a data de saída.</li></ul><p><b>Cancelamento:</b></p><ul><li>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.</li><li>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.</li><li>Menos de 15 dias antes da data de chegada – sem reembolso.</li></ul>",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><ul>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<ul>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.</li><li>O saldo de <b>70%</b> deverá ser pago até a data de saída.</li></ul><p><b>Cancelamento:</b></p><ul><li>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.</li><li>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.</li><li>Menos de 15 dias antes da data de chegada – sem reembolso.</li></ul>",
           "taxa_gateway_percentual": 0.01
         },      
         {
@@ -93,7 +93,7 @@
           "tipo": "Cartao",
           "parcelas_maximas": 6,
           "juros": false,
-          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO DE RESERVAS</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.035
         }
       ],
