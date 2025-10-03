@@ -22,6 +22,34 @@ function formatDateTimeForDisplay(isoDateTimeString) {
     return `${data} ${hora}`;
 }
 
+// Função para rolar suavemente até um elemento e focá-lo
+function scrollToAndFocusElement($element) {
+    if ($element.length === 0) return;
+    
+    // Calcular posição considerando header fixo (se houver)
+    const headerHeight = 80; // Ajuste conforme necessário
+    const elementTop = $element.offset().top - headerHeight;
+    
+    // Rolar suavemente até o elemento
+    $('html, body').animate({
+        scrollTop: elementTop
+    }, 500, function() {
+        // Após a animação, focar no elemento
+        $element.focus();
+        
+        // Para campos select, abrir o dropdown
+        if ($element.is('select')) {
+            $element.trigger('click');
+        }
+        
+        // Adicionar efeito visual temporário
+        $element.addClass('field-highlight');
+        setTimeout(() => {
+            $element.removeClass('field-highlight');
+        }, 2000);
+    });
+}
+
 // Inicialização
 $(document).ready(function() {
     console.log('Formulário iniciado');
@@ -657,8 +685,11 @@ function validateCurrentStep() {
 }
 
 // Validar etapa de participantes
+
+// Validar etapa de participantes
 function validateParticipantsStep() {
     let isValid = true;
+    let firstErrorField = null;
     
     // Validar cada participante
     $('#participants-container .participant-block').each(function() {
@@ -666,17 +697,20 @@ function validateParticipantsStep() {
         
         // Campos obrigatórios
         const requiredFields = [
-            '.full-name',
-            '.phone-mask',
-            '.cpf-mask',
-            '.email-input',
-            '.dob-input'
+            { selector: '.full-name', name: 'Nome Completo' },
+            { selector: '.phone-mask', name: 'Telefone' },
+            { selector: '.cpf-mask', name: 'CPF' },
+            { selector: '.email-input', name: 'E-mail' },
+            { selector: '.dob-input', name: 'Data de Nascimento' }
         ];
         
-        requiredFields.forEach(selector => {
-            const $field = $participant.find(selector);
+        requiredFields.forEach(field => {
+            const $field = $participant.find(field.selector);
             if (!$field.val().trim()) {
                 $field.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $field;
+                }
                 isValid = false;
             } else {
                 $field.removeClass('error');
@@ -686,6 +720,9 @@ function validateParticipantsStep() {
         // Validar CPF
         const $cpfField = $participant.find('.cpf-mask');
         if (!validateCPF($cpfField)) {
+            if (!firstErrorField) {
+                firstErrorField = $cpfField;
+            }
             isValid = false;
         }
         
@@ -696,12 +733,22 @@ function validateParticipantsStep() {
             
             if ($stayPeriod.is(':visible') && !$stayPeriod.val()) {
                 $stayPeriod.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $stayPeriod;
+                }
                 isValid = false;
+            } else {
+                $stayPeriod.removeClass('error');
             }
             
             if ($accommodation.is(':visible') && !$accommodation.val()) {
                 $accommodation.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $accommodation;
+                }
                 isValid = false;
+            } else {
+                $accommodation.removeClass('error');
             }
         }
         
@@ -710,7 +757,12 @@ function validateParticipantsStep() {
             
             if ($eventOption.is(':visible') && !$eventOption.val()) {
                 $eventOption.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $eventOption;
+                }
                 isValid = false;
+            } else {
+                $eventOption.removeClass('error');
             }
         }
     });
@@ -719,39 +771,104 @@ function validateParticipantsStep() {
     if (participants.length > 1) {
         const hasResponsible = $('.responsible-payer:checked').length > 0;
         if (!hasResponsible) {
-            alert('Por favor, selecione um responsável pelo pagamento.');
+            // Encontrar o primeiro checkbox de responsável pelo pagamento visível
+            const $firstResponsibleCheckbox = $('.responsible-payer-section:visible').first().find('.responsible-payer');
+            if ($firstResponsibleCheckbox.length > 0 && !firstErrorField) {
+                firstErrorField = $firstResponsibleCheckbox;
+            }
             isValid = false;
         }
     }
 
-// Validar responsável pela criança se houver menores
-if (hasMinors()) {
-    const hasResponsibleChild = $('.responsible-child:checked').length > 0;
-    if (!hasResponsibleChild) {
-        alert('Por favor, selecione um responsável pela criança.');
-        isValid = false;
+    // Validar responsável pela criança se houver menores
+    if (hasMinors()) {
+        const hasResponsibleChild = $('.responsible-child:checked').length > 0;
+        if (!hasResponsibleChild) {
+            // Encontrar o primeiro checkbox de responsável pela criança visível
+            const $firstResponsibleChildCheckbox = $('.responsible-child-section:visible').first().find('.responsible-child');
+            if ($firstResponsibleChildCheckbox.length > 0 && !firstErrorField) {
+                firstErrorField = $firstResponsibleChildCheckbox;
+            }
+            isValid = false;
+        }
     }
-}
+    
+    // Se há erro, rolar até o primeiro campo com problema
+    if (!isValid && firstErrorField) {
+        scrollToAndFocusElement(firstErrorField);
+        
+        // Mostrar mensagem específica baseada no tipo de erro
+        showValidationMessage(firstErrorField);
+    }
     
     return isValid;
 }
 
 // Validar etapa de resumo
 function validateSummaryStep() {
+    let firstErrorField = null;
+    
     // Verificar se forma de pagamento foi selecionada
     if (!selectedPaymentMethod) {
-        $('#payment-method').addClass('error');
-        alert('Por favor, selecione uma forma de pagamento.');
-        return false;
+        const $paymentField = $('#payment-method');
+        $paymentField.addClass('error');
+        firstErrorField = $paymentField;
+    } else {
+        $('#payment-method').removeClass('error');
     }
     
     // Verificar se termos foram aceitos
     if (!$('#terms-conditions').is(':checked')) {
-        alert('Por favor, aceite os termos e condições.');
+        const $termsField = $('#terms-conditions');
+        if (!firstErrorField) {
+            firstErrorField = $termsField.closest('.terms-section');
+        }
+    }
+    
+    // Se há erro, rolar até o primeiro campo com problema
+    if (firstErrorField) {
+        scrollToAndFocusElement(firstErrorField);
+        showValidationMessage(firstErrorField);
         return false;
     }
     
     return true;
+}
+
+// Mostrar mensagem de validação específica
+function showValidationMessage($field) {
+    let message = '';
+    
+    if ($field.hasClass('full-name')) {
+        message = 'Por favor, preencha o nome completo.';
+    } else if ($field.hasClass('phone-mask')) {
+        message = 'Por favor, preencha o telefone.';
+    } else if ($field.hasClass('cpf-mask')) {
+        message = 'Por favor, preencha um CPF válido.';
+    } else if ($field.hasClass('email-input')) {
+        message = 'Por favor, preencha um e-mail válido.';
+    } else if ($field.hasClass('dob-input')) {
+        message = 'Por favor, preencha a data de nascimento.';
+    } else if ($field.hasClass('stay-period-select')) {
+        message = 'Por favor, selecione o período de estadia.';
+    } else if ($field.hasClass('accommodation-select')) {
+        message = 'Por favor, selecione o tipo de acomodação.';
+    } else if ($field.hasClass('event-option-select')) {
+        message = 'Por favor, selecione a opção de participação no evento.';
+    } else if ($field.attr('id') === 'payment-method') {
+        message = 'Por favor, selecione uma forma de pagamento.';
+    } else if ($field.hasClass('responsible-payer')) {
+        message = 'Por favor, selecione um responsável pelo pagamento.';
+    } else if ($field.hasClass('responsible-child')) {
+        message = 'Por favor, selecione um responsável pela criança.';
+    } else if ($field.closest('.terms-section').length > 0) {
+        message = 'Por favor, aceite os termos e condições.';
+    } else {
+        message = 'Por favor, preencha este campo obrigatório.';
+    }
+    
+    // Mostrar toast com a mensagem
+    showToast(message, 'error');
 }
 
 // Configurar etapa de resumo
