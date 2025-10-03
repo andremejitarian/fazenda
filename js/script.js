@@ -835,11 +835,21 @@ function validateSummaryStep() {
     return true;
 }
 
-// Mostrar mensagem de validação específica
+// Função atualizada para mostrar mensagem de validação específica
 function showValidationMessage($field) {
     let message = '';
     
-    if ($field.hasClass('full-name')) {
+    // Adicionar classe de erro visual aos containers pais quando necessário
+    if ($field.hasClass('responsible-payer')) {
+        $field.closest('.responsible-payer-section').addClass('error');
+        message = 'Por favor, selecione um responsável pelo pagamento.';
+    } else if ($field.hasClass('responsible-child')) {
+        $field.closest('.responsible-child-section').addClass('error');
+        message = 'Por favor, selecione um responsável pela criança.';
+    } else if ($field.closest('.terms-section').length > 0) {
+        $field.closest('.terms-section').addClass('error');
+        message = 'Por favor, aceite os termos e condições.';
+    } else if ($field.hasClass('full-name')) {
         message = 'Por favor, preencha o nome completo.';
     } else if ($field.hasClass('phone-mask')) {
         message = 'Por favor, preencha o telefone.';
@@ -857,18 +867,17 @@ function showValidationMessage($field) {
         message = 'Por favor, selecione a opção de participação no evento.';
     } else if ($field.attr('id') === 'payment-method') {
         message = 'Por favor, selecione uma forma de pagamento.';
-    } else if ($field.hasClass('responsible-payer')) {
-        message = 'Por favor, selecione um responsável pelo pagamento.';
-    } else if ($field.hasClass('responsible-child')) {
-        message = 'Por favor, selecione um responsável pela criança.';
-    } else if ($field.closest('.terms-section').length > 0) {
-        message = 'Por favor, aceite os termos e condições.';
     } else {
         message = 'Por favor, preencha este campo obrigatório.';
     }
     
     // Mostrar toast com a mensagem
     showToast(message, 'error');
+    
+    // Remover classes de erro após alguns segundos
+    setTimeout(() => {
+        $('.responsible-payer-section, .responsible-child-section, .terms-section').removeClass('error');
+    }, 3000);
 }
 
 // Configurar etapa de resumo
