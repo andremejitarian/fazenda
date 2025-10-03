@@ -835,44 +835,16 @@ function validateSummaryStep() {
     return true;
 }
 
-// Função atualizada para mostrar mensagem de validação específica
+// Função simplificada para mostrar feedback visual de validação
 function showValidationMessage($field) {
-    let message = '';
-    
     // Adicionar classe de erro visual aos containers pais quando necessário
     if ($field.hasClass('responsible-payer')) {
         $field.closest('.responsible-payer-section').addClass('error');
-        message = 'Por favor, selecione um responsável pelo pagamento.';
     } else if ($field.hasClass('responsible-child')) {
         $field.closest('.responsible-child-section').addClass('error');
-        message = 'Por favor, selecione um responsável pela criança.';
     } else if ($field.closest('.terms-section').length > 0) {
         $field.closest('.terms-section').addClass('error');
-        message = 'Por favor, aceite os termos e condições.';
-    } else if ($field.hasClass('full-name')) {
-        message = 'Por favor, preencha o nome completo.';
-    } else if ($field.hasClass('phone-mask')) {
-        message = 'Por favor, preencha o telefone.';
-    } else if ($field.hasClass('cpf-mask')) {
-        message = 'Por favor, preencha um CPF válido.';
-    } else if ($field.hasClass('email-input')) {
-        message = 'Por favor, preencha um e-mail válido.';
-    } else if ($field.hasClass('dob-input')) {
-        message = 'Por favor, preencha a data de nascimento.';
-    } else if ($field.hasClass('stay-period-select')) {
-        message = 'Por favor, selecione o período de estadia.';
-    } else if ($field.hasClass('accommodation-select')) {
-        message = 'Por favor, selecione o tipo de acomodação.';
-    } else if ($field.hasClass('event-option-select')) {
-        message = 'Por favor, selecione a opção de participação no evento.';
-    } else if ($field.attr('id') === 'payment-method') {
-        message = 'Por favor, selecione uma forma de pagamento.';
-    } else {
-        message = 'Por favor, preencha este campo obrigatório.';
     }
-    
-    // Mostrar toast com a mensagem
-    showToast(message, 'error');
     
     // Remover classes de erro após alguns segundos
     setTimeout(() => {
