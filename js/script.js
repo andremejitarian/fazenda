@@ -1617,20 +1617,11 @@ function checkForSavedData() {
 
 // Configurar ações da confirmação
 function setupConfirmationActions() {
-    // Botão de nova inscrição
-    if ($('.new-registration-btn').length === 0) {
-        $('.payment-link-btn').after(`
-            <button class="btn btn-secondary new-registration-btn" style="margin-top: 20px;">
-                Nova Inscrição
-            </button>
-        `);
-    }
+    // Remover qualquer botão de nova inscrição existente
+    $('.new-registration-btn').remove();
     
-    $('.new-registration-btn').off('click').on('click', function() {
-        // Limpar dados e reiniciar
-        clearFormData();
-        location.reload();
-    });
+    // Não criar novo botão
+    // (código de criação removido)
 }
 
 // Limpar dados do formulário
