@@ -1306,9 +1306,10 @@ function simulateOfflineSubmission(formData) {
 
 // Gerar ID único da inscrição
 function generateInscricaoId() {
-    const year = new Date().getFullYear();
-    const timestamp = Date.now().toString().slice(-6);
-    return `FS${year}${timestamp}`;
+    const eventCode = currentEvent ? currentEvent.id : 'UNKN';
+    const timestamp = Date.now().toString().slice(-3); // 3 dígitos
+    const random = Math.random().toString(36).substr(2, 1).toUpperCase(); // 1 char
+    return `${eventCode}${timestamp}${random}`;
 }
 
 // Preparar dados do formulário
