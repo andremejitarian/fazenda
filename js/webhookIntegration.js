@@ -2,7 +2,7 @@
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
-            submission: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/c51bd45c-c232-44db-8490-f52f22ae34ce',
+            submission: 'https://criadordigital-n8n-editor.kttqgl.easypanel.host/webhook-test/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae',
             preload: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/preload-evento',
             paymentLink: null // Será definido por evento ou usará o endpoint de submission
         };
