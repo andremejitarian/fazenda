@@ -1,56 +1,38 @@
-// Sistema de integração com webhooks
+// webhookIntegration.js - Versão simplificada para seu caso
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
-            submission: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae',
-            preload: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/preload-evento',
-            paymentLink: null // Será definido por evento ou usará o endpoint de submission
+            submission: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
         };
-        this.timeout = 10000; // 10 segundos
-        this.retryAttempts = 3;
+        this.timeout = 15000; // 15 segundos
+        this.retryAttempts = 2;
     }
 
-    // Pré-carregar dados do evento via webhook
-    async preloadEventData(eventoId) {
-        try {
-            console.log(`Tentando pré-carregar evento via webhook: ${eventoId}`);
-            
-            const response = await this.makeRequest('GET', this.endpoints.preload, null, {
-                evento: eventoId
-            });
-
-            if (response && response.evento) {
-                console.log('Dados do evento carregados via webhook:', response.evento);
-                return response.evento;
-            } else {
-                throw new Error('Resposta inválida do webhook de pré-carregamento');
-            }
-        } catch (error) {
-            console.warn('Falha no pré-carregamento via webhook:', error.message);
-            console.log('Fallback: carregando do arquivo JSON local');
-            return null; // Fallback para JSON local
-        }
-    }
-
-    // Submeter formulário via webhook
+    // Submeter formulário via webhook - FOCO NO LINK DE PAGAMENTO
     async submitForm(formData) {
         try {
-            console.log('Enviando formulário via webhook...');
+            console.log('=== ENVIANDO FORMULÁRIO PARA WEBHOOK ===');
+            console.log('URL:', this.endpoints.submission);
+            console.log('Dados enviados:', JSON.stringify(formData, null, 2));
             
             const response = await this.makeRequest('POST', this.endpoints.submission, formData);
             
             if (response) {
-                console.log('Formulário enviado com sucesso:', response);
+                console.log('✅ Resposta do webhook recebida:', response);
+                
+                // O n8n deve retornar o link de pagamento na resposta
                 return {
                     success: true,
-                    data: response,
-                    paymentLink: response.link || null
+                    data: {
+                        message: response.message || 'Inscrição processada com sucesso',
+                        link: response.link || response.payment_link || response.pagamento_link // Diferentes possibilidades de nome
+                    }
                 };
             } else {
-                throw new Error('Resposta vazia do servidor');
+                throw new Error('Resposta vazia do webhook');
             }
         } catch (error) {
-            console.error('Erro ao enviar formulário:', error);
+            console.error('❌ Erro ao enviar para webhook:', error);
             return {
                 success: false,
                 error: error.message,
@@ -59,65 +41,13 @@ class WebhookIntegration {
         }
     }
 
-    // Gerar link de pagamento
-    async generatePaymentLink(formData) {
-        try {
-            const endpoint = currentEvent?.payment_link_webhook_url || this.endpoints.submission;
-            console.log('Gerando link de pagamento...');
-            
-            const payloadForPayment = this.preparePaymentPayload(formData);
-            const response = await this.makeRequest('POST', endpoint, payloadForPayment);
-            
-            if (response && response.link) {
-                console.log('Link de pagamento gerado:', response.link);
-                return {
-                    success: true,
-                    link: response.link,
-                    provider: response.provider || 'gateway',
-                    expiresAt: response.expires_at || null
-                };
-            } else {
-                throw new Error('Link de pagamento não retornado');
-            }
-        } catch (error) {
-            console.error('Erro ao gerar link de pagamento:', error);
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    }
-
-    // Preparar payload para geração de link de pagamento
-    preparePaymentPayload(formData) {
-        return {
-            inscricao_id: formData.inscricao_id,
-            evento: formData.evento,
-            responsavel: formData.responsavel,
-            participantes: formData.participantes.map(p => ({
-                nome: p.fullName,
-                cpf: p.cpf,
-                valorHospedagem: p.valorHospedagem,
-                valorEvento: p.valorEvento
-            })),
-            totals: formData.totais,
-            forma_pagamento: formData.forma_pagamento,
-            cupom: formData.cupom,
-            meta: {
-                origin: 'frontend',
-                lang: 'pt-BR',
-                timestamp: formData.timestamp
-            }
-        };
-    }
-
-    // Fazer requisição HTTP com retry
-    async makeRequest(method, url, data = null, params = null) {
+    // Fazer requisição HTTP - VERSÃO SIMPLIFICADA
+    async makeRequest(method, url, data = null) {
         let lastError = null;
         
         for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
             try {
-                console.log(`Tentativa ${attempt}/${this.retryAttempts} para ${method} ${url}`);
+                console.log(`🔄 Tentativa ${attempt}/${this.retryAttempts} para ${method} ${url}`);
                 
                 const config = {
                     method: method,
@@ -125,84 +55,106 @@ class WebhookIntegration {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    timeout: this.timeout
+                    mode: 'cors'
                 };
 
                 // Adicionar dados ao corpo da requisição
-                if (data && (method === 'POST' || method === 'PUT')) {
+                if (data && method === 'POST') {
                     config.body = JSON.stringify(data);
+                    console.log('📤 JSON enviado:', config.body);
                 }
 
-                // Adicionar parâmetros de query
-                let requestUrl = url;
-                if (params) {
-                    const queryString = new URLSearchParams(params).toString();
-                    requestUrl += (url.includes('?') ? '&' : '?') + queryString;
-                }
+                console.log('🌐 Fazendo requisição para:', url);
 
                 // Fazer requisição com timeout
                 const response = await Promise.race([
-                    fetch(requestUrl, config),
+                    fetch(url, config),
                     new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), this.timeout)
+                        setTimeout(() => reject(new Error('Timeout da requisição')), this.timeout)
                     )
                 ]);
 
+                console.log('📡 Status HTTP:', response.status, response.statusText);
+
                 if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Erro HTTP:', response.status, errorText);
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
-                const result = await response.json();
-                console.log(`Sucesso na tentativa ${attempt}:`, result);
+                // Tentar fazer parse do JSON
+                const contentType = response.headers.get('content-type');
+                console.log('📋 Content-Type da resposta:', contentType);
+
+                let result;
+                if (contentType && contentType.includes('application/json')) {
+                    result = await response.json();
+                } else {
+                    const textResult = await response.text();
+                    console.log('📄 Resposta em texto:', textResult);
+                    // Tentar fazer parse manual se for JSON válido
+                    try {
+                        result = JSON.parse(textResult);
+                    } catch {
+                        result = { message: textResult };
+                    }
+                }
+
+                console.log(`✅ Sucesso na tentativa ${attempt}:`, result);
                 return result;
 
             } catch (error) {
                 lastError = error;
-                console.warn(`Tentativa ${attempt} falhou:`, error.message);
+                console.warn(`⚠️ Tentativa ${attempt} falhou:`, error.message);
                 
                 if (attempt < this.retryAttempts) {
-                    // Aguardar antes da próxima tentativa (backoff exponencial)
-                    const delay = Math.pow(2, attempt) * 1000;
-                    console.log(`Aguardando ${delay}ms antes da próxima tentativa...`);
+                    const delay = 1000 * attempt; // 1s, 2s
+                    console.log(`⏳ Aguardando ${delay}ms antes da próxima tentativa...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
 
+        console.error('💥 Todas as tentativas falharam:', lastError.message);
         throw lastError;
     }
 
-    // Validar conectividade
+    // Testar conectividade simples
     async testConnection() {
         try {
+            console.log('🔍 Testando conectividade...');
             const response = await fetch(this.endpoints.submission, {
-                method: 'HEAD',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ test: true }),
                 timeout: 5000
             });
-            return response.ok;
+            
+            console.log('Teste de conectividade:', response.status);
+            return response.status < 500; // Aceitar até erros 4xx como conectividade OK
         } catch (error) {
-            console.warn('Teste de conectividade falhou:', error.message);
+            console.warn('❌ Teste de conectividade falhou:', error.message);
             return false;
         }
     }
 }
 
-// Instância global do integrador
+// Instância global
 let webhookIntegration = null;
 
-// Inicializar integração
+// Inicializar integração - VERSÃO SIMPLIFICADA
 function initializeWebhookIntegration() {
     webhookIntegration = new WebhookIntegration();
-    console.log('Integração com webhooks inicializada');
+    console.log('🔗 Integração com webhook inicializada');
 }
 
-// Testar conectividade na inicialização
+// Testar conectividade
 async function testWebhookConnectivity() {
     if (!webhookIntegration) return false;
     
     const isConnected = await webhookIntegration.testConnection();
-    console.log('Conectividade com webhooks:', isConnected ? 'OK' : 'FALHA');
+    console.log('🌐 Conectividade com webhook:', isConnected ? 'OK' : 'FALHA');
     return isConnected;
 }
 
-console.log('Sistema de integração com webhooks carregado');
+console.log('📡 Sistema de webhook carregado (versão simplificada)');
