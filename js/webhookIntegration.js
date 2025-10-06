@@ -1,15 +1,30 @@
-// webhookIntegration.js - Versão final sem preload
+// webhookIntegration.js - Versão final SEM testes automáticos
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
             submission: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
         };
         this.timeout = 15000;
-        this.retryAttempts = 2;
+        this.retryAttempts = 1;
+        this.submissionInProgress = false;
     }
 
-    // APENAS a função submitForm - SEM preloadEventData
+    // APENAS a função submitForm
     async submitForm(formData) {
+        // Proteção contra submissões duplicadas
+        if (this.submissionInProgress) {
+            console.warn('⚠️ Submissão já em andamento, ignorando nova tentativa');
+            return { success: false, error: 'Submissão já em andamento' };
+        }
+
+        // Validação básica dos dados
+        if (!formData || !formData.inscricao_id) {
+            console.error('❌ Dados inválidos para submissão:', formData);
+            return { success: false, error: 'Dados inválidos' };
+        }
+
+        this.submissionInProgress = true;
+
         try {
             console.log('=== ENVIANDO FORMULÁRIO PARA WEBHOOK ===');
             console.log('URL:', this.endpoints.submission);
@@ -37,6 +52,8 @@ class WebhookIntegration {
                 error: error.message,
                 data: null
             };
+        } finally {
+            this.submissionInProgress = false;
         }
     }
 
@@ -107,35 +124,11 @@ class WebhookIntegration {
 
         throw lastError;
     }
-
-    async testConnection() {
-        try {
-            const response = await fetch(this.endpoints.submission, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ test: true }),
-                timeout: 5000
-            });
-            
-            return response.status < 500;
-        } catch (error) {
-            console.warn('❌ Teste de conectividade falhou:', error.message);
-            return false;
-        }
-    }
 }
 
 let webhookIntegration = null;
 
 function initializeWebhookIntegration() {
     webhookIntegration = new WebhookIntegration();
-    console.log('🔗 Integração com webhook inicializada (sem preload)');
-}
-
-async function testWebhookConnectivity() {
-    if (!webhookIntegration) return false;
-    
-    const isConnected = await webhookIntegration.testConnection();
-    console.log('🌐 Conectividade com webhook:', isConnected ? 'OK' : 'FALHA');
-    return isConnected;
+    console.log('🔗 Integração com webhook inicializada (apenas para submissão)');
 }
