@@ -4,7 +4,6 @@ let participants = [];
 let currentStep = 1;
 let appliedCoupon = null;
 let selectedPaymentMethod = null;
-let webhookConnected = false;
 let submissionInProgress = false;
 let paymentLinkGenerated = false;
 
@@ -62,14 +61,8 @@ function initializeForm() {
     const urlParams = new URLSearchParams(window.location.search);
     const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
     
-    // Inicializar integração com webhooks
+    // Inicializar integração com webhooks (SEM testes)
     initializeWebhookIntegration();
-    
-    // Testar conectividade
-    testWebhookConnectivity().then(connected => {
-        webhookConnected = connected;
-        console.log('🔗 Webhook conectado:', webhookConnected);
-    });
     
     // Carregar dados do evento APENAS do JSON local
     console.log(`📂 Carregando evento: ${eventoId}`);
@@ -1213,11 +1206,11 @@ async function submitForm() {
         
         let submissionResult = null;
         
-        if (webhookIntegration && webhookConnected) {
+        if (webhookIntegration) {
             console.log('📡 Enviando para webhook...');
             submissionResult = await webhookIntegration.submitForm(formData);
         } else {
-            console.log('⚠️ Webhook não disponível, usando modo offline...');
+            console.log('⚠️ Webhook não inicializado, usando modo offline...');
             submissionResult = await simulateOfflineSubmission(formData);
         }
         
