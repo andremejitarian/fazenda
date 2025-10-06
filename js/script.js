@@ -1306,7 +1306,6 @@ function generateInscricaoId() {
 }
 
 // Preparar dados do formulário
-// Preparar dados do formulário - COM dados completos do evento
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
@@ -1316,15 +1315,24 @@ function prepareFormData(inscricaoId) {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         
-        // Preparar objeto do participante com todos os dados
+        // Preparar objeto do participante SEM duplicação
         const participantForWebhook = {
-            ...participantData,
+            fullName: participantData.fullName,
+            phone: participantData.phone,
+            cpf: participantData.cpf,
+            email: participantData.email,
+            birthDate: participantData.birthDate,
+            stayPeriod: participantData.stayPeriod,
+            accommodation: participantData.accommodation,
+            eventOption: participantData.eventOption,
+            isResponsiblePayer: participantData.isResponsiblePayer,
+            isResponsibleChild: participantData.isResponsibleChild,
             valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
             valorEvento: priceCalculator.calculateEventValue(participantData),
             idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
-        // Adicionar campos de hospedagem apenas se existirem
+        // Adicionar campos de hospedagem apenas se existirem (SEM duplicação)
         if (participantData.numDiarias !== null) {
             participantForWebhook.num_diarias = participantData.numDiarias;
         }
@@ -1365,18 +1373,18 @@ function prepareFormData(inscricaoId) {
         id: currentEvent.id,
         nome: currentEvent.nome,
         tipo_formulario: currentEvent.tipo_formulario,
-        descricao: currentEvent.descricao, // NOVO CAMPO
-        politicas_evento_url: currentEvent.politicas_evento_url, // NOVO CAMPO
+        descricao: currentEvent.descricao,
+        politicas_evento_url: currentEvent.politicas_evento_url,
     };
 
     // Adicionar observações adicionais apenas se existirem
     if (currentEvent.observacoes_adicionais) {
-        eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais; // NOVO CAMPO
+        eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais;
     }
     
     return {
         inscricao_id: inscricaoId,
-        evento: eventoCompleto, // OBJETO COMPLETO COM NOVOS CAMPOS
+        evento: eventoCompleto,
         responsavel: {
             nome: responsiblePayer.fullName,
             cpf: responsiblePayer.cpf,
