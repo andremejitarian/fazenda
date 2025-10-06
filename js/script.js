@@ -68,10 +68,23 @@ function initializeForm() {
     // Testar conectividade
     testWebhookConnectivity().then(connected => {
         webhookConnected = connected;
+        console.log('🔗 Webhook conectado:', webhookConnected);
     });
     
-    // Carregar dados do evento (com tentativa de webhook primeiro)
-    loadEventDataWithWebhook(eventoId);
+    // Carregar dados do evento APENAS do JSON local
+    loadEventFromJSON(eventoId).then(eventoData => {
+        if (eventoData) {
+            currentEvent = eventoData;
+            console.log('📋 Evento carregado do JSON:', currentEvent);
+            setupEventInterface();
+            hideLoadingState();
+        } else {
+            showErrorState(`Evento ${eventoId} não encontrado`);
+        }
+    }).catch(error => {
+        console.error('❌ Erro ao carregar evento:', error);
+        showErrorState(error.message);
+    });
     
     // Configurar event listeners
     setupEventListeners();
@@ -80,49 +93,10 @@ function initializeForm() {
     setupInputMasks();
 }
 
-// Nova função para carregar dados com webhook
-async function loadEventDataWithWebhook(eventoId) {
-    console.log(`Carregando evento: ${eventoId}`);
-    
-    // Mostrar estado de loading
-    showLoadingState();
-    
-    try {
-        // Tentar carregar via webhook primeiro
-        let eventoData = null;
-        
-        if (webhookIntegration) {
-            eventoData = await webhookIntegration.preloadEventData(eventoId);
-        }
-        
-        // Se webhook falhou, carregar do JSON local
-        if (!eventoData) {
-            console.log('Carregando do arquivo JSON local...');
-            eventoData = await loadEventFromJSON(eventoId);
-        }
-        
-        if (!eventoData) {
-            throw new Error(`Evento ${eventoId} não encontrado`);
-        }
-        
-        currentEvent = eventoData;
-        console.log('Evento carregado:', currentEvent);
-        
-        // Configurar interface com dados do evento
-        setupEventInterface();
-        
-        // Ocultar loading e mostrar conteúdo
-        hideLoadingState();
-        
-    } catch (error) {
-        console.error('Erro ao carregar evento:', error);
-        showErrorState(error.message);
-    }
-}
-
-// Função para carregar do JSON local (fallback)
+// Função para carregar do JSON local
 async function loadEventFromJSON(eventoId) {
     try {
+        console.log(`📂 Carregando evento ${eventoId} do arquivo JSON...`);
         const response = await fetch('eventos.json');
         if (!response.ok) {
             throw new Error('Erro ao carregar dados dos eventos');
@@ -133,7 +107,7 @@ async function loadEventFromJSON(eventoId) {
         
         return evento;
     } catch (error) {
-        console.error('Erro ao carregar JSON local:', error);
+        console.error('❌ Erro ao carregar JSON local:', error);
         return null;
     }
 }
@@ -1209,6 +1183,8 @@ async function submitForm() {
     submissionInProgress = true;
     
     try {
+        console.log('=== INICIANDO SUBMISSÃO ===');
+        
         // Mostrar estado de carregamento
         showSubmissionLoading();
         
@@ -1218,20 +1194,29 @@ async function submitForm() {
         // Preparar dados para envio
         const formData = prepareFormData(inscricaoId);
         
-        console.log('Dados preparados para envio:', formData);
+        console.log('📦 Dados preparados para webhook:', formData);
         
-        // Tentar enviar via webhook
         let submissionResult = null;
         
         if (webhookIntegration && webhookConnected) {
+            console.log('📡 Enviando para webhook...');
             submissionResult = await webhookIntegration.submitForm(formData);
         } else {
-            // Simular envio offline
+            console.log('⚠️ Webhook não disponível, usando modo offline...');
             submissionResult = await simulateOfflineSubmission(formData);
         }
         
+        console.log('📨 Resultado da submissão:', submissionResult);
+        
         if (submissionResult.success) {
-            console.log('Formulário enviado com sucesso');
+            console.log('✅ Formulário enviado com sucesso');
+            
+            // Verificar se recebeu link de pagamento
+            if (submissionResult.data && submissionResult.data.link) {
+                console.log('💳 Link de pagamento recebido:', submissionResult.data.link);
+            } else {
+                console.warn('⚠️ Link de pagamento não encontrado na resposta');
+            }
             
             // Ir para tela de confirmação
             showConfirmation(inscricaoId, formData, submissionResult.data);
@@ -1240,7 +1225,7 @@ async function submitForm() {
         }
         
     } catch (error) {
-        console.error('Erro na submissão:', error);
+        console.error('💥 Erro na submissão:', error);
         showSubmissionError(error.message);
     } finally {
         submissionInProgress = false;
