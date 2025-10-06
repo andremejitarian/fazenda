@@ -72,11 +72,20 @@ function initializeForm() {
     });
     
     // Carregar dados do evento APENAS do JSON local
+    console.log(`📂 Carregando evento: ${eventoId}`);
+    
+    // Mostrar estado de loading
+    showLoadingState();
+    
     loadEventFromJSON(eventoId).then(eventoData => {
         if (eventoData) {
             currentEvent = eventoData;
             console.log('📋 Evento carregado do JSON:', currentEvent);
+            
+            // Configurar interface com dados do evento
             setupEventInterface();
+            
+            // Ocultar loading e mostrar conteúdo
             hideLoadingState();
         } else {
             showErrorState(`Evento ${eventoId} não encontrado`);
@@ -104,6 +113,12 @@ async function loadEventFromJSON(eventoId) {
         
         const data = await response.json();
         const evento = data.eventos.find(e => e.id === eventoId);
+        
+        if (evento) {
+            console.log('✅ Evento encontrado:', evento.nome);
+        } else {
+            console.warn('⚠️ Evento não encontrado:', eventoId);
+        }
         
         return evento;
     } catch (error) {
