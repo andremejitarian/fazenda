@@ -1323,9 +1323,17 @@ function prepareFormData(inscricaoId) {
             idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
-        // Adicionar num_diarias apenas se existir
+        // Adicionar campos de hospedagem apenas se existirem
         if (participantData.numDiarias !== null) {
             participantForWebhook.num_diarias = participantData.numDiarias;
+        }
+        
+        if (participantData.dataCheckin !== null) {
+            participantForWebhook.data_checkin = participantData.dataCheckin;
+        }
+        
+        if (participantData.dataCheckout !== null) {
+            participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
         participantsData.push(participantForWebhook);
@@ -1339,7 +1347,7 @@ function prepareFormData(inscricaoId) {
         id: selectedPaymentMethod.id,
         label: selectedPaymentMethod.label,
         tipo: selectedPaymentMethod.tipo,
-        descricao: selectedPaymentMethod.descricao, // NOVO CAMPO
+        descricao: selectedPaymentMethod.descricao,
         taxa_gateway_percentual: selectedPaymentMethod.taxa_gateway_percentual
     };
 
@@ -1371,7 +1379,7 @@ function prepareFormData(inscricaoId) {
             desconto: summary.discount,
             total: summary.finalTotal
         },
-        forma_pagamento: formaPagamentoCompleta, // OBJETO COMPLETO COM DESCRIÇÃO
+        forma_pagamento: formaPagamentoCompleta,
         cupom: priceCalculator.appliedCoupon,
         timestamp: new Date().toISOString()
     };
@@ -1668,12 +1676,26 @@ function extractParticipantData($participant) {
     const stayPeriodId = $participant.find('.stay-period-select').val() || 
                         (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
     
-    // Buscar num_diarias do período selecionado
+    // Buscar dados do período selecionado
     let numDiarias = null;
+    let dataCheckin = null;
+    let dataCheckout = null;
+    
     if (stayPeriodId && currentEvent.periodos_estadia_opcoes) {
         const periodoSelecionado = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
-        if (periodoSelecionado && periodoSelecionado.num_diarias) {
-            numDiarias = periodoSelecionado.num_diarias;
+        if (periodoSelecionado) {
+            // Capturar num_diarias
+            if (periodoSelecionado.num_diarias) {
+                numDiarias = periodoSelecionado.num_diarias;
+            }
+            
+            // Capturar datas de check-in e check-out
+            if (periodoSelecionado.data_inicio) {
+                dataCheckin = periodoSelecionado.data_inicio;
+            }
+            if (periodoSelecionado.data_fim) {
+                dataCheckout = periodoSelecionado.data_fim;
+            }
         }
     }
 
@@ -1690,7 +1712,9 @@ function extractParticipantData($participant) {
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
-        numDiarias: numDiarias // NOVO CAMPO
+        numDiarias: numDiarias, // Campo existente
+        dataCheckin: dataCheckin, // NOVO CAMPO
+        dataCheckout: dataCheckout // NOVO CAMPO
     };
 }
 
