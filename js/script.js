@@ -1315,12 +1315,20 @@ function prepareFormData(inscricaoId) {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         
-        participantsData.push({
+        // Preparar objeto do participante com todos os dados
+        const participantForWebhook = {
             ...participantData,
             valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
             valorEvento: priceCalculator.calculateEventValue(participantData),
             idade: priceCalculator.calculateAge(participantData.birthDate)
-        });
+        };
+
+        // Adicionar num_diarias apenas se existir
+        if (participantData.numDiarias !== null) {
+            participantForWebhook.num_diarias = participantData.numDiarias;
+        }
+
+        participantsData.push(participantForWebhook);
     });
     
     // Identificar responsável pelo pagamento
@@ -1640,20 +1648,32 @@ function clearFormData() {
 
 // Extrair dados do participante do formulário
 function extractParticipantData($participant) {
+    const stayPeriodId = $participant.find('.stay-period-select').val() || 
+                        (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+    
+    // Buscar num_diarias do período selecionado
+    let numDiarias = null;
+    if (stayPeriodId && currentEvent.periodos_estadia_opcoes) {
+        const periodoSelecionado = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
+        if (periodoSelecionado && periodoSelecionado.num_diarias) {
+            numDiarias = periodoSelecionado.num_diarias;
+        }
+    }
+
     return {
         fullName: $participant.find('.full-name').val(),
         phone: $participant.find('.phone-mask').val(),
         cpf: $participant.find('.cpf-mask').val(),
         email: $participant.find('.email-input').val(),
         birthDate: $participant.find('.dob-input').val(),
-        stayPeriod: $participant.find('.stay-period-select').val() || 
-                   (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null),
+        stayPeriod: stayPeriodId,
         accommodation: $participant.find('.accommodation-select').val() || 
                       (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
         eventOption: $participant.find('.event-option-select').val() || 
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
-        isResponsibleChild: $participant.find('.responsible-child').is(':checked') // Nova propriedade
+        isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
+        numDiarias: numDiarias // NOVO CAMPO
     };
 }
 
