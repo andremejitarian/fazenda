@@ -1334,6 +1334,23 @@ function prepareFormData(inscricaoId) {
     // Identificar responsável pelo pagamento
     const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
     
+    // Preparar dados da forma de pagamento com descrição
+    const formaPagamentoCompleta = {
+        id: selectedPaymentMethod.id,
+        label: selectedPaymentMethod.label,
+        tipo: selectedPaymentMethod.tipo,
+        descricao: selectedPaymentMethod.descricao, // NOVO CAMPO
+        taxa_gateway_percentual: selectedPaymentMethod.taxa_gateway_percentual
+    };
+
+    // Adicionar campos opcionais da forma de pagamento se existirem
+    if (selectedPaymentMethod.parcelas_maximas) {
+        formaPagamentoCompleta.parcelas_maximas = selectedPaymentMethod.parcelas_maximas;
+    }
+    if (selectedPaymentMethod.juros !== undefined) {
+        formaPagamentoCompleta.juros = selectedPaymentMethod.juros;
+    }
+    
     return {
         inscricao_id: inscricaoId,
         evento: {
@@ -1354,7 +1371,7 @@ function prepareFormData(inscricaoId) {
             desconto: summary.discount,
             total: summary.finalTotal
         },
-        forma_pagamento: selectedPaymentMethod,
+        forma_pagamento: formaPagamentoCompleta, // OBJETO COMPLETO COM DESCRIÇÃO
         cupom: priceCalculator.appliedCoupon,
         timestamp: new Date().toISOString()
     };
