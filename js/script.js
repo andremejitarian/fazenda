@@ -1306,6 +1306,7 @@ function generateInscricaoId() {
 }
 
 // Preparar dados do formulário
+// Preparar dados do formulário - COM dados completos do evento
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
@@ -1358,14 +1359,24 @@ function prepareFormData(inscricaoId) {
     if (selectedPaymentMethod.juros !== undefined) {
         formaPagamentoCompleta.juros = selectedPaymentMethod.juros;
     }
+
+    // Preparar dados completos do evento
+    const eventoCompleto = {
+        id: currentEvent.id,
+        nome: currentEvent.nome,
+        tipo_formulario: currentEvent.tipo_formulario,
+        descricao: currentEvent.descricao, // NOVO CAMPO
+        politicas_evento_url: currentEvent.politicas_evento_url, // NOVO CAMPO
+    };
+
+    // Adicionar observações adicionais apenas se existirem
+    if (currentEvent.observacoes_adicionais) {
+        eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais; // NOVO CAMPO
+    }
     
     return {
         inscricao_id: inscricaoId,
-        evento: {
-            id: currentEvent.id,
-            nome: currentEvent.nome,
-            tipo_formulario: currentEvent.tipo_formulario
-        },
+        evento: eventoCompleto, // OBJETO COMPLETO COM NOVOS CAMPOS
         responsavel: {
             nome: responsiblePayer.fullName,
             cpf: responsiblePayer.cpf,
