@@ -1674,9 +1674,12 @@ html {
 }
 
 .country-select {
-    flex: 0 0 180px;
-    min-width: 180px;
+    flex: 0 0 100px; /* Reduzido de 180px para 100px */
+    min-width: 100px;
     font-size: 14px;
+    text-align: center;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .phone-input {
@@ -1706,4 +1709,10 @@ html {
 .phone-input.valid {
     border-color: #27ae60;
     background-color: #f2fdf2;
+}
+
+/* Estilo adicional para melhor aparência do select */
+.country-select option {
+    padding: 8px;
+    font-size: 14px;
 }
