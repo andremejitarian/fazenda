@@ -443,8 +443,185 @@ function updateCheckInOutInfo($participant, periodo) {
 
 // Configurar máscaras para participante
 function setupParticipantMasks($participant) {
-    $participant.find('.phone-mask').mask('(00) 00000-0000');
     $participant.find('.cpf-mask').mask('000.000.000-00');
+}
+
+// NOVA FUNÇÃO: Aplicar máscara de telefone baseada no país
+function applyPhoneMask($phoneInput, countryCode) {
+    // Remover máscara existente
+    $phoneInput.unmask();
+    
+    // Aplicar máscara baseada no país
+    switch(countryCode) {
+        case 'BR':
+            $phoneInput.mask('(00) 00000-0000');
+            $phoneInput.attr('placeholder', '(11) 99999-9999');
+            break;
+        case 'US':
+        case 'CA':
+            $phoneInput.mask('(000) 000-0000');
+            $phoneInput.attr('placeholder', '(555) 123-4567');
+            break;
+        case 'AR':
+            $phoneInput.mask('(00) 0000-0000');
+            $phoneInput.attr('placeholder', '(11) 1234-5678');
+            break;
+        case 'CL':
+            $phoneInput.mask('0 0000 0000');
+            $phoneInput.attr('placeholder', '9 1234 5678');
+            break;
+        case 'CO':
+            $phoneInput.mask('000 000 0000');
+            $phoneInput.attr('placeholder', '300 123 4567');
+            break;
+        case 'PE':
+            $phoneInput.mask('000 000 000');
+            $phoneInput.attr('placeholder', '987 654 321');
+            break;
+        case 'UY':
+            $phoneInput.mask('0000 0000');
+            $phoneInput.attr('placeholder', '9876 5432');
+            break;
+        case 'PY':
+            $phoneInput.mask('000 000 000');
+            $phoneInput.attr('placeholder', '987 123 456');
+            break;
+        case 'BO':
+            $phoneInput.mask('0000 0000');
+            $phoneInput.attr('placeholder', '7123 4567');
+            break;
+        case 'EC':
+            $phoneInput.mask('00 000 0000');
+            $phoneInput.attr('placeholder', '99 123 4567');
+            break;
+        case 'VE':
+            $phoneInput.mask('000-000-0000');
+            $phoneInput.attr('placeholder', '412-123-4567');
+            break;
+        case 'PT':
+            $phoneInput.mask('000 000 000');
+            $phoneInput.attr('placeholder', '912 345 678');
+            break;
+        case 'ES':
+            $phoneInput.mask('000 00 00 00');
+            $phoneInput.attr('placeholder', '612 34 56 78');
+            break;
+        case 'FR':
+            $phoneInput.mask('00 00 00 00 00');
+            $phoneInput.attr('placeholder', '06 12 34 56 78');
+            break;
+        case 'DE':
+            $phoneInput.mask('000 00000000');
+            $phoneInput.attr('placeholder', '030 12345678');
+            break;
+        case 'IT':
+            $phoneInput.mask('000 000 0000');
+            $phoneInput.attr('placeholder', '347 123 4567');
+            break;
+        case 'GB':
+            $phoneInput.mask('00000 000000');
+            $phoneInput.attr('placeholder', '07700 123456');
+            break;
+        default:
+            // Sem máscara para países não mapeados
+            $phoneInput.attr('placeholder', 'Digite o telefone');
+            break;
+    }
+}
+
+// NOVA FUNÇÃO: Validar telefone baseado no país
+function validatePhoneNumber($phoneInput, countryCode) {
+    const phoneValue = $phoneInput.val().replace(/\D/g, ''); // Remove caracteres não numéricos
+    
+    let isValid = false;
+    let minLength = 0;
+    let maxLength = 0;
+    
+    switch(countryCode) {
+        case 'BR':
+            minLength = 10;
+            maxLength = 11;
+            break;
+        case 'US':
+        case 'CA':
+            minLength = 10;
+            maxLength = 10;
+            break;
+        case 'AR':
+            minLength = 10;
+            maxLength = 11;
+            break;
+        case 'CL':
+            minLength = 8;
+            maxLength = 9;
+            break;
+        case 'CO':
+            minLength = 10;
+            maxLength = 10;
+            break;
+        case 'PE':
+            minLength = 9;
+            maxLength = 9;
+            break;
+        case 'UY':
+            minLength = 8;
+            maxLength = 8;
+            break;
+        case 'PY':
+            minLength = 9;
+            maxLength = 9;
+            break;
+        case 'BO':
+            minLength = 8;
+            maxLength = 8;
+            break;
+        case 'EC':
+            minLength = 9;
+            maxLength = 9;
+            break;
+        case 'VE':
+            minLength = 10;
+            maxLength = 10;
+            break;
+        case 'PT':
+            minLength = 9;
+            maxLength = 9;
+            break;
+        case 'ES':
+            minLength = 9;
+            maxLength = 9;
+            break;
+        case 'FR':
+            minLength = 10;
+            maxLength = 10;
+            break;
+        case 'DE':
+            minLength = 10;
+            maxLength = 12;
+            break;
+        case 'IT':
+            minLength = 9;
+            maxLength = 10;
+            break;
+        case 'GB':
+            minLength = 10;
+            maxLength = 11;
+            break;
+        default:
+            minLength = 7;
+            maxLength = 15;
+            break;
+    }
+    
+    isValid = phoneValue.length >= minLength && phoneValue.length <= maxLength;
+    
+    if (isValid) {
+        $phoneInput.removeClass('error').addClass('valid');
+    } else {
+        $phoneInput.addClass('error').removeClass('valid');
+    }
+    
+    return isValid;
 }
 
 // Configurar event listeners para participante
@@ -452,6 +629,24 @@ function setupParticipantEventListeners($participant) {
     // Remover participante
     $participant.find('.btn-remove-participant').on('click', function() {
         removeParticipant($participant);
+    });
+
+        // NOVO: Mudança de país do telefone
+    $participant.find('.country-select').on('change', function() {
+        const selectedCountry = $(this).find(':selected').data('country');
+        const $phoneInput = $participant.find('.phone-input');
+        
+        // Limpar valor atual e aplicar nova máscara
+        $phoneInput.val('');
+        applyPhoneMask($phoneInput, selectedCountry);
+        
+        console.log(`País alterado para: ${selectedCountry}`);
+    });
+    
+    // ATUALIZADO: Validação de telefone
+    $participant.find('.phone-input').on('blur', function() {
+        const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
+        validatePhoneNumber($(this), selectedCountry);
     });
     
     // Validação de CPF
@@ -712,7 +907,7 @@ function validateParticipantsStep() {
         // Campos obrigatórios
         const requiredFields = [
             { selector: '.full-name', name: 'Nome Completo' },
-            { selector: '.phone-mask', name: 'Telefone' },
+            { selector: '.phone-input', name: 'Telefone' }, // ATUALIZADO
             { selector: '.cpf-mask', name: 'CPF' },
             { selector: '.email-input', name: 'E-mail' },
             { selector: '.dob-input', name: 'Data de Nascimento' }
@@ -745,6 +940,16 @@ function validateParticipantsStep() {
         if (!validateEmail($emailField)) {
             if (!firstErrorField) {
                 firstErrorField = $emailField;
+            }
+            isValid = false;
+        }
+
+                // NOVO: Validar telefone
+        const $phoneField = $participant.find('.phone-input');
+        const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
+        if (!validatePhoneNumber($phoneField, selectedCountry)) {
+            if (!firstErrorField) {
+                firstErrorField = $phoneField;
             }
             isValid = false;
         }
@@ -1718,9 +1923,16 @@ function extractParticipantData($participant) {
         }
     }
 
+        // NOVO: Capturar dados do telefone com país
+    const countryCode = $participant.find('.country-select').val();
+    const countryName = $participant.find('.country-select').find(':selected').data('country');
+    const phoneNumber = $participant.find('.phone-input').val();
+
     return {
         fullName: $participant.find('.full-name').val(),
-        phone: $participant.find('.phone-mask').val(),
+        phone: phoneNumber, // ATUALIZADO
+        phoneCountryCode: countryCode, // NOVO
+        phoneCountry: countryName, // NOVO
         cpf: $participant.find('.cpf-mask').val(),
         email: $participant.find('.email-input').val(),
         birthDate: $participant.find('.dob-input').val(),
