@@ -184,9 +184,32 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Telefone:</label>
-                        <input type="text" class="form-control phone-mask" required>
+                    <label>Telefone:</label>
+                    <div class="phone-input-container">
+                        <select class="form-control country-select">
+                            <option value="+55" data-country="BR" selected>🇧🇷 Brasil (+55)</option>
+                            <option value="+1" data-country="US">🇺🇸 EUA (+1)</option>
+                            <option value="+1" data-country="CA">🇨🇦 Canadá (+1)</option>
+                            <option value="+54" data-country="AR">🇦🇷 Argentina (+54)</option>
+                            <option value="+56" data-country="CL">🇨�� Chile (+56)</option>
+                            <option value="+57" data-country="CO">🇨🇴 Colômbia (+57)</option>
+                            <option value="+51" data-country="PE">🇵🇪 Peru (+51)</option>
+                            <option value="+598" data-country="UY">🇺�� Uruguai (+598)</option>
+                            <option value="+595" data-country="PY">🇵�� Paraguai (+595)</option>
+                            <option value="+591" data-country="BO">🇧🇴 Bolívia (+591)</option>
+                            <option value="+593" data-country="EC">🇪🇨 Equador (+593)</option>
+                            <option value="+58" data-country="VE">🇻�� Venezuela (+58)</option>
+                            <option value="+351" data-country="PT">🇵🇹 Portugal (+351)</option>
+                            <option value="+34" data-country="ES">🇪🇸 Espanha (+34)</option>
+                            <option value="+33" data-country="FR">🇫🇷 França (+33)</option>
+                            <option value="+49" data-country="DE">🇩🇪 Alemanha (+49)</option>
+                            <option value="+39" data-country="IT">🇮🇹 Itália (+39)</option>
+                            <option value="+44" data-country="GB">🇬🇧 Reino Unido (+44)</option>
+                        </select>
+                        <input type="text" class="form-control phone-input" required placeholder="Digite o telefone">
+                        </div>
                     </div>
+                </div>
                     <div class="form-group">
                         <label>CPF:</label>
                         <input type="text" class="form-control cpf-mask" required>
