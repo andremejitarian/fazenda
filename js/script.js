@@ -674,12 +674,14 @@ function setupParticipantEventListeners($participant) {
     // Data de nascimento - verificar idade para responsável pela criança
     $participant.find('.dob-input').on('change', function() {
         updateResponsibleSections();
-        updateParticipantCalculations($participant);
+        // **CORREÇÃO**: Atualizar todos os cálculos quando idade muda
+        updateAllCalculations();
     });
     
     // Listener para mudanças que afetam os cálculos diretamente
     $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .accommodation-select, .event-option-select').on('change', function() {
-        updateParticipantCalculations($participant);
+        // **CORREÇÃO**: Atualizar todos os cálculos para considerar ordem de prioridade
+        updateAllCalculations();
     });
 
     // Listener APENAS para o período de estadia
@@ -696,7 +698,8 @@ function setupParticipantEventListeners($participant) {
         }
 
         updateEventOptionsForPeriod($participant);
-        updateParticipantCalculations($participant);
+        // **CORREÇÃO**: Atualizar todos os cálculos
+        updateAllCalculations();
     });
     
     // Responsável pelo pagamento
@@ -726,6 +729,9 @@ function removeParticipant($participant) {
     
     // Renumerar participantes
     renumberParticipants();
+    
+    // **CORREÇÃO**: Atualizar todos os cálculos após remoção
+    updateAllCalculations();
     
     // Atualizar seções de responsáveis (pagamento e criança)
     updateResponsibleSections();
@@ -2048,39 +2054,15 @@ function updateParticipantCalculations($participant) {
     // **CORREÇÃO**: Garantir que o participantData tenha o ID
     participantData.id = participantId;
     
-    // Atualizar dados do participante no calculador
-function updateParticipantInCalculator(participantId, participantData) {
-    if (!window.priceCalculator) return;
-
-    // **CORREÇÃO**: Garantir que o participantData tenha o ID
-    participantData.id = participantId;
-
-    // Encontrar índice do participante
-    const participantIndex = window.priceCalculator.participants.findIndex(p => p.id === participantId);
-    
-    if (participantIndex >= 0) {
-        // Atualizar participante existente
-        window.priceCalculator.participants[participantIndex] = {
-            ...participantData
-        };
-    } else {
-        // Adicionar novo participante
-        window.priceCalculator.participants.push({
-            ...participantData
-        });
-    }
-    
-    // **DEBUG**: Log para verificar estado do calculador
-    console.log('Participantes no calculador:', window.priceCalculator.participants);
-}
+    // **IMPORTANTE**: Atualizar TODOS os participantes no calculador antes de calcular valores
+    updateAllParticipantsInCalculator();
     
     // Calcular valores individuais usando os dados atualizados
     const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
     const eventValue = window.priceCalculator.calculateEventValue(participantData);
     
-    // Atualizar display dos valores
-    $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
-    $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
+    // **CORREÇÃO**: Atualizar display dos valores com informações adicionais
+    updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
     
     // **DEBUG**: Log para verificar valores
     console.log(`Cálculos atualizados para participante ${participantId}:`, {
@@ -2099,24 +2081,87 @@ function updateParticipantInCalculator(participantId, participantData) {
     }
 }
 
-// Atualizar todos os cálculos
-function updateAllCalculations() {
-    if (!priceCalculator) return;
+// **NOVA FUNÇÃO**: Atualizar todos os participantes no calculador
+function updateAllParticipantsInCalculator() {
+    if (!window.priceCalculator) return;
 
-    // Atualizar dados de todos os participantes
+    // Limpar participantes existentes
+    window.priceCalculator.participants = [];
+    
+    // Adicionar todos os participantes na ordem correta
     $('#participants-container .participant-block').each(function() {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         const participantId = $participant.attr('data-participant-id');
         
-        updateParticipantInCalculator(participantId, participantData);
+        // Garantir que o participantData tenha o ID
+        participantData.id = participantId;
         
-        // Atualizar displays individuais
-        const lodgingValue = priceCalculator.calculateLodgingValue(participantData);
-        const eventValue = priceCalculator.calculateEventValue(participantData);
+        // Adicionar ao calculador
+        window.priceCalculator.participants.push(participantData);
+    });
+    
+    console.log('Todos os participantes atualizados no calculador:', window.priceCalculator.participants);
+}
+
+// **NOVA FUNÇÃO**: Atualizar display de valores do participante
+function updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData) {
+    const age = window.priceCalculator.calculateAge(participantData.birthDate);
+    
+    // Atualizar valor de hospedagem
+    const $lodgingValue = $participant.find('.lodging-value');
+    if ($lodgingValue.length > 0) {
+        let lodgingText = window.priceCalculator.formatCurrency(lodgingValue);
         
-        $participant.find('.lodging-value').text(priceCalculator.formatCurrency(lodgingValue));
-        $participant.find('.event-value').text(priceCalculator.formatCurrency(eventValue));
+        // Adicionar indicador se necessário
+        if (lodgingValue === 0 && age >= 0 && age <= 4) {
+            lodgingText += ' <span class="free-indicator">(Gratuito)</span>';
+        } else if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
+            lodgingText += ' <span class="discount-indicator">(50%)</span>';
+        }
+        
+        $lodgingValue.html(lodgingText);
+    }
+    
+    // Atualizar valor de evento
+    const $eventValue = $participant.find('.event-value');
+    if ($eventValue.length > 0) {
+        let eventText = window.priceCalculator.formatCurrency(eventValue);
+        
+        // Adicionar indicador se necessário
+        if (eventValue === 0 && age >= 0 && age <= 4) {
+            eventText += ' <span class="free-indicator">(Gratuito)</span>';
+        } else if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')) {
+            eventText += ' <span class="discount-indicator">(50%)</span>';
+        }
+        
+        $eventValue.html(eventText);
+    }
+}
+
+// Atualizar todos os cálculos
+// Atualizar todos os cálculos
+function updateAllCalculations() {
+    if (!window.priceCalculator) return;
+
+    // **CORREÇÃO**: Primeiro atualizar todos os participantes no calculador
+    updateAllParticipantsInCalculator();
+    
+    // Depois atualizar displays individuais
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        const participantId = $participant.attr('data-participant-id');
+        
+        // Garantir que o participantData tenha o ID
+        participantData.id = participantId;
+        
+        // Calcular valores individuais
+        const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+        const eventValue = window.priceCalculator.calculateEventValue(participantData);
+        
+        // Atualizar display
+        updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
     });
     
     // Atualizar totais se estivermos na tela de resumo
