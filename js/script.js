@@ -1240,6 +1240,9 @@ function generateParticipantsSummary() {
     const $summaryContent = $('#summary-content');
     let summaryHtml = '';
     
+    // **IMPORTANTE**: Atualizar dados do calculador antes de gerar o resumo
+    updateAllCalculations();
+    
     // Identificar responsável pelo pagamento
     const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
     let responsiblePayerData = null;
@@ -1299,9 +1302,31 @@ function generateParticipantsSummary() {
         const participantData = extractParticipantData($participant);
         const participantNumber = index + 1;
         
-        // Calcular valores individuais
-        const lodgingValue = window.priceCalculator ? window.priceCalculator.calculateLodgingValue(participantData) : 0;
-        const eventValue = window.priceCalculator ? window.priceCalculator.calculateEventValue(participantData) : 0;
+        // **CORREÇÃO**: Buscar valores do calculador usando o ID correto
+        const participantId = $participant.attr('data-participant-id');
+        const calculatorParticipant = window.priceCalculator.participants.find(p => p.id === participantId);
+        
+        let lodgingValue = 0;
+        let eventValue = 0;
+        
+        if (calculatorParticipant) {
+            // Usar dados do calculador que já foram processados
+            lodgingValue = window.priceCalculator.calculateLodgingValue(calculatorParticipant);
+            eventValue = window.priceCalculator.calculateEventValue(calculatorParticipant);
+        } else {
+            // Fallback: calcular diretamente
+            lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+            eventValue = window.priceCalculator.calculateEventValue(participantData);
+        }
+        
+        // **DEBUG**: Log para verificar valores
+        console.log(`Participante ${participantNumber}:`, {
+            id: participantId,
+            idade: window.priceCalculator.calculateAge(participantData.birthDate),
+            lodgingValue,
+            eventValue,
+            participantData
+        });
         
         // Obter descrições das opções selecionadas
         const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
@@ -1329,19 +1354,43 @@ function generateParticipantsSummary() {
         
         // Mostrar detalhes baseado no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
+            let lodgingInfo = '';
+            if (lodgingValue === 0) {
+                lodgingInfo = ' <span class="free-indicator">(Gratuito)</span>';
+            } else {
+                // Verificar se está aplicando regra de excedente
+                const age = window.priceCalculator.calculateAge(participantData.birthDate);
+                if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
+                    lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
+                }
+            }
+            
             summaryHtml += `
                 <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
                 <p><strong>Período:</strong> ${stayPeriodLabel}</p>
                 ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
                 ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
-                <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}</p>
+                <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
             `;
         }
         
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+            // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
+            let eventInfo = '';
+            if (eventValue === 0) {
+                eventInfo = ' <span class="free-indicator">(Gratuito)</span>';
+            } else {
+                // Verificar se está aplicando regra de excedente
+                const age = window.priceCalculator.calculateAge(participantData.birthDate);
+                if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')) {
+                    eventInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
+                }
+            }
+            
             summaryHtml += `
                 <p><strong>Evento:</strong> ${eventOptionLabel}</p>
-                <p><strong>Valor do Evento:</strong> ${window.priceCalculator.formatCurrency(eventValue)}</p>
+                <p><strong>Valor do Evento:</strong> ${window.priceCalculator.formatCurrency(eventValue)}${eventInfo}</p>
             `;
         }
         
@@ -1996,26 +2045,58 @@ function updateParticipantCalculations($participant) {
     const participantData = extractParticipantData($participant);
     const participantId = $participant.attr('data-participant-id');
     
-    // Atualizar dados do participante no calculador
-    updateParticipantInCalculator(participantId, participantData);
+    // **CORREÇÃO**: Garantir que o participantData tenha o ID
+    participantData.id = participantId;
     
-    // Calcular valores individuais
-    const lodgingValue = priceCalculator.calculateLodgingValue(participantData);
-    const eventValue = priceCalculator.calculateEventValue(participantData);
+    // Atualizar dados do participante no calculador
+function updateParticipantInCalculator(participantId, participantData) {
+    if (!window.priceCalculator) return;
+
+    // **CORREÇÃO**: Garantir que o participantData tenha o ID
+    participantData.id = participantId;
+
+    // Encontrar índice do participante
+    const participantIndex = window.priceCalculator.participants.findIndex(p => p.id === participantId);
+    
+    if (participantIndex >= 0) {
+        // Atualizar participante existente
+        window.priceCalculator.participants[participantIndex] = {
+            ...participantData
+        };
+    } else {
+        // Adicionar novo participante
+        window.priceCalculator.participants.push({
+            ...participantData
+        });
+    }
+    
+    // **DEBUG**: Log para verificar estado do calculador
+    console.log('Participantes no calculador:', window.priceCalculator.participants);
+}
+    
+    // Calcular valores individuais usando os dados atualizados
+    const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+    const eventValue = window.priceCalculator.calculateEventValue(participantData);
     
     // Atualizar display dos valores
-    $participant.find('.lodging-value').text(priceCalculator.formatCurrency(lodgingValue));
-    $participant.find('.event-value').text(priceCalculator.formatCurrency(eventValue));
+    $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
+    $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
+    
+    // **DEBUG**: Log para verificar valores
+    console.log(`Cálculos atualizados para participante ${participantId}:`, {
+        idade: window.priceCalculator.calculateAge(participantData.birthDate),
+        lodging: lodgingValue,
+        event: eventValue,
+        isEligibleForFreeLodging: window.priceCalculator.isEligibleForFree(participantData, 'hospedagem'),
+        shouldApplyExcessLodging: window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem'),
+        isEligibleForFreeEvent: window.priceCalculator.isEligibleForFree(participantData, 'evento'),
+        shouldApplyExcessEvent: window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')
+    });
     
     // Atualizar totais gerais se estivermos na tela de resumo
     if (currentStep === 3) {
         updateSummaryTotals();
     }
-    
-    console.log(`Cálculos atualizados para participante ${participantId}:`, {
-        lodging: lodgingValue,
-        event: eventValue
-    });
 }
 
 // Atualizar todos os cálculos
