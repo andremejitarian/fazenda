@@ -444,6 +444,8 @@ function updateCheckInOutInfo($participant, periodo) {
 // Configurar máscaras para participante
 function setupParticipantMasks($participant) {
     $participant.find('.cpf-mask').mask('000.000.000-00');
+    const $phoneInput = $participant.find('.phone-input');
+    applyPhoneMask($phoneInput, 'BR');
 }
 
 // NOVA FUNÇÃO: Aplicar máscara de telefone baseada no país
