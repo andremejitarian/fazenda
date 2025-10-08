@@ -40,6 +40,87 @@ class PriceCalculator {
         return { percentual_valor_adulto: 1.0 };
     }
 
+    // **NOVO MÉTODO**: Obter participantes elegíveis para gratuidade ordenados
+    getEligibleFreeParticipants(type) {
+        const eligibleParticipants = [];
+        
+        this.participants.forEach((participant, index) => {
+            if (!participant.birthDate) return;
+            
+            const age = this.calculateAge(participant.birthDate);
+            const ageRule = this.getAgeRule(age, type);
+            
+            // Verificar se está na faixa de gratuidade
+            if (ageRule.percentual_valor_adulto === 0 && ageRule.limite_gratuidade_por_reserva) {
+                const minAge = ageRule.faixa_min_anos;
+                const maxAge = ageRule.faixa_max_anos || Infinity;
+                
+                if (age >= minAge && age <= maxAge) {
+                    eligibleParticipants.push({
+                        participant,
+                        index,
+                        age,
+                        ageRule
+                    });
+                }
+            }
+        });
+        
+        // Ordenar por ordem de inserção (primeiro a ser inserido tem prioridade)
+        return eligibleParticipants.sort((a, b) => a.index - b.index);
+    }
+
+    // **MÉTODO ATUALIZADO**: Verificar se participante específico é elegível para gratuidade
+    isEligibleForFree(participantData, type) {
+        if (!participantData.birthDate) return false;
+        
+        const age = this.calculateAge(participantData.birthDate);
+        const ageRule = this.getAgeRule(age, type);
+        
+        if (!ageRule.limite_gratuidade_por_reserva || ageRule.percentual_valor_adulto !== 0) {
+            return false;
+        }
+        
+        // Obter todos os participantes elegíveis para gratuidade
+        const eligibleParticipants = this.getEligibleFreeParticipants(type);
+        
+        // Encontrar a posição deste participante na lista ordenada
+        const participantIndex = eligibleParticipants.findIndex(ep => 
+            ep.participant.id === participantData.id
+        );
+        
+        if (participantIndex === -1) return false;
+        
+        // Verificar se está dentro do limite de gratuidade
+        return participantIndex < ageRule.limite_gratuidade_por_reserva;
+    }
+
+    // **MÉTODO ATUALIZADO**: Verificar se deve aplicar regra de excedente
+    shouldApplyExcessRule(participantData, type) {
+        if (!participantData.birthDate) return false;
+        
+        const age = this.calculateAge(participantData.birthDate);
+        const ageRule = this.getAgeRule(age, type);
+        
+        // Verificar se tem regra de excedente e se está na faixa de idade original
+        if (!ageRule.regra_excedente_gratuito || ageRule.percentual_valor_adulto !== 0) {
+            return false;
+        }
+        
+        // Obter todos os participantes elegíveis para gratuidade
+        const eligibleParticipants = this.getEligibleFreeParticipants(type);
+        
+        // Encontrar a posição deste participante na lista ordenada
+        const participantIndex = eligibleParticipants.findIndex(ep => 
+            ep.participant.id === participantData.id
+        );
+        
+        if (participantIndex === -1) return false;
+        
+        // Verificar se está FORA do limite de gratuidade (excedente)
+        return participantIndex >= ageRule.limite_gratuidade_por_reserva;
+    }
+
     // Calcular valor de hospedagem para um participante
     calculateLodgingValue(participantData) {
         if (!participantData.stayPeriod || !participantData.accommodation || !participantData.birthDate) {
@@ -55,13 +136,24 @@ class PriceCalculator {
         const baseValue = acomodacao.valor_diaria_por_pessoa * periodo.num_diarias;
         const ageRule = this.getAgeRule(age, 'hospedagem');
         
-        // Aplicar regra de gratuidade
-        const freeChildrenCount = this.getFreeChildrenCount('hospedagem');
-        if (this.isEligibleForFree(age, ageRule, freeChildrenCount, 'hospedagem')) {
+        // **NOVA LÓGICA**: Verificar gratuidade primeiro
+        if (this.isEligibleForFree(participantData, 'hospedagem')) {
             return 0;
         }
+        
+        // **NOVA LÓGICA**: Verificar regra de excedente
+        if (this.shouldApplyExcessRule(participantData, 'hospedagem')) {
+            let finalValue = baseValue * ageRule.regra_excedente_gratuito.percentual_valor_adulto;
+            
+            // Aplicar taxa de gateway se método de pagamento selecionado
+            if (this.selectedPaymentMethod) {
+                finalValue = finalValue * (1 + this.selectedPaymentMethod.taxa_gateway_percentual);
+            }
+            
+            return Math.round(finalValue * 100) / 100;
+        }
 
-        // Aplicar percentual da regra de idade
+        // Aplicar percentual normal da regra de idade
         let finalValue = baseValue * ageRule.percentual_valor_adulto;
 
         // Aplicar taxa de gateway se método de pagamento selecionado
@@ -96,13 +188,24 @@ class PriceCalculator {
         const baseValue = eventOption.valor;
         const ageRule = this.getAgeRule(age, 'evento');
         
-        // Aplicar regra de gratuidade
-        const freeChildrenCount = this.getFreeChildrenCount('evento');
-        if (this.isEligibleForFree(age, ageRule, freeChildrenCount, 'evento')) {
+        // **NOVA LÓGICA**: Verificar gratuidade primeiro
+        if (this.isEligibleForFree(participantData, 'evento')) {
             return 0;
         }
+        
+        // **NOVA LÓGICA**: Verificar regra de excedente
+        if (this.shouldApplyExcessRule(participantData, 'evento')) {
+            let finalValue = baseValue * ageRule.regra_excedente_gratuito.percentual_valor_adulto;
+            
+            // Aplicar taxa de gateway se método de pagamento selecionado
+            if (this.selectedPaymentMethod) {
+                finalValue = finalValue * (1 + this.selectedPaymentMethod.taxa_gateway_percentual);
+            }
+            
+            return Math.round(finalValue * 100) / 100;
+        }
 
-        // Aplicar percentual da regra de idade
+        // Aplicar percentual normal da regra de idade
         let finalValue = baseValue * ageRule.percentual_valor_adulto;
 
         // Aplicar taxa de gateway se método de pagamento selecionado
@@ -113,44 +216,7 @@ class PriceCalculator {
         return Math.round(finalValue * 100) / 100;
     }
 
-    // Verificar se participante é elegível para gratuidade
-    isEligibleForFree(age, ageRule, currentFreeCount, type) {
-        if (!ageRule.limite_gratuidade_por_reserva) return false;
-        
-        const minAge = ageRule.faixa_min_anos;
-        const maxAge = ageRule.faixa_max_anos || Infinity;
-        
-        // Verificar se está na faixa de idade para gratuidade
-        if (age >= minAge && age <= maxAge && ageRule.percentual_valor_adulto === 0) {
-            // Verificar se ainda há vagas gratuitas
-            return currentFreeCount < ageRule.limite_gratuidade_por_reserva;
-        }
-        
-        return false;
-    }
-
-    // Contar crianças gratuitas já aplicadas
-    getFreeChildrenCount(type) {
-        let count = 0;
-        
-        this.participants.forEach(participant => {
-            if (!participant.birthDate) return;
-            
-            const age = this.calculateAge(participant.birthDate);
-            const ageRule = this.getAgeRule(age, type);
-            
-            if (ageRule.percentual_valor_adulto === 0 && ageRule.limite_gratuidade_por_reserva) {
-                const minAge = ageRule.faixa_min_anos;
-                const maxAge = ageRule.faixa_max_anos || Infinity;
-                
-                if (age >= minAge && age <= maxAge) {
-                    count++;
-                }
-            }
-        });
-        
-        return count;
-    }
+    // **MÉTODOS REMOVIDOS**: getFreeChildrenCount e isEligibleForFree antigos foram substituídos
 
     // Calcular subtotal de hospedagem
     calculateLodgingSubtotal() {
