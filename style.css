@@ -1665,3 +1665,45 @@ html {
     background-position: right 12px center;
     background-size: 16px;
 }
+
+/* Container do telefone com país */
+.phone-input-container {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.country-select {
+    flex: 0 0 180px;
+    min-width: 180px;
+    font-size: 14px;
+}
+
+.phone-input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+    .phone-input-container {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .country-select {
+        flex: none;
+        width: 100%;
+    }
+}
+
+/* Estilo para campo de telefone com erro */
+.phone-input.error {
+    border-color: #e74c3c;
+    background-color: #fdf2f2;
+}
+
+.phone-input.valid {
+    border-color: #27ae60;
+    background-color: #f2fdf2;
+}
