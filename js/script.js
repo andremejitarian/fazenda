@@ -806,7 +806,7 @@ function updateResponsiblePayerSection() {
         }
         
         // Se há mais de um participante E este participante NÃO é menor, mostrar a seção
-        if (participants.length > 1 && !isMinor) {
+        if (participants.length > 1 && !isMinor && birthDate) { // ADICIONADO: && birthDate
             $section.show();
         } else {
             $section.hide();
@@ -818,10 +818,10 @@ function updateResponsiblePayerSection() {
     // Se só há um participante adulto, ele é automaticamente o responsável
     const adultParticipants = $('#participants-container .participant-block').filter(function() {
         const birthDate = $(this).find('.dob-input').val();
-        if (!birthDate) return true; // Considera adulto se não há data
+        if (!birthDate) return false; // CORRIGIDO: Não considera adulto se não há data
         
         const age = calculateAge(birthDate);
-        return age === null || age >= 18;
+        return age !== null && age >= 18; // CORRIGIDO: Só adultos com data válida
     });
     
     if (adultParticipants.length === 1) {
@@ -837,18 +837,17 @@ function hasMultipleAdults() {
         const $participant = $(this);
         const birthDate = $participant.find('.dob-input').val();
         
-        // Considera adulto se não há data ou se idade >= 18
-        let isAdult = true;
+        // CORREÇÃO: Só considera adulto se há data de nascimento E idade >= 18
         if (birthDate) {
             const age = calculateAge(birthDate);
-            isAdult = (age === null || age >= 18);
+            if (age !== null && age >= 18) {
+                adultCount++;
+            }
         }
-        
-        if (isAdult) {
-            adultCount++;
-        }
+        // REMOVIDO: Não considera mais participantes sem data como adultos automaticamente
     });
     
+    console.log(`🔍 DEBUG hasMultipleAdults: ${adultCount} adultos encontrados`);
     return adultCount > 1;
 }
 
@@ -862,10 +861,10 @@ function updateBedPreferenceSection() {
         const birthDate = $participant.find('.dob-input').val();
         
         // Verificar se este participante é adulto
-        let isAdult = true;
+        let isAdult = false; // CORRIGIDO: Padrão false
         if (birthDate) {
             const age = calculateAge(birthDate);
-            isAdult = (age === null || age >= 18);
+            isAdult = (age !== null && age >= 18); // CORRIGIDO: Só adulto com data válida
         }
         
         // Mostrar seção apenas para adultos quando há múltiplos adultos
@@ -880,9 +879,9 @@ function updateBedPreferenceSection() {
     
     console.log(`Preferência de cama ${showBedPreference ? 'habilitada' : 'desabilitada'} - Adultos: ${$('#participants-container .participant-block').filter(function() {
         const birthDate = $(this).find('.dob-input').val();
-        if (!birthDate) return true;
+        if (!birthDate) return false; // CORRIGIDO
         const age = calculateAge(birthDate);
-        return age === null || age >= 18;
+        return age !== null && age >= 18;
     }).length}`);
 }
 
