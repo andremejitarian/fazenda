@@ -2107,6 +2107,17 @@ function updateAllParticipantsInCalculator() {
 // **NOVA FUNÇÃO**: Atualizar display de valores do participante
 function updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData) {
     const age = window.priceCalculator.calculateAge(participantData.birthDate);
+    const participantId = $participant.attr('data-participant-id');
+    
+    console.log(`🔄 Atualizando display para participante ${participantId}:`, {
+        idade: age,
+        lodgingValue,
+        eventValue,
+        isEligibleForFreeLodging: window.priceCalculator.isEligibleForFree(participantData, 'hospedagem'),
+        shouldApplyExcessLodging: window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem'),
+        isEligibleForFreeEvent: window.priceCalculator.isEligibleForFree(participantData, 'evento'),
+        shouldApplyExcessEvent: window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')
+    });
     
     // Atualizar valor de hospedagem
     const $lodgingValue = $participant.find('.lodging-value');
@@ -2121,6 +2132,9 @@ function updateParticipantValueDisplay($participant, lodgingValue, eventValue, p
         }
         
         $lodgingValue.html(lodgingText);
+        console.log(`💰 Hospedagem atualizada para ${participantId}: ${lodgingText}`);
+    } else {
+        console.warn(`⚠️ Elemento .lodging-value não encontrado para participante ${participantId}`);
     }
     
     // Atualizar valor de evento
@@ -2136,6 +2150,9 @@ function updateParticipantValueDisplay($participant, lodgingValue, eventValue, p
         }
         
         $eventValue.html(eventText);
+        console.log(`🎈 Evento atualizado para ${participantId}: ${eventText}`);
+    } else {
+        console.warn(`⚠️ Elemento .event-value não encontrado para participante ${participantId}`);
     }
 }
 
