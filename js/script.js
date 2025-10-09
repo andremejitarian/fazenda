@@ -725,7 +725,7 @@ function setupParticipantEventListeners($participant) {
     // NOVO: Listener para preferência de cama
     $participant.find('.bed-preference-select').on('change', function() {
         const selectedPreference = $(this).val();
-        console.log(`Preferência de cama alterada: ${selectedPreference}`);
+        console.log(`Preferência de cama alterada: ${selectedPreference}`);})
 
     
 // Forçar atualização periódica na Etapa 2
