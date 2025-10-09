@@ -2087,17 +2087,20 @@ function updateParticipantCalculations($participant) {
     const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
     const eventValue = window.priceCalculator.calculateEventValue(participantData);
     
+    // **CORREÇÃO**: Calcular idade aqui para o debug
+    const age = window.priceCalculator.calculateAge(participantData.birthDate);
+    
     // **CORREÇÃO**: Atualizar display dos valores com informações adicionais
     updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
     
-console.log(`🔍 DEBUG - Participante ${participantId}:`, {
-    idade: age,
-    posicaoNoArray: window.priceCalculator.participants.findIndex(p => p.id === participantId),
-    totalParticipantes: window.priceCalculator.participants.length,
-    elegiveisGratuidade: window.priceCalculator.getEligibleFreeParticipants('hospedagem').length,
-    lodgingValue,
-    eventValue
-});
+    console.log(`🔍 DEBUG - Participante ${participantId}:`, {
+        idade: age, // ✅ CORRIGIDO: agora 'age' está definida
+        posicaoNoArray: window.priceCalculator.participants.findIndex(p => p.id === participantId),
+        totalParticipantes: window.priceCalculator.participants.length,
+        elegiveisGratuidade: window.priceCalculator.getEligibleFreeParticipants('hospedagem').length,
+        lodgingValue,
+        eventValue
+    });
     
     // Atualizar totais gerais se estivermos na tela de resumo
     if (currentStep === 3) {
