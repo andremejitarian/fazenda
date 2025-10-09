@@ -2067,16 +2067,14 @@ function updateParticipantCalculations($participant) {
     // **CORREÇÃO**: Atualizar display dos valores com informações adicionais
     updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
     
-    // **DEBUG**: Log para verificar valores
-    console.log(`Cálculos atualizados para participante ${participantId}:`, {
-        idade: window.priceCalculator.calculateAge(participantData.birthDate),
-        lodging: lodgingValue,
-        event: eventValue,
-        isEligibleForFreeLodging: window.priceCalculator.isEligibleForFree(participantData, 'hospedagem'),
-        shouldApplyExcessLodging: window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem'),
-        isEligibleForFreeEvent: window.priceCalculator.isEligibleForFree(participantData, 'evento'),
-        shouldApplyExcessEvent: window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')
-    });
+console.log(`🔍 DEBUG - Participante ${participantId}:`, {
+    idade: age,
+    posicaoNoArray: window.priceCalculator.participants.findIndex(p => p.id === participantId),
+    totalParticipantes: window.priceCalculator.participants.length,
+    elegiveisGratuidade: window.priceCalculator.getEligibleFreeParticipants('hospedagem').length,
+    lodgingValue,
+    eventValue
+});
     
     // Atualizar totais gerais se estivermos na tela de resumo
     if (currentStep === 3) {
