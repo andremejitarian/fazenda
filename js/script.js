@@ -323,6 +323,9 @@ function addParticipant() {
     
     // Atualizar seções de responsáveis (pagamento e criança)
     updateResponsibleSections();
+
+    // NOVA LINHA: Atualizar seção de preferência de cama
+    updateBedPreferenceSection();
     
     console.log(`Participante ${participantNumber} adicionado`);
 }
@@ -672,14 +675,14 @@ function setupParticipantEventListeners($participant) {
     }, 500));
     
     // Data de nascimento - verificar idade para responsável pela criança
-$participant.find('.dob-input').on('change', function() {
-    updateResponsibleSections();
-    
-    // **CORREÇÃO**: Usar setTimeout para garantir que DOM esteja atualizado
-    setTimeout(() => {
-        updateAllCalculations();
-    }, 10);
-});
+    $participant.find('.dob-input').on('change', function() {
+        updateResponsibleSections();
+        updateBedPreferenceSection(); // NOVA LINHA
+        
+        setTimeout(() => {
+            updateAllCalculations();
+        }, 10);
+    });
     
     // Listener para mudanças que afetam os cálculos diretamente
     $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .accommodation-select, .event-option-select').on('change', function() {
@@ -719,6 +722,12 @@ $participant.find('.dob-input').on('change', function() {
         }
     });
 
+    // NOVO: Listener para preferência de cama
+    $participant.find('.bed-preference-select').on('change', function() {
+        const selectedPreference = $(this).val();
+        console.log(`Preferência de cama alterada: ${selectedPreference}`);
+
+    
 // Forçar atualização periódica na Etapa 2
 if (currentStep === 2) {
     const participantId = $participant.attr('data-participant-id');
@@ -761,6 +770,9 @@ function removeParticipant($participant) {
     
     // Atualizar seções de responsáveis (pagamento e criança)
     updateResponsibleSections();
+
+    // NOVA LINHA: Atualizar seção de preferência de cama
+    updateBedPreferenceSection();
     
     console.log(`Participante ${participantId} removido`);
 }
@@ -815,6 +827,63 @@ function updateResponsiblePayerSection() {
     if (adultParticipants.length === 1) {
         adultParticipants.find('.responsible-payer').prop('checked', true);
     }
+}
+
+// NOVA FUNÇÃO: Verificar se há múltiplos adultos
+function hasMultipleAdults() {
+    let adultCount = 0;
+    
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const birthDate = $participant.find('.dob-input').val();
+        
+        // Considera adulto se não há data ou se idade >= 18
+        let isAdult = true;
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            isAdult = (age === null || age >= 18);
+        }
+        
+        if (isAdult) {
+            adultCount++;
+        }
+    });
+    
+    return adultCount > 1;
+}
+
+// NOVA FUNÇÃO: Atualizar seção de preferência de cama
+function updateBedPreferenceSection() {
+    const showBedPreference = hasMultipleAdults();
+    
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        const $bedSection = $participant.find('.bed-preference-section');
+        const birthDate = $participant.find('.dob-input').val();
+        
+        // Verificar se este participante é adulto
+        let isAdult = true;
+        if (birthDate) {
+            const age = calculateAge(birthDate);
+            isAdult = (age === null || age >= 18);
+        }
+        
+        // Mostrar seção apenas para adultos quando há múltiplos adultos
+        if (showBedPreference && isAdult) {
+            $bedSection.show();
+        } else {
+            $bedSection.hide();
+            // Limpar seleção quando ocultar
+            $participant.find('.bed-preference-select').val('');
+        }
+    });
+    
+    console.log(`Preferência de cama ${showBedPreference ? 'habilitada' : 'desabilitada'} - Adultos: ${$('#participants-container .participant-block').filter(function() {
+        const birthDate = $(this).find('.dob-input').val();
+        if (!birthDate) return true;
+        const age = calculateAge(birthDate);
+        return age === null || age >= 18;
+    }).length}`);
 }
 
 // Atualizar opções de evento baseado no período selecionado
@@ -1396,6 +1465,12 @@ function generateParticipantsSummary() {
                 if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
                     lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
                 }
+            }
+
+                // NOVA SEÇÃO: Mostrar preferência de cama se foi selecionada
+            if (participantData.bedPreference) {
+                const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
+                summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
             }
             
             summaryHtml += `
@@ -2024,6 +2099,7 @@ function extractParticipantData($participant) {
                       (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
         eventOption: $participant.find('.event-option-select').val() || 
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
+        bedPreference: $participant.find('.bed-preference-select').val(), // NOVA LINHA
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias, // Campo existente
