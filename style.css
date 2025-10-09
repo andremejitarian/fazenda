@@ -1791,3 +1791,28 @@ html {
 .participant-details p {
     margin: 5px 0;
 }
+
+/* Seção de preferência de cama */
+.bed-preference-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.bed-preference-section .form-group {
+    margin-bottom: 10px;
+}
+
+.bed-preference-info {
+    font-size: 0.9em;
+    color: #666;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+/* Indicador visual para seções condicionais */
+.bed-preference-section.highlighted {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 10px;
+}
