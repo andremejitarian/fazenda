@@ -718,6 +718,29 @@ $participant.find('.dob-input').on('change', function() {
             $('.responsible-child').not(this).prop('checked', false);
         }
     });
+
+// Forçar atualização periódica na Etapa 2
+if (currentStep === 2) {
+    const participantId = $participant.attr('data-participant-id');
+    
+    // Observer para mudanças nos campos
+    const observer = new MutationObserver(() => {
+        if (currentStep === 2) {
+            setTimeout(() => {
+                updateParticipantCalculations($participant);
+            }, 50);
+        }
+    });
+    
+    // Observar mudanças nos campos do participante
+    observer.observe($participant[0], {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['value']
+    });
+}
+    
 }
 
 // Remover participante
