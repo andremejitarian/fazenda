@@ -998,6 +998,7 @@ function validateEmail($emailField) {
 }
 
 // Validar etapa de participantes
+// Validar etapa de participantes
 function validateParticipantsStep() {
     let isValid = true;
     let firstErrorField = null;
@@ -1009,7 +1010,7 @@ function validateParticipantsStep() {
         // Campos obrigatórios
         const requiredFields = [
             { selector: '.full-name', name: 'Nome Completo' },
-            { selector: '.phone-input', name: 'Telefone' }, // ATUALIZADO
+            { selector: '.phone-input', name: 'Telefone' },
             { selector: '.cpf-mask', name: 'CPF' },
             { selector: '.email-input', name: 'E-mail' },
             { selector: '.dob-input', name: 'Data de Nascimento' }
@@ -1037,7 +1038,7 @@ function validateParticipantsStep() {
             isValid = false;
         }
         
-        // NOVA: Validar email
+        // Validar email
         const $emailField = $participant.find('.email-input');
         if (!validateEmail($emailField)) {
             if (!firstErrorField) {
@@ -1046,7 +1047,7 @@ function validateParticipantsStep() {
             isValid = false;
         }
 
-                // NOVO: Validar telefone
+        // Validar telefone
         const $phoneField = $participant.find('.phone-input');
         const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
         if (!validatePhoneNumber($phoneField, selectedCountry)) {
@@ -1054,6 +1055,20 @@ function validateParticipantsStep() {
                 firstErrorField = $phoneField;
             }
             isValid = false;
+        }
+
+        // NOVA VALIDAÇÃO: Preferência de cama (se visível)
+        const $bedPreferenceSection = $participant.find('.bed-preference-section');
+        const $bedPreferenceField = $participant.find('.bed-preference-select');
+        
+        if ($bedPreferenceSection.is(':visible') && !$bedPreferenceField.val()) {
+            $bedPreferenceField.addClass('error');
+            if (!firstErrorField) {
+                firstErrorField = $bedPreferenceField;
+            }
+            isValid = false;
+        } else {
+            $bedPreferenceField.removeClass('error');
         }
         
         // Validar seleções baseadas no tipo de formulário
@@ -1101,7 +1116,6 @@ function validateParticipantsStep() {
     if (participants.length > 1) {
         const hasResponsible = $('.responsible-payer:checked').length > 0;
         if (!hasResponsible) {
-            // Encontrar o primeiro checkbox de responsável pelo pagamento visível
             const $firstResponsibleCheckbox = $('.responsible-payer-section:visible').first().find('.responsible-payer');
             if ($firstResponsibleCheckbox.length > 0 && !firstErrorField) {
                 firstErrorField = $firstResponsibleCheckbox;
@@ -1114,7 +1128,6 @@ function validateParticipantsStep() {
     if (hasMinors()) {
         const hasResponsibleChild = $('.responsible-child:checked').length > 0;
         if (!hasResponsibleChild) {
-            // Encontrar o primeiro checkbox de responsável pela criança visível
             const $firstResponsibleChildCheckbox = $('.responsible-child-section:visible').first().find('.responsible-child');
             if ($firstResponsibleChildCheckbox.length > 0 && !firstErrorField) {
                 firstErrorField = $firstResponsibleChildCheckbox;
@@ -1126,8 +1139,6 @@ function validateParticipantsStep() {
     // Se há erro, rolar até o primeiro campo com problema
     if (!isValid && firstErrorField) {
         scrollToAndFocusElement(firstErrorField);
-        
-        // Mostrar feedback visual
         showValidationMessage(firstErrorField);
     }
     
