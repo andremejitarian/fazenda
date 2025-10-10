@@ -1816,3 +1816,49 @@ html {
     border-radius: 5px;
     padding: 10px;
 }
+
+/* Estilos para informações de refeições */
+.primeira-refeicao-info, 
+.ultima-refeicao-info {
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    margin: 3px 0;
+    text-align: left;
+    font-style: italic;
+    padding-left: 15px;
+    border-left: 3px solid var(--warning-color);
+    background: rgba(243, 156, 18, 0.05);
+    padding: 8px 15px;
+    border-radius: 4px;
+}
+
+.primeira-refeicao-info {
+    margin-top: 8px;
+    margin-bottom: 15px;
+}
+
+.ultima-refeicao-info {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* Ícones para as refeições */
+.primeira-refeicao-info::before {
+    content: "🍽️ ";
+    margin-right: 5px;
+}
+
+.ultima-refeicao-info::before {
+    content: "🥗 ";
+    margin-right: 5px;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .primeira-refeicao-info, 
+    .ultima-refeicao-info {
+        font-size: 0.85em;
+        padding: 6px 12px;
+        margin: 5px 0;
+    }
+}
