@@ -428,20 +428,43 @@ function setupEventOptions($participant) {
     }
 }
 
-// Atualizar informações de check-in/out
+// Atualizar informações de check-in/out E refeições
 function updateCheckInOutInfo($participant, periodo) {
     if (!periodo || !periodo.data_inicio || !periodo.data_fim) {
         $participant.find('.checkin-datetime').text('');
         $participant.find('.checkout-datetime').text('');
+        // Ocultar informações de refeições
+        $participant.find('.primeira-refeicao-info').hide();
+        $participant.find('.ultima-refeicao-info').hide();
         return;
     }
 
-    // Usando a função utilitária global para consistência
+    // Atualizar datas (código existente)
     const checkinFormatted = formatDateTimeForDisplay(periodo.data_inicio);
     const checkoutFormatted = formatDateTimeForDisplay(periodo.data_fim);
 
     $participant.find('.checkin-datetime').text(checkinFormatted);
     $participant.find('.checkout-datetime').text(checkoutFormatted);
+    
+    // NOVO: Atualizar informações de refeições
+    if (periodo.primeira_refeicao) {
+        $participant.find('.primeira-refeicao-text').text(periodo.primeira_refeicao);
+        $participant.find('.primeira-refeicao-info').show();
+    } else {
+        $participant.find('.primeira-refeicao-info').hide();
+    }
+    
+    if (periodo.ultima_refeicao) {
+        $participant.find('.ultima-refeicao-text').text(periodo.ultima_refeicao);
+        $participant.find('.ultima-refeicao-info').show();
+    } else {
+        $participant.find('.ultima-refeicao-info').hide();
+    }
+    
+    console.log('Informações de refeições atualizadas:', {
+        primeira: periodo.primeira_refeicao,
+        ultima: periodo.ultima_refeicao
+    });
 }
 
 // Configurar máscaras para participante
@@ -1465,32 +1488,47 @@ function generateParticipantsSummary() {
         
         // Mostrar detalhes baseado no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-            // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
-            let lodgingInfo = '';
-            if (lodgingValue === 0) {
-                lodgingInfo = ' <span class="free-indicator">(Gratuito)</span>';
-            } else {
-                // Verificar se está aplicando regra de excedente
-                const age = window.priceCalculator.calculateAge(participantData.birthDate);
-                if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
-                    lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
-                }
-            }
-
-                // NOVA SEÇÃO: Mostrar preferência de cama se foi selecionada
-            if (participantData.bedPreference) {
-                const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
-                summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
-            }
-            
-            summaryHtml += `
-                <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
-                <p><strong>Período:</strong> ${stayPeriodLabel}</p>
-                ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
-                ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
-                <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
-            `;
+    // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
+    let lodgingInfo = '';
+    if (lodgingValue === 0) {
+        lodgingInfo = ' <span class="free-indicator">(Gratuito)</span>';
+    } else {
+        // Verificar se está aplicando regra de excedente
+        const age = window.priceCalculator.calculateAge(participantData.birthDate);
+        if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
+            lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
         }
+    }
+
+    // NOVA SEÇÃO: Mostrar preferência de cama se foi selecionada
+    if (participantData.bedPreference) {
+        const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
+        summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
+    }
+    
+    // NOVO: Buscar informações de refeições do período selecionado
+    let refeicoesInfo = '';
+    if (participantData.stayPeriod) {
+        const selectedPeriod = currentEvent.periodos_estadia_opcoes.find(p => p.id === participantData.stayPeriod);
+        if (selectedPeriod) {
+            if (selectedPeriod.primeira_refeicao) {
+                refeicoesInfo += `<p><strong>��️ Primeira Refeição:</strong> ${selectedPeriod.primeira_refeicao}</p>`;
+            }
+            if (selectedPeriod.ultima_refeicao) {
+                refeicoesInfo += `<p><strong>�� Última Refeição:</strong> ${selectedPeriod.ultima_refeicao}</p>`;
+            }
+        }
+    }
+    
+    summaryHtml += `
+        <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
+        <p><strong>Período:</strong> ${stayPeriodLabel}</p>
+        ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
+        ${refeicoesInfo}
+        ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
+        <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
+    `;
+}
         
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
