@@ -38,6 +38,8 @@
           "label": "Período Padrão do Retiro (10/10 - 12/10)",
           "data_inicio": "2025-10-10T18:00",
           "data_fim": "2025-10-12T14:00",
+          "primeira_refeicao": "Jantar do dia 10/10",
+          "ultima_refeicao": "Almoço do dia 12/10",
           "num_diarias": 2,
           "valores_evento_opcoes": [
             {
@@ -59,6 +61,8 @@
           "label": "Chegada Antecipada (09/10 - 12/10)",
           "data_inicio": "2025-10-09T18:00",
           "data_fim": "2025-10-12T14:00",
+          "primeira_refeicao": "Jantar do dia 09/10",
+          "ultima_refeicao": "Almoço do dia 12/10",
           "num_diarias": 3,
           "valores_evento_opcoes": [
             {
