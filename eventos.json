@@ -94,8 +94,26 @@
         {
           "id": "cartao_parcelado",
           "label": "Cartão Parcelado (até 6x sem juros)",
-          "tipo": "cartao",
+          "tipo": "cartao_parcelado",
           "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": 0.035
+        },
+                {
+          "id": "cartao_vista",
+          "label": "Cartão Á vista",
+          "tipo": "cartao_avista",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": 0.035
+        },
+                        {
+          "id": "pix_sinal",
+          "label": "Pix sinal 30% e 70%",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.035
