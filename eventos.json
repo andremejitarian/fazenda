@@ -87,7 +87,7 @@
         {
           "id": "pix_vista",
           "label": "PIX à Vista",
-          "tipo": "PIX",
+          "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de <b>70%</b> deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": 0.01
         },      
@@ -202,7 +202,7 @@
         {
           "id": "pix_vista",
           "label": "PIX à Vista",
-          "tipo": "PIX",
+          "tipo": "pix",
           "descricao": "Pagamento total.",
           "taxa_gateway_percentual": 0.01
         }
@@ -301,7 +301,7 @@
         {
           "id": "pix_vista2",
           "label": "PIX à Vista com 5% de desconto",
-          "tipo": "PIX",
+          "tipo": "pix",
           "descricao": " ",
           "taxa_gateway_percentual": -0.05
         }
@@ -389,7 +389,7 @@
         {
           "id": "pix_vista2",
           "label": "PIX à Vista com 5% de desconto",
-          "tipo": "PIX",
+          "tipo": "pix",
           "descricao": " outro testeeee ",
           "taxa_gateway_percentual": -0.05
         }
