@@ -1842,17 +1842,6 @@ html {
     margin-bottom: 0;
 }
 
-/* Ícones para as refeições */
-.primeira-refeicao-info::before {
-    content: "🍽️ ";
-    margin-right: 5px;
-}
-
-.ultima-refeicao-info::before {
-    content: "🥗 ";
-    margin-right: 5px;
-}
-
 /* Responsividade para mobile */
 @media (max-width: 768px) {
     .primeira-refeicao-info, 
