@@ -1548,6 +1548,11 @@ function generateParticipantsSummary() {
                 <p><strong>Valor do Evento:</strong> ${window.priceCalculator.formatCurrency(eventValue)}${eventInfo}</p>
             `;
         }
+
+                // NOVA SEÇÃO: Adicionar restrições se preenchidas
+        if (participantData.restrictions && participantData.restrictions.length > 0) {
+            summaryHtml += `<p><strong>Restrições/Observações:</strong> ${participantData.restrictions}</p>`;
+        }
         
         summaryHtml += `
                 </div>
@@ -1736,6 +1741,8 @@ function prepareFormData(inscricaoId) {
             stayPeriod: participantData.stayPeriod,
             accommodation: participantData.accommodation,
             eventOption: participantData.eventOption,
+            bedPreference: participantData.bedPreference, // Campo existente
+            restrictions: participantData.restrictions, // NOVA LINHA
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
             valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
@@ -2147,7 +2154,8 @@ function extractParticipantData($participant) {
                       (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
         eventOption: $participant.find('.event-option-select').val() || 
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
-        bedPreference: $participant.find('.bed-preference-select').val(), // NOVA LINHA
+        bedPreference: $participant.find('.bed-preference-select').val(),
+        restrictions: $participant.find('.restrictions-input').val().trim(),
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias, // Campo existente
