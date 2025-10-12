@@ -1820,16 +1820,13 @@ html {
 /* Estilos para informações de refeições */
 .primeira-refeicao-info, 
 .ultima-refeicao-info {
-    font-size: 0.9em;
-    color: var(--text-secondary);
-    margin: 3px 0;
+    font-size: 0.95em;
+    color: var(--text-primary);
+    margin: 15px 0;
     text-align: left;
-    font-style: italic;
-    padding-left: 15px;
-    border-left: 3px solid var(--warning-color);
-    background: rgba(243, 156, 18, 0.05);
-    padding: 8px 15px;
-    border-radius: 4px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 .primeira-refeicao-info {
