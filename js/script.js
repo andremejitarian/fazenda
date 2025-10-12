@@ -1522,7 +1522,6 @@ function generateParticipantsSummary() {
     
     summaryHtml += `
         <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
-        <p><strong>Período:</strong> ${stayPeriodLabel}</p>
         ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
         ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
         ${refeicoesInfo}
