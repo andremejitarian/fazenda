@@ -1840,3 +1840,39 @@ html {
         margin: 3px 0;
     }
 }
+
+/* Seção de restrições */
+.restrictions-section {
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+.restrictions-section .form-group {
+    margin-bottom: 10px;
+}
+
+.restrictions-input {
+    resize: vertical; /* Permite redimensionar apenas verticalmente */
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.restrictions-info {
+    font-size: 0.95em;
+    color: var(--text-primary);
+    margin-top: 5px;
+    text-align: left;
+    font-style: italic;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .restrictions-input {
+        min-height: 70px;
+        font-size: 16px; /* Evita zoom no iOS */
+    }
+    
+    .restrictions-info {
+        font-size: 0.85em;
+    }
+}
