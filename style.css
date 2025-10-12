@@ -1796,7 +1796,6 @@ html {
 .bed-preference-section {
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 1px solid #e0e0e0;
 }
 
 .bed-preference-section .form-group {
@@ -1804,10 +1803,10 @@ html {
 }
 
 .bed-preference-info {
-    font-size: 0.9em;
-    color: #666;
-    font-style: italic;
+    font-size: 0.95em;
+    color: var(--text-primary);
     margin-top: 5px;
+    text-align: left;
 }
 
 /* Indicador visual para seções condicionais */
