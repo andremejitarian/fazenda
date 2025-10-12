@@ -1524,8 +1524,8 @@ function generateParticipantsSummary() {
         <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
         <p><strong>Período:</strong> ${stayPeriodLabel}</p>
         ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
-        ${refeicoesInfo}
         ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
+        ${refeicoesInfo}
         <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
     `;
 }
