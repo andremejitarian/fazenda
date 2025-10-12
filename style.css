@@ -1816,34 +1816,21 @@ html {
     padding: 10px;
 }
 
-/* Estilos para informações de refeições */
-.primeira-refeicao-info, 
-.ultima-refeicao-info {
+/* Ajustar os estilos para que todos os elementos dentro de checkin-checkout-info se alinhem igualmente */
+.checkin-info, .checkout-info,
+.primeira-refeicao-info, .ultima-refeicao-info {
     font-size: 0.95em;
     color: var(--text-primary);
-    margin: 15px 0;
+    margin: 5px 0; /* Margem consistente para todos os itens */
     text-align: left;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.primeira-refeicao-info {
-    margin-top: 8px;
-    margin-bottom: 15px;
-}
-
-.ultima-refeicao-info {
-    margin-top: 8px;
-    margin-bottom: 0;
+    /* Remova qualquer padding, background ou border-radius adicionais aqui */
 }
 
 /* Responsividade para mobile */
 @media (max-width: 768px) {
-    .primeira-refeicao-info, 
-    .ultima-refeicao-info {
+    .checkin-info, .checkout-info,
+    .primeira-refeicao-info, .ultima-refeicao-info {
         font-size: 0.85em;
-        padding: 6px 12px;
-        margin: 5px 0;
+        margin: 3px 0;
     }
 }
