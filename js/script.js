@@ -1512,10 +1512,10 @@ function generateParticipantsSummary() {
         const selectedPeriod = currentEvent.periodos_estadia_opcoes.find(p => p.id === participantData.stayPeriod);
         if (selectedPeriod) {
             if (selectedPeriod.primeira_refeicao) {
-                refeicoesInfo += `<p><strong>��️ Primeira Refeição:</strong> ${selectedPeriod.primeira_refeicao}</p>`;
+                refeicoesInfo += `<p><strong>Primeira Refeição:</strong> ${selectedPeriod.primeira_refeicao}</p>`;
             }
             if (selectedPeriod.ultima_refeicao) {
-                refeicoesInfo += `<p><strong>�� Última Refeição:</strong> ${selectedPeriod.ultima_refeicao}</p>`;
+                refeicoesInfo += `<p><strong>Última Refeição:</strong> ${selectedPeriod.ultima_refeicao}</p>`;
             }
         }
     }
