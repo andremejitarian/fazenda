@@ -94,7 +94,7 @@
         {
           "id": "cartao_parcelado",
           "label": "Cartão Parcelado (até 6x sem juros)",
-          "tipo": "Cartao",
+          "tipo": "cartao",
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
@@ -294,7 +294,7 @@
         {
           "id": "cartao_credito",
           "label": "Cartão de Crédito em até 6x",
-          "tipo": "Cartao",
+          "tipo": "cartao",
           "descricao": " ",
           "taxa_gateway_percentual": 0.00
         },
@@ -382,7 +382,7 @@
         {
           "id": "cartao_credito",
           "label": "Cartão de Crédito em até 6x",
-          "tipo": "Cartao",
+          "tipo": "cartao",
           "descricao": " testeee",
           "taxa_gateway_percentual": 0.00
         },
