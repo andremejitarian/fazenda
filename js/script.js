@@ -673,7 +673,7 @@ function setupParticipantEventListeners($participant) {
         removeParticipant($participant);
     });
 
-        // NOVO: Mudança de país do telefone
+    // NOVO: Mudança de país do telefone
     $participant.find('.country-select').on('change', function() {
         const selectedCountry = $(this).find(':selected').data('country');
         const $phoneInput = $participant.find('.phone-input');
@@ -685,7 +685,7 @@ function setupParticipantEventListeners($participant) {
         console.log(`País alterado para: ${selectedCountry}`);
     });
 
-        // NOVO: Listener para gênero
+    // NOVO: Listener para gênero
     $participant.find('.gender-select').on('change', function() {
         const selectedGender = $(this).val();
         console.log(`Gênero alterado: ${selectedGender}`);
@@ -694,7 +694,7 @@ function setupParticipantEventListeners($participant) {
         $(this).removeClass('error');
     });
 
-        // NOVO: Listener para data de nascimento - controlar visibilidade dos campos
+    // NOVO: Listener para data de nascimento - controlar visibilidade dos campos
     $participant.find('.dob-input').on('change', function() {
         const birthDate = $(this).val();
         toggleAdultFields($participant, birthDate);
@@ -733,19 +733,8 @@ function setupParticipantEventListeners($participant) {
         }
     }, 500));
     
-    // Data de nascimento - verificar idade para responsável pela criança
-    $participant.find('.dob-input').on('change', function() {
-        updateResponsibleSections();
-        updateBedPreferenceSection(); // NOVA LINHA
-        
-        setTimeout(() => {
-            updateAllCalculations();
-        }, 10);
-    });
-    
     // Listener para mudanças que afetam os cálculos diretamente
     $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .accommodation-select, .event-option-select').on('change', function() {
-        // **CORREÇÃO**: Atualizar todos os cálculos para considerar ordem de prioridade
         updateAllCalculations();
     });
 
@@ -763,7 +752,6 @@ function setupParticipantEventListeners($participant) {
         }
 
         updateEventOptionsForPeriod($participant);
-        // **CORREÇÃO**: Atualizar todos os cálculos
         updateAllCalculations();
     });
     
@@ -784,31 +772,30 @@ function setupParticipantEventListeners($participant) {
     // NOVO: Listener para preferência de cama
     $participant.find('.bed-preference-select').on('change', function() {
         const selectedPreference = $(this).val();
-        console.log(`Preferência de cama alterada: ${selectedPreference}`);})
+        console.log(`Preferência de cama alterada: ${selectedPreference}`);
+    });
 
-    
-// Forçar atualização periódica na Etapa 2
-if (currentStep === 2) {
-    const participantId = $participant.attr('data-participant-id');
-    
-    // Observer para mudanças nos campos
-    const observer = new MutationObserver(() => {
-        if (currentStep === 2) {
-            setTimeout(() => {
-                updateParticipantCalculations($participant);
-            }, 50);
-        }
-    });
-    
-    // Observar mudanças nos campos do participante
-    observer.observe($participant[0], {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['value']
-    });
-}
-    
+    // Forçar atualização periódica na Etapa 2
+    if (currentStep === 2) {
+        const participantId = $participant.attr('data-participant-id');
+        
+        // Observer para mudanças nos campos
+        const observer = new MutationObserver(() => {
+            if (currentStep === 2) {
+                setTimeout(() => {
+                    updateParticipantCalculations($participant);
+                }, 50);
+            }
+        });
+        
+        // Observar mudanças nos campos do participante
+        observer.observe($participant[0], {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['value']
+        });
+    }
 }
 
 // NOVA FUNÇÃO: Controlar visibilidade dos campos baseado na idade
@@ -2253,20 +2240,6 @@ function clearFormData() {
 function extractParticipantData($participant) {
     const stayPeriodId = $participant.find('.stay-period-select').val() || 
                         (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
-
-
-    // NOVO: Capturar dados do telefone com país (apenas se visível)
-    const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
-    let countryCode = '';
-    let countryName = '';
-    let phoneNumber = '';
-    
-    if ($phoneGroup.is(':visible')) {
-        countryCode = $participant.find('.country-select').val();
-        countryName = $participant.find('.country-select').find(':selected').data('country');
-        phoneNumber = $participant.find('.phone-input').val();
-    }
-
     
     // Buscar dados do período selecionado
     let numDiarias = null;
@@ -2291,16 +2264,23 @@ function extractParticipantData($participant) {
         }
     }
 
-        // NOVO: Capturar dados do telefone com país
-    const countryCode = $participant.find('.country-select').val();
-    const countryName = $participant.find('.country-select').find(':selected').data('country');
-    const phoneNumber = $participant.find('.phone-input').val();
+    // CORRIGIDO: Capturar dados do telefone com país (apenas se visível)
+    const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
+    let countryCode = '';
+    let countryName = '';
+    let phoneNumber = '';
+    
+    if ($phoneGroup.is(':visible')) {
+        countryCode = $participant.find('.country-select').val();
+        countryName = $participant.find('.country-select').find(':selected').data('country');
+        phoneNumber = $participant.find('.phone-input').val();
+    }
 
     return {
         fullName: $participant.find('.full-name').val(),
-        phone: phoneNumber, // ATUALIZADO
-        phoneCountryCode: countryCode, // NOVO
-        phoneCountry: countryName, // NOVO
+        phone: phoneNumber,
+        phoneCountryCode: countryCode,
+        phoneCountry: countryName,
         cpf: $participant.find('.cpf-mask').closest('.form-group').is(':visible') ? 
              $participant.find('.cpf-mask').val() : '',
         gender: $participant.find('.gender-select').val(),
@@ -2316,9 +2296,9 @@ function extractParticipantData($participant) {
         restrictions: $participant.find('.restrictions-input').val().trim(),
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
-        numDiarias: numDiarias, // Campo existente
-        dataCheckin: dataCheckin, // NOVO CAMPO
-        dataCheckout: dataCheckout // NOVO CAMPO
+        numDiarias: numDiarias,
+        dataCheckin: dataCheckin,
+        dataCheckout: dataCheckout
     };
 }
 
@@ -2583,44 +2563,6 @@ function validateCoupon() {
 }
 
 console.log('Script principal carregado com integração completa');
-
-// Obter opções de evento para um participante específico
-function getEventOptionsForParticipant($participant) {
-    if (currentEvent.tipo_formulario === 'evento_apenas') {
-        return currentEvent.valores_evento_opcoes;
-    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-        const stayPeriodId = $participant.find('.stay-period-select').val() || 
-                           (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
-        
-        if (stayPeriodId) {
-            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
-            return periodo ? (periodo.valores_evento_opcoes || []) : [];
-        }
-    }
-    return [];
-}
-
-// Atualizar participante no calculador
-function updateParticipantInCalculator(participantId, participantData) {
-    if (!window.priceCalculator) return;
-
-    // Encontrar índice do participante
-    const participantIndex = window.priceCalculator.participants.findIndex(p => p.id === participantId);
-    
-    if (participantIndex >= 0) {
-        // Atualizar participante existente
-        window.priceCalculator.participants[participantIndex] = {
-            id: participantId,
-            ...participantData
-        };
-    } else {
-        // Adicionar novo participante
-        window.priceCalculator.participants.push({
-            id: participantId,
-            ...participantData
-        });
-    }
-}
 
 // Atualizar cálculos de um participante específico
 function updateParticipantCalculations($participant) {
