@@ -1488,11 +1488,23 @@ function generateParticipantsSummary() {
                 checkoutInfo = formatDateTimeForDisplay(selectedPeriod.data_fim);
             }
         }
+
+            // Função para formatar o gênero para exibição
+        function formatGenderForDisplay(gender) {
+        const genderLabels = {
+            'masculino': 'Masculino',
+            'feminino': 'Feminino',
+            'nao-binario': 'Não-binário',
+            'prefiro-nao-informar': 'Prefiro não informar'
+            };
+        return genderLabels[gender] || gender;
+        }
         
         summaryHtml += `
             <div class="participant-summary-item">
                 <h4>Participante ${participantNumber}: ${participantData.fullName}</h4>
                 <div class="participant-details">
+                <p><strong>Gênero:</strong> ${formatGenderForDisplay(participantData.gender)}</p>
         `;
         
         // Mostrar detalhes baseado no tipo de formulário
