@@ -1881,3 +1881,24 @@ html {
         font-size: 0.85em;
     }
 }
+
+/* Estilos para campo de gênero */
+.gender-select {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.gender-select option {
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* Garantir que o select se comporte bem no mobile */
+@media (max-width: 768px) {
+    .gender-select {
+        font-size: 16px; /* Evita zoom no iOS */
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
