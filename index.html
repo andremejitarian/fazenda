@@ -216,15 +216,34 @@
                         <p class="feedback-message cpf-feedback"></p>
                     </div>
                 </div>
-                
+
+                <!-- NOVA LINHA: Adicionar campo de gênero -->
                 <div class="form-row">
+                    <div class="form-group">
+                        <label>Gênero:</label>
+                        <select class="form-control gender-select" required>
+                            <option value="">Selecione o gênero</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="nao-binario">Não-binário</option>
+                            <option value="prefiro-nao-informar">Prefiro não informar</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>E-mail:</label>
                         <input type="email" class="form-control email-input" required>
                     </div>
+                </div>
+            
+                <!-- Mover E-mail e Data de Nascimento para a próxima linha -->
+                <div class="form-row">
                     <div class="form-group">
                         <label>Data Nasc.:</label>
                         <input type="date" class="form-control dob-input" required>
+                    </div>
+                    <!-- Deixar uma coluna vazia ou adicionar outro campo se necessário -->
+                    <div class="form-group">
+                        <!-- Coluna vazia ou outro campo futuro -->
                     </div>
                 </div>
 
