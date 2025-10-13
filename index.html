@@ -181,6 +181,18 @@
                         <input type="text" class="form-control full-name" required>
                     </div>
                 </div>
+
+                                <!-- Mover E-mail e Data de Nascimento para a próxima linha -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Data Nasc.:</label>
+                        <input type="date" class="form-control dob-input" required>
+                    </div>
+                    <!-- Deixar uma coluna vazia ou adicionar outro campo se necessário -->
+                    <div class="form-group">
+                        <!-- Coluna vazia ou outro campo futuro -->
+                    </div>
+                </div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -209,13 +221,13 @@
                         <input type="text" class="form-control phone-input" required placeholder="Digite o telefone">
                         </div>
                     </div>
+                <!-- QUARTA LINHA: CPF (será oculto inicialmente) -->
+                <div class="form-group">
+                    <label>CPF:</label>
+                    <input type="text" class="form-control cpf-mask" required>
+                    <p class="feedback-message cpf-feedback"></p>
                 </div>
-                    <div class="form-group">
-                        <label>CPF:</label>
-                        <input type="text" class="form-control cpf-mask" required>
-                        <p class="feedback-message cpf-feedback"></p>
-                    </div>
-                </div>
+            </div>
 
                 <!-- NOVA LINHA: Adicionar campo de gênero -->
                 <div class="form-row">
@@ -232,18 +244,6 @@
                     <div class="form-group">
                         <label>E-mail:</label>
                         <input type="email" class="form-control email-input" required>
-                    </div>
-                </div>
-            
-                <!-- Mover E-mail e Data de Nascimento para a próxima linha -->
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Data Nasc.:</label>
-                        <input type="date" class="form-control dob-input" required>
-                    </div>
-                    <!-- Deixar uma coluna vazia ou adicionar outro campo se necessário -->
-                    <div class="form-group">
-                        <!-- Coluna vazia ou outro campo futuro -->
                     </div>
                 </div>
 
