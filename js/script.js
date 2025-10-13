@@ -1486,6 +1486,7 @@ function updateResponsibleSections() {
 
 
 // Gerar resumo dos participantes
+// Gerar resumo dos participantes
 function generateParticipantsSummary() {
     const $summaryContent = $('#summary-content');
     let summaryHtml = '';
@@ -1506,14 +1507,19 @@ function generateParticipantsSummary() {
     
     // Seção do responsável pelo pagamento
     if (responsiblePayerData) {
+        // CORRIGIDO: Verificar se os dados existem antes de exibir
+        const payerCpf = responsiblePayerData.cpf || 'Não informado';
+        const payerEmail = responsiblePayerData.email || 'Não informado';
+        const payerPhone = responsiblePayerData.phone || 'Não informado';
+        
         summaryHtml += `
             <div class="responsible-payer-summary">
                 <h3>Responsável pelo Pagamento</h3>
                 <div class="payer-info">
                     <p><strong>Nome:</strong> ${responsiblePayerData.fullName}</p>
-                    <p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>
-                    <p><strong>Email:</strong> ${responsiblePayerData.email}</p>
-                    <p><strong>Telefone:</strong> ${responsiblePayerData.phone}</p>
+                    <p><strong>CPF:</strong> ${payerCpf}</p>
+                    <p><strong>Email:</strong> ${payerEmail}</p>
+                    <p><strong>Telefone:</strong> ${payerPhone}</p>
                 </div>
             </div>
         `;
@@ -1527,14 +1533,19 @@ function generateParticipantsSummary() {
         if ($responsibleChild.length > 0) {
             responsibleChildData = extractParticipantData($responsibleChild);
             
+            // CORRIGIDO: Verificar se os dados existem antes de exibir
+            const childCpf = responsibleChildData.cpf || 'Não informado';
+            const childEmail = responsibleChildData.email || 'Não informado';
+            const childPhone = responsibleChildData.phone || 'Não informado';
+            
             summaryHtml += `
                 <div class="responsible-payer-summary">
                     <h3>Responsável pela Criança</h3>
                     <div class="payer-info">
                         <p><strong>Nome:</strong> ${responsibleChildData.fullName}</p>
-                        <p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>
-                        <p><strong>Email:</strong> ${responsibleChildData.email}</p>
-                        <p><strong>Telefone:</strong> ${responsibleChildData.phone}</p>
+                        <p><strong>CPF:</strong> ${childCpf}</p>
+                        <p><strong>Email:</strong> ${childEmail}</p>
+                        <p><strong>Telefone:</strong> ${childPhone}</p>
                     </div>
                 </div>
             `;
@@ -1596,15 +1607,15 @@ function generateParticipantsSummary() {
             }
         }
 
-            // Função para formatar o gênero para exibição
+        // Função para formatar o gênero para exibição
         function formatGenderForDisplay(gender) {
-        const genderLabels = {
-            'masculino': 'Masculino',
-            'feminino': 'Feminino',
-            'nao-binario': 'Não-binário',
-            'prefiro-nao-informar': 'Prefiro não informar'
+            const genderLabels = {
+                'masculino': 'Masculino',
+                'feminino': 'Feminino',
+                'nao-binario': 'Não-binário',
+                'prefiro-nao-informar': 'Prefiro não informar'
             };
-        return genderLabels[gender] || gender;
+            return genderLabels[gender] || gender;
         }
         
         summaryHtml += `
@@ -1614,48 +1625,59 @@ function generateParticipantsSummary() {
                 <p><strong>Gênero:</strong> ${formatGenderForDisplay(participantData.gender)}</p>
         `;
         
+        // NOVO: Mostrar dados pessoais apenas se existirem (para adultos)
+        if (participantData.cpf) {
+            summaryHtml += `<p><strong>CPF:</strong> ${participantData.cpf}</p>`;
+        }
+        if (participantData.email) {
+            summaryHtml += `<p><strong>Email:</strong> ${participantData.email}</p>`;
+        }
+        if (participantData.phone) {
+            summaryHtml += `<p><strong>Telefone:</strong> ${participantData.phone}</p>`;
+        }
+        
         // Mostrar detalhes baseado no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-    // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
-    let lodgingInfo = '';
-    if (lodgingValue === 0) {
-        lodgingInfo = ' <span class="free-indicator">(Gratuito)</span>';
-    } else {
-        // Verificar se está aplicando regra de excedente
-        const age = window.priceCalculator.calculateAge(participantData.birthDate);
-        if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
-            lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
-        }
-    }
+            // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
+            let lodgingInfo = '';
+            if (lodgingValue === 0) {
+                lodgingInfo = ' <span class="free-indicator">(Gratuito)</span>';
+            } else {
+                // Verificar se está aplicando regra de excedente
+                const age = window.priceCalculator.calculateAge(participantData.birthDate);
+                if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
+                    lodgingInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
+                }
+            }
 
-    // NOVA SEÇÃO: Mostrar preferência de cama se foi selecionada
-    if (participantData.bedPreference) {
-        const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
-        summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
-    }
-    
-    // NOVO: Buscar informações de refeições do período selecionado
-    let refeicoesInfo = '';
-    if (participantData.stayPeriod) {
-        const selectedPeriod = currentEvent.periodos_estadia_opcoes.find(p => p.id === participantData.stayPeriod);
-        if (selectedPeriod) {
-            if (selectedPeriod.primeira_refeicao) {
-                refeicoesInfo += `<p><strong>Primeira Refeição:</strong> ${selectedPeriod.primeira_refeicao}</p>`;
+            // NOVA SEÇÃO: Mostrar preferência de cama se foi selecionada
+            if (participantData.bedPreference) {
+                const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
+                summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
             }
-            if (selectedPeriod.ultima_refeicao) {
-                refeicoesInfo += `<p><strong>Última Refeição:</strong> ${selectedPeriod.ultima_refeicao}</p>`;
+            
+            // NOVO: Buscar informações de refeições do período selecionado
+            let refeicoesInfo = '';
+            if (participantData.stayPeriod) {
+                const selectedPeriod = currentEvent.periodos_estadia_opcoes.find(p => p.id === participantData.stayPeriod);
+                if (selectedPeriod) {
+                    if (selectedPeriod.primeira_refeicao) {
+                        refeicoesInfo += `<p><strong>Primeira Refeição:</strong> ${selectedPeriod.primeira_refeicao}</p>`;
+                    }
+                    if (selectedPeriod.ultima_refeicao) {
+                        refeicoesInfo += `<p><strong>Última Refeição:</strong> ${selectedPeriod.ultima_refeicao}</p>`;
+                    }
+                }
             }
+            
+            summaryHtml += `
+                <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
+                ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
+                ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
+                ${refeicoesInfo}
+                <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
+            `;
         }
-    }
-    
-    summaryHtml += `
-        <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
-        ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
-        ${checkoutInfo ? `<p><strong>Check-out:</strong> ${checkoutInfo}</p>` : ''}
-        ${refeicoesInfo}
-        <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
-    `;
-}
         
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
@@ -1676,7 +1698,7 @@ function generateParticipantsSummary() {
             `;
         }
 
-                // NOVA SEÇÃO: Adicionar restrições se preenchidas
+        // NOVA SEÇÃO: Adicionar restrições se preenchidas
         if (participantData.restrictions && participantData.restrictions.length > 0) {
             summaryHtml += `<p><strong>Restrições/Observações:</strong> ${participantData.restrictions}</p>`;
         }
