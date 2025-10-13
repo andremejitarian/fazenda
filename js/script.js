@@ -670,6 +670,15 @@ function setupParticipantEventListeners($participant) {
         
         console.log(`País alterado para: ${selectedCountry}`);
     });
+
+        // NOVO: Listener para gênero
+    $participant.find('.gender-select').on('change', function() {
+        const selectedGender = $(this).val();
+        console.log(`Gênero alterado: ${selectedGender}`);
+        
+        // Remover classe de erro se havia
+        $(this).removeClass('error');
+    });
     
     // ATUALIZADO: Validação de telefone
     $participant.find('.phone-input').on('blur', function() {
@@ -1021,7 +1030,6 @@ function validateEmail($emailField) {
 }
 
 // Validar etapa de participantes
-// Validar etapa de participantes
 function validateParticipantsStep() {
     let isValid = true;
     let firstErrorField = null;
@@ -1035,6 +1043,7 @@ function validateParticipantsStep() {
             { selector: '.full-name', name: 'Nome Completo' },
             { selector: '.phone-input', name: 'Telefone' },
             { selector: '.cpf-mask', name: 'CPF' },
+            { selector: '.gender-select', name: 'Gênero' },
             { selector: '.email-input', name: 'E-mail' },
             { selector: '.dob-input', name: 'Data de Nascimento' }
         ];
@@ -1735,6 +1744,7 @@ function prepareFormData(inscricaoId) {
             fullName: participantData.fullName,
             phone: participantData.phone,
             cpf: participantData.cpf,
+            gender: participantData.gender,
             email: participantData.email,
             birthDate: participantData.birthDate,
             stayPeriod: participantData.stayPeriod,
@@ -2146,6 +2156,7 @@ function extractParticipantData($participant) {
         phoneCountryCode: countryCode, // NOVO
         phoneCountry: countryName, // NOVO
         cpf: $participant.find('.cpf-mask').val(),
+        gender: $participant.find('.gender-select').val(),
         email: $participant.find('.email-input').val(),
         birthDate: $participant.find('.dob-input').val(),
         stayPeriod: stayPeriodId,
