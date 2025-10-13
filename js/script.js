@@ -312,6 +312,20 @@ function addParticipant() {
     
     // Configurar event listeners para este participante
     setupParticipantEventListeners($participant);
+
+    // NOVO: Inicializar campos adultos como ocultos
+    const $cpfGroup = $participant.find('.cpf-mask').closest('.form-group');
+    const $emailGroup = $participant.find('.email-input').closest('.form-group');
+    const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
+    
+    $cpfGroup.hide();
+    $emailGroup.hide();
+    $phoneGroup.hide();
+    
+    // Remover obrigatoriedade inicial
+    $participant.find('.cpf-mask').removeAttr('required');
+    $participant.find('.email-input').removeAttr('required');
+    $participant.find('.phone-input').removeAttr('required');
     
     // Adicionar aos dados
     participants.push({
@@ -679,6 +693,19 @@ function setupParticipantEventListeners($participant) {
         // Remover classe de erro se havia
         $(this).removeClass('error');
     });
+
+        // NOVO: Listener para data de nascimento - controlar visibilidade dos campos
+    $participant.find('.dob-input').on('change', function() {
+        const birthDate = $(this).val();
+        toggleAdultFields($participant, birthDate);
+        
+        updateResponsibleSections();
+        updateBedPreferenceSection();
+        
+        setTimeout(() => {
+            updateAllCalculations();
+        }, 10);
+    });
     
     // ATUALIZADO: Validação de telefone
     $participant.find('.phone-input').on('blur', function() {
@@ -782,6 +809,64 @@ if (currentStep === 2) {
     });
 }
     
+}
+
+// NOVA FUNÇÃO: Controlar visibilidade dos campos baseado na idade
+function toggleAdultFields($participant, birthDate) {
+    const $cpfField = $participant.find('.cpf-mask');
+    const $emailField = $participant.find('.email-input');
+    const $phoneField = $participant.find('.phone-input');
+    const $countrySelect = $participant.find('.country-select');
+    const $genderField = $participant.find('.gender-select');
+    
+    // Elementos containers dos campos
+    const $cpfGroup = $cpfField.closest('.form-group');
+    const $emailGroup = $emailField.closest('.form-group');
+    const $phoneGroup = $phoneField.closest('.form-group');
+    
+    if (!birthDate) {
+        // Se não há data de nascimento, ocultar todos os campos adultos
+        $cpfGroup.hide();
+        $emailGroup.hide();
+        $phoneGroup.hide();
+        
+        // Remover obrigatoriedade e limpar valores
+        $cpfField.removeAttr('required').val('').removeClass('error valid');
+        $emailField.removeAttr('required').val('').removeClass('error valid');
+        $phoneField.removeAttr('required').val('').removeClass('error valid');
+        $countrySelect.val('+55'); // Reset para Brasil
+        
+        console.log('Campos adultos ocultados - sem data de nascimento');
+        return;
+    }
+    
+    const age = calculateAge(birthDate);
+    
+    if (age !== null && age > 10) {
+        // Pessoa com mais de 10 anos - mostrar e tornar obrigatórios
+        $cpfGroup.show();
+        $emailGroup.show();
+        $phoneGroup.show();
+        
+        $cpfField.attr('required', true);
+        $emailField.attr('required', true);
+        $phoneField.attr('required', true);
+        
+        console.log(`Campos adultos exibidos para idade: ${age} anos`);
+    } else {
+        // Pessoa com 10 anos ou menos - ocultar e remover obrigatoriedade
+        $cpfGroup.hide();
+        $emailGroup.hide();
+        $phoneGroup.hide();
+        
+        // Remover obrigatoriedade e limpar valores
+        $cpfField.removeAttr('required').val('').removeClass('error valid');
+        $emailField.removeAttr('required').val('').removeClass('error valid');
+        $phoneField.removeAttr('required').val('').removeClass('error valid');
+        $countrySelect.val('+55'); // Reset para Brasil
+        
+        console.log(`Campos adultos ocultados para idade: ${age} anos`);
+    }
 }
 
 // Remover participante
@@ -1038,17 +1123,21 @@ function validateParticipantsStep() {
     $('#participants-container .participant-block').each(function() {
         const $participant = $(this);
         
-        // Campos obrigatórios
-        const requiredFields = [
+        // Campos sempre obrigatórios
+        const alwaysRequiredFields = [
             { selector: '.full-name', name: 'Nome Completo' },
-            { selector: '.phone-input', name: 'Telefone' },
-            { selector: '.cpf-mask', name: 'CPF' },
-            { selector: '.gender-select', name: 'Gênero' },
-            { selector: '.email-input', name: 'E-mail' },
             { selector: '.dob-input', name: 'Data de Nascimento' }
         ];
+
+        // Campos condicionalmente obrigatórios (apenas se visíveis)
+        const conditionalFields = [
+            { selector: '.phone-input', name: 'Telefone' },
+            { selector: '.cpf-mask', name: 'CPF' },
+            { selector: '.email-input', name: 'E-mail' }
+        ];
         
-        requiredFields.forEach(field => {
+        // Validar campos sempre obrigatórios
+        alwaysRequiredFields.forEach(field => {
             const $field = $participant.find(field.selector);
             if (!$field.val().trim()) {
                 $field.addClass('error');
@@ -1060,33 +1149,64 @@ function validateParticipantsStep() {
                 $field.removeClass('error');
             }
         });
+
+        // Validar campos condicionalmente obrigatórios (apenas se visíveis)
+        conditionalFields.forEach(field => {
+            const $field = $participant.find(field.selector);
+            const $fieldGroup = $field.closest('.form-group');
+            
+            // Só validar se o campo estiver visível
+            if ($fieldGroup.is(':visible')) {
+                if (!$field.val().trim()) {
+                    $field.addClass('error');
+                    if (!firstErrorField) {
+                        firstErrorField = $field;
+                    }
+                    isValid = false;
+                } else {
+                    $field.removeClass('error');
+                }
+            }
+        });
+
+        // Validar gênero (sempre obrigatório)
+        const $genderField = $participant.find('.gender-select');
+        if (!$genderField.val()) {
+            $genderField.addClass('error');
+            if (!firstErrorField) {
+                firstErrorField = $genderField;
+            }
+            isValid = false;
+        } else {
+            $genderField.removeClass('error');
+        }
         
-        // Validar CPF
+               // Validações específicas apenas para campos visíveis
         const $cpfField = $participant.find('.cpf-mask');
-        if (!validateCPF($cpfField)) {
+        if ($cpfField.closest('.form-group').is(':visible') && !validateCPF($cpfField)) {
             if (!firstErrorField) {
                 firstErrorField = $cpfField;
             }
             isValid = false;
         }
         
-        // Validar email
         const $emailField = $participant.find('.email-input');
-        if (!validateEmail($emailField)) {
+        if ($emailField.closest('.form-group').is(':visible') && !validateEmail($emailField)) {
             if (!firstErrorField) {
                 firstErrorField = $emailField;
             }
             isValid = false;
         }
 
-        // Validar telefone
         const $phoneField = $participant.find('.phone-input');
-        const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
-        if (!validatePhoneNumber($phoneField, selectedCountry)) {
-            if (!firstErrorField) {
-                firstErrorField = $phoneField;
+        if ($phoneField.closest('.form-group').is(':visible')) {
+            const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
+            if (!validatePhoneNumber($phoneField, selectedCountry)) {
+                if (!firstErrorField) {
+                    firstErrorField = $phoneField;
+                }
+                isValid = false;
             }
-            isValid = false;
         }
 
         // NOVA VALIDAÇÃO: Preferência de cama (se visível)
@@ -2133,6 +2253,20 @@ function clearFormData() {
 function extractParticipantData($participant) {
     const stayPeriodId = $participant.find('.stay-period-select').val() || 
                         (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+
+
+    // NOVO: Capturar dados do telefone com país (apenas se visível)
+    const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
+    let countryCode = '';
+    let countryName = '';
+    let phoneNumber = '';
+    
+    if ($phoneGroup.is(':visible')) {
+        countryCode = $participant.find('.country-select').val();
+        countryName = $participant.find('.country-select').find(':selected').data('country');
+        phoneNumber = $participant.find('.phone-input').val();
+    }
+
     
     // Buscar dados do período selecionado
     let numDiarias = null;
@@ -2167,9 +2301,11 @@ function extractParticipantData($participant) {
         phone: phoneNumber, // ATUALIZADO
         phoneCountryCode: countryCode, // NOVO
         phoneCountry: countryName, // NOVO
-        cpf: $participant.find('.cpf-mask').val(),
+        cpf: $participant.find('.cpf-mask').closest('.form-group').is(':visible') ? 
+             $participant.find('.cpf-mask').val() : '',
         gender: $participant.find('.gender-select').val(),
-        email: $participant.find('.email-input').val(),
+        email: $participant.find('.email-input').closest('.form-group').is(':visible') ? 
+               $participant.find('.email-input').val() : '',
         birthDate: $participant.find('.dob-input').val(),
         stayPeriod: stayPeriodId,
         accommodation: $participant.find('.accommodation-select').val() || 
