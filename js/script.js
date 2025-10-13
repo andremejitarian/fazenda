@@ -1486,7 +1486,6 @@ function updateResponsibleSections() {
 
 
 // Gerar resumo dos participantes
-// Gerar resumo dos participantes
 function generateParticipantsSummary() {
     const $summaryContent = $('#summary-content');
     let summaryHtml = '';
@@ -1507,19 +1506,27 @@ function generateParticipantsSummary() {
     
     // Seção do responsável pelo pagamento
     if (responsiblePayerData) {
-        // CORRIGIDO: Verificar se os dados existem antes de exibir
-        const payerCpf = responsiblePayerData.cpf || 'Não informado';
-        const payerEmail = responsiblePayerData.email || 'Não informado';
-        const payerPhone = responsiblePayerData.phone || 'Não informado';
+        console.log('🔍 DEBUG Responsável Pagamento:', responsiblePayerData);
         
         summaryHtml += `
             <div class="responsible-payer-summary">
                 <h3>Responsável pelo Pagamento</h3>
                 <div class="payer-info">
                     <p><strong>Nome:</strong> ${responsiblePayerData.fullName}</p>
-                    <p><strong>CPF:</strong> ${payerCpf}</p>
-                    <p><strong>Email:</strong> ${payerEmail}</p>
-                    <p><strong>Telefone:</strong> ${payerPhone}</p>
+        `;
+        
+        // CORRIGIDO: Só mostrar campos se eles têm valor
+        if (responsiblePayerData.cpf && responsiblePayerData.cpf.trim()) {
+            summaryHtml += `<p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>`;
+        }
+        if (responsiblePayerData.email && responsiblePayerData.email.trim()) {
+            summaryHtml += `<p><strong>Email:</strong> ${responsiblePayerData.email}</p>`;
+        }
+        if (responsiblePayerData.phone && responsiblePayerData.phone.trim()) {
+            summaryHtml += `<p><strong>Telefone:</strong> ${responsiblePayerData.phone}</p>`;
+        }
+        
+        summaryHtml += `
                 </div>
             </div>
         `;
@@ -1532,20 +1539,27 @@ function generateParticipantsSummary() {
         
         if ($responsibleChild.length > 0) {
             responsibleChildData = extractParticipantData($responsibleChild);
-            
-            // CORRIGIDO: Verificar se os dados existem antes de exibir
-            const childCpf = responsibleChildData.cpf || 'Não informado';
-            const childEmail = responsibleChildData.email || 'Não informado';
-            const childPhone = responsibleChildData.phone || 'Não informado';
+            console.log('🔍 DEBUG Responsável Criança:', responsibleChildData);
             
             summaryHtml += `
                 <div class="responsible-payer-summary">
                     <h3>Responsável pela Criança</h3>
                     <div class="payer-info">
                         <p><strong>Nome:</strong> ${responsibleChildData.fullName}</p>
-                        <p><strong>CPF:</strong> ${childCpf}</p>
-                        <p><strong>Email:</strong> ${childEmail}</p>
-                        <p><strong>Telefone:</strong> ${childPhone}</p>
+            `;
+            
+            // CORRIGIDO: Só mostrar campos se eles têm valor
+            if (responsibleChildData.cpf && responsibleChildData.cpf.trim()) {
+                summaryHtml += `<p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>`;
+            }
+            if (responsibleChildData.email && responsibleChildData.email.trim()) {
+                summaryHtml += `<p><strong>Email:</strong> ${responsibleChildData.email}</p>`;
+            }
+            if (responsibleChildData.phone && responsibleChildData.phone.trim()) {
+                summaryHtml += `<p><strong>Telefone:</strong> ${responsibleChildData.phone}</p>`;
+            }
+            
+            summaryHtml += `
                     </div>
                 </div>
             `;
@@ -1563,6 +1577,8 @@ function generateParticipantsSummary() {
         const participantData = extractParticipantData($participant);
         const participantNumber = index + 1;
         
+        console.log(`🔍 DEBUG Participante ${participantNumber}:`, participantData);
+        
         // **CORREÇÃO**: Buscar valores do calculador usando o ID correto
         const participantId = $participant.attr('data-participant-id');
         const calculatorParticipant = window.priceCalculator.participants.find(p => p.id === participantId);
@@ -1579,15 +1595,6 @@ function generateParticipantsSummary() {
             lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
             eventValue = window.priceCalculator.calculateEventValue(participantData);
         }
-        
-        // **DEBUG**: Log para verificar valores
-        console.log(`Participante ${participantNumber}:`, {
-            id: participantId,
-            idade: window.priceCalculator.calculateAge(participantData.birthDate),
-            lodgingValue,
-            eventValue,
-            participantData
-        });
         
         // Obter descrições das opções selecionadas
         const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
@@ -1625,17 +1632,18 @@ function generateParticipantsSummary() {
                 <p><strong>Gênero:</strong> ${formatGenderForDisplay(participantData.gender)}</p>
         `;
         
-        // NOVO: Mostrar dados pessoais apenas se existirem (para adultos)
-        if (participantData.cpf) {
+        // CORRIGIDO: Só mostrar dados pessoais se existirem E tiverem valor
+        if (participantData.cpf && participantData.cpf.trim()) {
             summaryHtml += `<p><strong>CPF:</strong> ${participantData.cpf}</p>`;
         }
-        if (participantData.email) {
+        if (participantData.email && participantData.email.trim()) {
             summaryHtml += `<p><strong>Email:</strong> ${participantData.email}</p>`;
         }
-        if (participantData.phone) {
+        if (participantData.phone && participantData.phone.trim()) {
             summaryHtml += `<p><strong>Telefone:</strong> ${participantData.phone}</p>`;
         }
         
+        // Resto do código permanece igual...
         // Mostrar detalhes baseado no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
@@ -2286,36 +2294,40 @@ function extractParticipantData($participant) {
         }
     }
 
-    // CORRIGIDO: Capturar dados do telefone com país (apenas se visível)
-    const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
-    let countryCode = '';
-    let countryName = '';
-    let phoneNumber = '';
-    
-    if ($phoneGroup.is(':visible')) {
-        countryCode = $participant.find('.country-select').val();
-        countryName = $participant.find('.country-select').find(':selected').data('country');
-        phoneNumber = $participant.find('.phone-input').val();
-    }
+    // CORRIGIDO: Capturar dados sempre, independente da visibilidade
+    const countryCode = $participant.find('.country-select').val() || '';
+    const countryName = $participant.find('.country-select').find(':selected').data('country') || '';
+    const phoneNumber = $participant.find('.phone-input').val() || '';
+    const cpfValue = $participant.find('.cpf-mask').val() || '';
+    const emailValue = $participant.find('.email-input').val() || '';
+
+    // DEBUG: Log para verificar se os valores estão sendo capturados
+    console.log('🔍 DEBUG extractParticipantData:', {
+        participantId: $participant.attr('data-participant-id'),
+        phoneNumber,
+        cpfValue,
+        emailValue,
+        phoneVisible: $participant.find('.phone-input').closest('.form-group').is(':visible'),
+        cpfVisible: $participant.find('.cpf-mask').closest('.form-group').is(':visible'),
+        emailVisible: $participant.find('.email-input').closest('.form-group').is(':visible')
+    });
 
     return {
-        fullName: $participant.find('.full-name').val(),
+        fullName: $participant.find('.full-name').val() || '',
         phone: phoneNumber,
         phoneCountryCode: countryCode,
         phoneCountry: countryName,
-        cpf: $participant.find('.cpf-mask').closest('.form-group').is(':visible') ? 
-             $participant.find('.cpf-mask').val() : '',
-        gender: $participant.find('.gender-select').val(),
-        email: $participant.find('.email-input').closest('.form-group').is(':visible') ? 
-               $participant.find('.email-input').val() : '',
-        birthDate: $participant.find('.dob-input').val(),
+        cpf: cpfValue,
+        gender: $participant.find('.gender-select').val() || '',
+        email: emailValue,
+        birthDate: $participant.find('.dob-input').val() || '',
         stayPeriod: stayPeriodId,
         accommodation: $participant.find('.accommodation-select').val() || 
                       (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
         eventOption: $participant.find('.event-option-select').val() || 
                     (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
-        bedPreference: $participant.find('.bed-preference-select').val(),
-        restrictions: $participant.find('.restrictions-input').val().trim(),
+        bedPreference: $participant.find('.bed-preference-select').val() || '',
+        restrictions: $participant.find('.restrictions-input').val().trim() || '',
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias,
