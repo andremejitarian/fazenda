@@ -392,21 +392,26 @@ function setupLodgingOptions($participant) {
                 updateCheckInOutInfo($participant, periodoInicial);
             }
         }
-
     }
     
     // Tipos de acomodação
     const acomodacoes = currentEvent.tipos_acomodacao;
     
     if (acomodacoes.length === 1) {
-        // Apenas uma opção - mostrar como texto
+        // Apenas uma opção - mostrar como texto COM VALOR
+        const valorDiaria = acomodacoes[0].valor_diaria_por_pessoa;
+        const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
-        $accommodationInfo.text(`${acomodacoes[0].label} - ${acomodacoes[0].descricao}`).show();
+        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown
+        // Múltiplas opções - mostrar dropdown COM VALORES
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         acomodacoes.forEach(acomodacao => {
-            $accommodationSelect.append(`<option value="${acomodacao.id}">${acomodacao.label}</option>`);
+            const valorDiaria = acomodacao.valor_diaria_por_pessoa;
+            const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
+            const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
+            
+            $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
         $accommodationSelect.show();
         $accommodationInfo.hide();
@@ -420,22 +425,38 @@ function setupEventOptions($participant) {
     
     let eventOptions = [];
     
+    // Determinar opções baseadas no tipo de formulário
     if (currentEvent.tipo_formulario === 'evento_apenas') {
         eventOptions = currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-        // Será atualizado quando o período for selecionado
-        eventOptions = [];
+        const selectedPeriodId = $participant.find('.stay-period-select').val();
+        if (selectedPeriodId) {
+            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+            if (periodo && periodo.valores_evento_opcoes) {
+                eventOptions = periodo.valores_evento_opcoes;
+            }
+        }
+    }
+    
+    if (eventOptions.length === 0) {
+        $eventSelect.hide();
+        $eventInfo.hide();
+        return;
     }
     
     if (eventOptions.length === 1) {
-        // Apenas uma opção - mostrar como texto
+        // Apenas uma opção - mostrar como texto COM VALOR
+        const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
         $eventSelect.hide();
-        $eventInfo.text(`${eventOptions[0].label} - ${eventOptions[0].descricao}`).show();
-    } else if (eventOptions.length > 1) {
-        // Múltiplas opções - mostrar dropdown
+        $eventInfo.text(`${eventOptions[0].label} - ${valorFormatado}`).show();
+    } else {
+        // Múltiplas opções - mostrar dropdown COM VALORES
         $eventSelect.empty().append('<option value="">Selecione a participação</option>');
         eventOptions.forEach(opcao => {
-            $eventSelect.append(`<option value="${opcao.id}">${opcao.label}</option>`);
+            const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
+            const optionLabel = `${opcao.label} - ${valorFormatado}`;
+            
+            $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
         });
         $eventSelect.show();
         $eventInfo.hide();
@@ -994,29 +1015,41 @@ function updateEventOptionsForPeriod($participant) {
     if (currentEvent.tipo_formulario !== 'hospedagem_e_evento') return;
     
     const selectedPeriodId = $participant.find('.stay-period-select').val();
-    if (!selectedPeriodId) return;
-    
-    const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
-    if (!periodo || !periodo.valores_evento_opcoes) return;
-    
     const $eventSelect = $participant.find('.event-option-select');
     const $eventInfo = $participant.find('.event-option-info');
+    
+    if (!selectedPeriodId) {
+        $eventSelect.empty().append('<option value="">Selecione primeiro o período</option>');
+        $eventInfo.hide();
+        return;
+    }
+    
+    const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+    
+        $eventSelect.hide();
+        $eventInfo.hide();
+        return;
+    }
+    
     const eventOptions = periodo.valores_evento_opcoes;
     
     if (eventOptions.length === 1) {
-        // Apenas uma opção - mostrar como texto
+        // Apenas uma opção - mostrar como texto COM VALOR
+        const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
         $eventSelect.hide();
-        $eventInfo.text(`${eventOptions[0].label} - ${eventOptions[0].descricao}`).show();
+        $eventInfo.text(`${eventOptions[0].label} - ${valorFormatado}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown
+        // Múltiplas opções - mostrar dropdown COM VALORES
         $eventSelect.empty().append('<option value="">Selecione a participação</option>');
         eventOptions.forEach(opcao => {
-            $eventSelect.append(`<option value="${opcao.id}">${opcao.label}</option>`);
+            const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
+            const optionLabel = `${opcao.label} - ${valorFormatado}`;
+            
+            $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
         });
         $eventSelect.show();
         $eventInfo.hide();
     }
-}
 
 // Configurar formas de pagamento
 function setupPaymentMethods() {
