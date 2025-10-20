@@ -435,9 +435,16 @@ function setupEventOptions($participant) {
             if (periodo && periodo.valores_evento_opcoes) {
                 eventOptions = periodo.valores_evento_opcoes;
             }
+        } else {
+            // Se não há período selecionado, mostrar mensagem
+            $eventSelect.empty().append('<option value="">Selecione primeiro o período</option>');
+            $eventSelect.show();
+            $eventInfo.hide();
+            return;
         }
     }
     
+    // Se não há opções disponíveis, ocultar campos
     if (eventOptions.length === 0) {
         $eventSelect.hide();
         $eventInfo.hide();
