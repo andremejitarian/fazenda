@@ -1973,6 +1973,7 @@ function prepareFormData(inscricaoId) {
         tipo_formulario: currentEvent.tipo_formulario,
         descricao: currentEvent.descricao,
         politicas_evento_url: currentEvent.politicas_evento_url,
+        planilha_url: currentEvent.planilha_url,
     };
 
     // Adicionar observações adicionais apenas se existirem
