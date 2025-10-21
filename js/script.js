@@ -401,16 +401,17 @@ function setupLodgingOptions($participant) {
     const acomodacoes = currentEvent.tipos_acomodacao;
     
     if (acomodacoes.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR BASE
-        const valorFormatado = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+        // Apenas uma opção - mostrar como texto COM VALOR CALCULADO
+        const valorCalculado = calculateAccommodationTotalValue(acomodacoes[0], $participant);
+        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
         $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado} - ${acomodacoes[0].descricao}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown COM VALORES BASE
+        // Múltiplas opções - mostrar dropdown COM VALORES CALCULADOS
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         acomodacoes.forEach(acomodacao => {
-            // USAR VALOR BASE AO INVÉS DE CALCULAR
-            const valorFormatado = `R$ ${valorBase.toFixed(2).replace('.', ',')}`;
+            const valorCalculado = calculateAccommodationTotalValue(acomodacao, $participant);
+            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${acomodacao.label} - ${valorFormatado}`;
             
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
