@@ -2,6 +2,7 @@
   "eventos": [
     {
       "id": "G001",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
@@ -188,6 +189,7 @@
     },
     {
       "id": "G002",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
@@ -265,6 +267,7 @@
     },
     {
       "id": "G003",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
@@ -364,6 +367,7 @@
     },
     {
       "id": "G003c",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
