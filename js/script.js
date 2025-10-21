@@ -55,12 +55,6 @@ $(document).ready(function() {
     initializeForm();
 });
 
-// Inicialização
-$(document).ready(function() {
-    console.log('Formulário iniciado');
-    initializeForm();
-});
-
 // ========================================
 // EVENTOS DE ATUALIZAÇÃO DE VALORES POR IDADE
 // ========================================
