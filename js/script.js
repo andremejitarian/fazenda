@@ -397,22 +397,20 @@ function setupLodgingOptions($participant) {
         }
     }
     
-    // Tipos de acomodação - MODIFICADO PARA CONSIDERAR REGRAS DE IDADE
+    // Tipos de acomodação - MODIFICADO PARA CONSIDERAR REGRAS DE IDADE E TRATAR VALOR ZERO
     const acomodacoes = currentEvent.tipos_acomodacao;
     
     if (acomodacoes.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR CALCULADO
         const valorCalculado = calculateAccommodationTotalValue(acomodacoes[0], $participant);
-        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
+        let valorDisplay = (valorCalculado === 0) ? '(Gratuito)' : `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
-        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado} - ${acomodacoes[0].descricao}`).show();
+        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorDisplay} - ${acomodacoes[0].descricao}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown COM VALORES CALCULADOS
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         acomodacoes.forEach(acomodacao => {
             const valorCalculado = calculateAccommodationTotalValue(acomodacao, $participant);
-            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
-            const optionLabel = `${acomodacao.label} - ${valorFormatado}`;
+            let valorDisplay = (valorCalculado === 0) ? '(Gratuito)' : `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
+            const optionLabel = `${acomodacao.label} - ${valorDisplay}`;
             
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
