@@ -1013,23 +1013,12 @@ function updateEventOptionsForPeriod($participant) {
     if (currentEvent.tipo_formulario !== 'hospedagem_e_evento') return;
     
     const selectedPeriodId = $participant.find('.stay-period-select').val();
-    const $eventSelect = $participant.find('.event-option-select');
-    const $eventInfo = $participant.find('.event-option-info');
-    
-    if (!selectedPeriodId) {
-        // ✅ Ocultar os campos se não há período selecionado
-        $eventSelect.hide();
-        $eventInfo.hide();
-        return;
-    }
+    if (!selectedPeriodId) return;
     
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
     
-        $eventSelect.hide();
-        $eventInfo.hide();
-        return;
-    }
-    
+    const $eventSelect = $participant.find('.event-option-select');
+    const $eventInfo = $participant.find('.event-option-info');
     const eventOptions = periodo.valores_evento_opcoes;
     
     if (eventOptions.length === 1) {
@@ -1049,6 +1038,7 @@ function updateEventOptionsForPeriod($participant) {
         $eventSelect.show();
         $eventInfo.hide();
     }
+}
 
 // Configurar formas de pagamento
 function setupPaymentMethods() {
