@@ -425,7 +425,6 @@ function setupEventOptions($participant) {
     
     let eventOptions = [];
     
-    // Determinar opções baseadas no tipo de formulário
     if (currentEvent.tipo_formulario === 'evento_apenas') {
         eventOptions = currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
@@ -436,27 +435,18 @@ function setupEventOptions($participant) {
                 eventOptions = periodo.valores_evento_opcoes;
             }
         } else {
-            // Se não há período selecionado, mostrar mensagem
-            $eventSelect.empty().append('<option value="">Selecione primeiro o período</option>');
-            $eventSelect.show();
-            $eventInfo.hide();
-            return;
+            // ✅ NÃO RETORNAR AQUI - apenas deixar eventOptions vazio
+            eventOptions = [];
         }
     }
     
-    // Se não há opções disponíveis, ocultar campos
-    if (eventOptions.length === 0) {
-        $eventSelect.hide();
-        $eventInfo.hide();
-        return;
-    }
-    
+    // ✅ Processar as opções (com valores formatados)
     if (eventOptions.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR
         const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
         $eventSelect.hide();
         $eventInfo.text(`${eventOptions[0].label} - ${valorFormatado}`).show();
-    } else {
+    } else if (eventOptions.length > 1) {
         // Múltiplas opções - mostrar dropdown COM VALORES
         $eventSelect.empty().append('<option value="">Selecione a participação</option>');
         eventOptions.forEach(opcao => {
@@ -468,6 +458,7 @@ function setupEventOptions($participant) {
         $eventSelect.show();
         $eventInfo.hide();
     }
+    // ✅ Se eventOptions.length === 0, não faz nada (campos ficam ocultos até período ser selecionado)
 }
 
 // Atualizar informações de check-in/out E refeições
@@ -1026,15 +1017,14 @@ function updateEventOptionsForPeriod($participant) {
     const $eventInfo = $participant.find('.event-option-info');
     
     if (!selectedPeriodId) {
-        $eventSelect.empty().append('<option value="">Selecione primeiro o período</option>');
-        $eventSelect.show();  // ✅ MOSTRAR o select
+        // ✅ Ocultar os campos se não há período selecionado
+        $eventSelect.hide();
         $eventInfo.hide();
         return;
     }
     
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
     
-    // ⚠️ CORREÇÃO: O código original tinha um bug aqui
         $eventSelect.hide();
         $eventInfo.hide();
         return;
@@ -1059,7 +1049,6 @@ function updateEventOptionsForPeriod($participant) {
         $eventSelect.show();
         $eventInfo.hide();
     }
-}
 
 // Configurar formas de pagamento
 function setupPaymentMethods() {
