@@ -55,7 +55,46 @@ $(document).ready(function() {
     initializeForm();
 });
 
-// ========================================
+// Função principal de inicialização
+function initializeForm() {
+    // Detectar parâmetro de evento na URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
+    
+    // Inicializar integração com webhooks (SEM testes)
+    initializeWebhookIntegration();
+    
+    // Carregar dados do evento APENAS do JSON local
+    console.log(`📂 Carregando evento: ${eventoId}`);
+    
+    // Mostrar estado de loading
+    showLoadingState();
+    
+    loadEventFromJSON(eventoId).then(eventoData => {
+        if (eventoData) {
+            currentEvent = eventoData;
+            console.log('📋 Evento carregado do JSON:', currentEvent);
+            
+            // Configurar interface com dados do evento
+            setupEventInterface();
+            
+            // Ocultar loading e mostrar conteúdo
+            hideLoadingState();
+        } else {
+            showErrorState(`Evento ${eventoId} não encontrado`);
+        }
+    }).catch(error => {
+        console.error('❌ Erro ao carregar evento:', error);
+        showErrorState(error.message);
+    });
+    
+    // Configurar event listeners
+    setupEventListeners();
+    
+    // Configurar máscaras de input
+    setupInputMasks();
+
+    // ========================================
 // EVENTOS DE ATUALIZAÇÃO DE VALORES POR IDADE
 // ========================================
 
@@ -119,45 +158,7 @@ $(document).on('change', '.stay-period-select', function() {
     // Recalcular preços
     updateParticipantPrice($participant);
 });
-
-// Função principal de inicialização
-function initializeForm() {
-    // Detectar parâmetro de evento na URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
     
-    // Inicializar integração com webhooks (SEM testes)
-    initializeWebhookIntegration();
-    
-    // Carregar dados do evento APENAS do JSON local
-    console.log(`📂 Carregando evento: ${eventoId}`);
-    
-    // Mostrar estado de loading
-    showLoadingState();
-    
-    loadEventFromJSON(eventoId).then(eventoData => {
-        if (eventoData) {
-            currentEvent = eventoData;
-            console.log('📋 Evento carregado do JSON:', currentEvent);
-            
-            // Configurar interface com dados do evento
-            setupEventInterface();
-            
-            // Ocultar loading e mostrar conteúdo
-            hideLoadingState();
-        } else {
-            showErrorState(`Evento ${eventoId} não encontrado`);
-        }
-    }).catch(error => {
-        console.error('❌ Erro ao carregar evento:', error);
-        showErrorState(error.message);
-    });
-    
-    // Configurar event listeners
-    setupEventListeners();
-    
-    // Configurar máscaras de input
-    setupInputMasks();
 }
 
 // Função para carregar do JSON local
