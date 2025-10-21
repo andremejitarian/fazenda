@@ -1027,12 +1027,14 @@ function updateEventOptionsForPeriod($participant) {
     
     if (!selectedPeriodId) {
         $eventSelect.empty().append('<option value="">Selecione primeiro o período</option>');
+        $eventSelect.show();  // ✅ MOSTRAR o select
         $eventInfo.hide();
         return;
     }
     
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
     
+    // ⚠️ CORREÇÃO: O código original tinha um bug aqui
         $eventSelect.hide();
         $eventInfo.hide();
         return;
@@ -1057,6 +1059,7 @@ function updateEventOptionsForPeriod($participant) {
         $eventSelect.show();
         $eventInfo.hide();
     }
+}
 
 // Configurar formas de pagamento
 function setupPaymentMethods() {
