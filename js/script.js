@@ -2758,60 +2758,55 @@ function updatePaymentMethod() {
 
 // Calcular valor de acomodação para UM participante considerando regras de idade
 function calculateAccommodationTotalValue(accommodationOption, $participant) {
-    // Se não há participante específico, retornar valor bruto
-        return accommodationOption.valor_diaria_por_pessoa;
-    }
-    
-    const participantData = extractParticipantData($participant);
-    
-    // Se não há data de nascimento, retornar valor bruto
-    if (!participantData.birthDate) {
-        return accommodationOption.valor_diaria_por_pessoa;
-    }
-    
-    // Usar o priceCalculator para calcular o valor com regras de idade
-    if (window.priceCalculator) {
-        // Criar um objeto temporário com a acomodação para calcular
-        const tempData = {
-            ...participantData,
-            accommodation: accommodationOption.id
-        };
-        
-        const lodgingValue = window.priceCalculator.calculateLodgingValue(tempData);
-        return lodgingValue;
-    } else {
-        // Fallback: usar valor bruto
-        return accommodationOption.valor_diaria_por_pessoa;
-    }
+  const participantData = extractParticipantData($participant);
+
+  // Sem data de nascimento: usa valor padrão
+  if (!participantData?.birthDate) {
+    return accommodationOption?.valor_diaria_por_pessoa ?? 0;
+  }
+
+  // Se houver calculadora, usa o valor calculado
+  if (window.priceCalculator) {
+    const tempData = {
+      ...participantData,
+      accommodation: accommodationOption?.id
+    };
+    const lodgingValue = window.priceCalculator.calculateLodgingValue(tempData);
+    return lodgingValue;
+  }
+
+  // Fallback: valor padrão
+  return accommodationOption?.valor_diaria_por_pessoa ?? 0;
 }
 
 // Calcular valor de evento para UM participante considerando regras de idade
 function calculateEventTotalValue(eventOption, $participant) {
-    // Se não há participante específico, retornar valor bruto
-        return eventOption.valor;
-    }
-    
-    const participantData = extractParticipantData($participant);
-    
-    // Se não há data de nascimento, retornar valor bruto
-    if (!participantData.birthDate) {
-        return eventOption.valor;
-    }
-    
-    // Usar o priceCalculator para calcular o valor com regras de idade
-    if (window.priceCalculator) {
-        // Criar um objeto temporário com a opção de evento para calcular
-        const tempData = {
-            ...participantData,
-            eventOption: eventOption.id
-        };
-        
-        const eventValue = window.priceCalculator.calculateEventValue(tempData);
-        return eventValue;
-    } else {
-        // Fallback: usar valor bruto
-        return eventOption.valor;
-    }
+  // Se não há participante específico, retornar valor bruto
+  if (!$participant) {
+    return eventOption?.valor ?? 0;
+  }
+
+  const participantData = extractParticipantData($participant);
+
+  // Se não há data de nascimento, retornar valor bruto
+  if (!participantData?.birthDate) {
+    return eventOption?.valor ?? 0;
+  }
+
+  // Usar o priceCalculator para calcular o valor com regras de idade
+  if (window.priceCalculator) {
+    // Criar um objeto temporário com a opção de evento para calcular
+    const tempData = {
+      ...participantData,
+      eventOption: eventOption?.id
+    };
+
+    const eventValue = window.priceCalculator.calculateEventValue(tempData);
+    return eventValue;
+  }
+
+  // Fallback: usar valor bruto
+  return eventOption?.valor ?? 0;
 }
 
 // Função para atualizar todos os dropdowns
