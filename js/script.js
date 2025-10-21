@@ -340,6 +340,9 @@ function addParticipant() {
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
+
+    // Atualizar dropdowns de TODOS os participantes
+    updateAllDropdownValues();
     
     console.log(`Participante ${participantNumber} adicionado`);
 }
@@ -384,7 +387,7 @@ function setupLodgingOptions($participant) {
         $stayPeriodSelect.show();
         $stayPeriodInfo.hide();
 
-        // Se já houver um período selecionado (por markup, estado salvo, etc.), inicializa as datas:
+        // Se já houver um período selecionado, inicializa as datas
         const selectedPeriodId = $stayPeriodSelect.val();
         if (selectedPeriodId) {
             const periodoInicial = periodos.find(p => String(p.id) === String(selectedPeriodId));
@@ -394,22 +397,22 @@ function setupLodgingOptions($participant) {
         }
     }
     
-    // Tipos de acomodação
+    // Tipos de acomodação - MODIFICADO PARA CONSIDERAR REGRAS DE IDADE
     const acomodacoes = currentEvent.tipos_acomodacao;
     
     if (acomodacoes.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR
-        const valorDiaria = acomodacoes[0].valor_diaria_por_pessoa;
-        const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
+        // Apenas uma opção - mostrar como texto COM VALOR CALCULADO
+        const valorCalculado = calculateAccommodationTotalValue(acomodacoes[0]);
+        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
-        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
+        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado} - ${acomodacoes[0].descricao}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown COM VALORES
+        // Múltiplas opções - mostrar dropdown COM VALORES CALCULADOS
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         acomodacoes.forEach(acomodacao => {
-            const valorDiaria = acomodacao.valor_diaria_por_pessoa;
-            const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
-            const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
+            const valorCalculado = calculateAccommodationTotalValue(acomodacao);
+            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
+            const optionLabel = `${acomodacao.label} - ${valorFormatado}`;
             
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
@@ -418,6 +421,7 @@ function setupLodgingOptions($participant) {
     }
 }
 
+// Configurar opções de evento
 // Configurar opções de evento
 function setupEventOptions($participant) {
     const $eventSelect = $participant.find('.event-option-select');
@@ -435,22 +439,23 @@ function setupEventOptions($participant) {
                 eventOptions = periodo.valores_evento_opcoes;
             }
         } else {
-            // ✅ NÃO RETORNAR AQUI - apenas deixar eventOptions vazio
             eventOptions = [];
         }
     }
     
-    // ✅ Processar as opções (com valores formatados)
+    // Processar as opções COM VALORES CALCULADOS
     if (eventOptions.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR
-        const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
+        // Apenas uma opção - mostrar como texto COM VALOR CALCULADO
+        const valorCalculado = calculateEventTotalValue(eventOptions[0]);
+        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $eventSelect.hide();
         $eventInfo.text(`${eventOptions[0].label} - ${valorFormatado}`).show();
     } else if (eventOptions.length > 1) {
-        // Múltiplas opções - mostrar dropdown COM VALORES
+        // Múltiplas opções - mostrar dropdown COM VALORES CALCULADOS
         $eventSelect.empty().append('<option value="">Selecione a participação</option>');
         eventOptions.forEach(opcao => {
-            const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
+            const valorCalculado = calculateEventTotalValue(opcao);
+            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${opcao.label} - ${valorFormatado}`;
             
             $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
@@ -458,7 +463,6 @@ function setupEventOptions($participant) {
         $eventSelect.show();
         $eventInfo.hide();
     }
-    // ✅ Se eventOptions.length === 0, não faz nada (campos ficam ocultos até período ser selecionado)
 }
 
 // Atualizar informações de check-in/out E refeições
@@ -720,6 +724,9 @@ function setupParticipantEventListeners($participant) {
         
         updateResponsibleSections();
         updateBedPreferenceSection();
+
+        // ADICIONAR ESTA LINHA:
+        updateAllDropdownValues();
         
         setTimeout(() => {
             updateAllCalculations();
@@ -896,6 +903,9 @@ function removeParticipant($participant) {
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
+
+    // Atualizar dropdowns de TODOS os participantes
+    updateAllDropdownValues();
     
     console.log(`Participante ${participantId} removido`);
 }
@@ -1022,15 +1032,17 @@ function updateEventOptionsForPeriod($participant) {
     const eventOptions = periodo.valores_evento_opcoes;
     
     if (eventOptions.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR
-        const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
+        // Apenas uma opção - mostrar como texto COM VALOR CALCULADO
+        const valorCalculado = calculateEventTotalValue(eventOptions[0]);
+        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $eventSelect.hide();
         $eventInfo.text(`${eventOptions[0].label} - ${valorFormatado}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown COM VALORES
+        // Múltiplas opções - mostrar dropdown COM VALORES CALCULADOS
         $eventSelect.empty().append('<option value="">Selecione a participação</option>');
         eventOptions.forEach(opcao => {
-            const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
+            const valorCalculado = calculateEventTotalValue(opcao);
+            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${opcao.label} - ${valorFormatado}`;
             
             $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
@@ -2743,4 +2755,73 @@ function updatePaymentMethod() {
             $('#cancellation-policy-section .policy-content').empty();
         }
     }
+}
+
+// Calcular valor total de acomodação considerando todos os participantes e regras de idade
+function calculateAccommodationTotalValue(accommodationOption) {
+    if (participants.length === 0) {
+        return accommodationOption.valor_diaria_por_pessoa;
+    }
+    
+    let totalValue = 0;
+    
+    participants.forEach(participant => {
+        const participantData = extractParticipantData(participant.$element);
+        
+        // Usar o priceCalculator para calcular o valor com regras de idade
+        if (window.priceCalculator) {
+            // Criar um objeto temporário com a acomodação para calcular
+            const tempData = {
+                ...participantData,
+                accommodation: accommodationOption.id
+            };
+            
+            const lodgingValue = window.priceCalculator.calculateLodgingValue(tempData);
+            totalValue += lodgingValue;
+        } else {
+            // Fallback: usar valor bruto
+            totalValue += accommodationOption.valor_diaria_por_pessoa;
+        }
+    });
+    
+    return totalValue;
+}
+
+// Calcular valor total de evento considerando todos os participantes e regras de idade
+function calculateEventTotalValue(eventOption) {
+    if (participants.length === 0) {
+        return eventOption.valor;
+    }
+    
+    let totalValue = 0;
+    
+    participants.forEach(participant => {
+        const participantData = extractParticipantData(participant.$element);
+        
+        // Usar o priceCalculator para calcular o valor com regras de idade
+        if (window.priceCalculator) {
+            // Criar um objeto temporário com a opção de evento para calcular
+            const tempData = {
+                ...participantData,
+                eventOption: eventOption.id
+            };
+            
+            const eventValue = window.priceCalculator.calculateEventValue(tempData);
+            totalValue += eventValue;
+        } else {
+            // Fallback: usar valor bruto
+            totalValue += eventOption.valor;
+        }
+    });
+    
+    return totalValue;
+}
+
+// Função para atualizar todos os dropdowns
+function updateAllDropdownValues() {
+    $('#participants-container .participant-block').each(function() {
+        const $participant = $(this);
+        setupLodgingOptions($participant);
+        setupEventOptions($participant);
+    });
 }
