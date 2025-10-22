@@ -2800,8 +2800,7 @@ function updateDropdownsWithPriceDetails() {
             const originalText = $(this).data('original-text');
             if (originalText) $(this).text(originalText);
         });
-        return;
-    }
+        return; // <--- ERRO CRÍTICO AQUI
 
     // Garante que o calculador tenha a lista de participantes mais recente ANTES de qualquer cálculo.
     priceCalculator.updateParticipants(participants);
@@ -2881,6 +2880,10 @@ $(document).on('change', '.participant-block input, .participant-block select', 
     updateDropdownsWithPriceDetails();
     updateSummary(); // Atualiza o resumo de totais
 });
+
+// =================================================================================
+// FIM DO BLOCO DE CÓDIGO CORRIGIDO
+// =================================================================================
 
 // =================================================================================
 // FIM DO BLOCO DE CÓDIGO CORRIGIDO
