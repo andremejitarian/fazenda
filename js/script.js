@@ -724,7 +724,15 @@ function setupParticipantEventListeners($participant) {
         
         updateResponsibleSections();
         updateBedPreferenceSection();
-        updateDropdownsWithPriceDetails(); 
+
+        // 1. Atualiza os dados do participante no array 'participants'
+        updateParticipantData($participantBlock);
+        
+        // 2. Agora, com os dados garantidamente atualizados, recalcula os preços nos dropdowns
+        updateDropdownsWithPriceDetails();
+        
+        // 3. (Opcional, mas recomendado) Recalcula também os totais gerais do formulário
+        updateSummary(); 
         
         setTimeout(() => {
             updateAllCalculations();
@@ -2869,4 +2877,42 @@ function updateDropdownsWithPriceDetails() {
             });
         }
     });
+}
+
+/**
+ * Centraliza a atualização dos dados de um participante no array 'participants'.
+ * Lê os valores dos campos do formulário e os salva no objeto do participante.
+ * @param {jQuery} $participantBlock - O elemento jQuery do bloco do participante a ser atualizado.
+ */
+function updateParticipantData($participantBlock) {
+    const participantId = $participantBlock.data('participant-id');
+    const participant = participants.find(p => p.id === participantId);
+
+    if (!participant) {
+        console.error('Participante não encontrado para atualização:', participantId);
+        return;
+    }
+
+    // Lê os valores de todos os campos e atualiza o objeto 'participant'
+    participant.name = $participantBlock.find('.full-name').val();
+    
+    // **PONTO CRÍTICO**: Garante que a data de nascimento seja lida e armazenada.
+    // O valor de um input type="date" já vem no formato 'YYYY-MM-DD', que é ideal.
+    participant.birthDate = $participantBlock.find('.dob-input').val(); 
+    
+    participant.phone = $participantBlock.find('.country-select').val() + $participantBlock.find('.phone-input').val();
+    participant.cpf = $participantBlock.find('.cpf-mask').val();
+    participant.gender = $participantBlock.find('.gender-select').val();
+    participant.email = $participantBlock.find('.email-input').val();
+    
+    // Atualiza as seleções de hospedagem e evento
+    participant.stayPeriod = $participantBlock.find('.stay-period-select').val();
+    participant.accommodation = $participantBlock.find('.accommodation-select').val();
+    participant.eventOption = $participantBlock.find('.event-option-select').val();
+    
+    // Outros campos que você possa ter...
+    participant.restrictions = $participantBlock.find('.restrictions-input').val();
+    participant.bedPreference = $participantBlock.find('.bed-preference-select').val();
+
+    console.log('Dados do participante atualizados:', participant); // Ótimo para depuração
 }
