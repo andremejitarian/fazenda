@@ -340,6 +340,9 @@ function addParticipant() {
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
+
+    // NOVA LINHA: Atualizar valores no dropdown
+    updateDropdownsWithPriceDetails();
     
     console.log(`Participante ${participantNumber} adicionado`);
 }
@@ -690,6 +693,7 @@ function setupParticipantEventListeners($participant) {
     // Remover participante
     $participant.find('.btn-remove-participant').on('click', function() {
         removeParticipant($participant);
+        updateDropdownsWithPriceDetails();
     });
 
     // NOVO: Mudança de país do telefone
@@ -720,6 +724,7 @@ function setupParticipantEventListeners($participant) {
         
         updateResponsibleSections();
         updateBedPreferenceSection();
+        updateDropdownsWithPriceDetails(); 
         
         setTimeout(() => {
             updateAllCalculations();
@@ -772,6 +777,7 @@ function setupParticipantEventListeners($participant) {
 
         updateEventOptionsForPeriod($participant);
         updateAllCalculations();
+        updateDropdownsWithPriceDetails();
     });
     
     // Responsável pelo pagamento
@@ -2743,4 +2749,124 @@ function updatePaymentMethod() {
             $('#cancellation-policy-section .policy-content').empty();
         }
     }
+}
+
+/**
+ * ATUALIZADO E CORRIGIDO: Atualiza os dropdowns de Acomodação e Evento com os detalhes de preço por participante.
+ * Esta função recalcula os custos para cada opção com base nos participantes atuais
+ * e exibe os valores individuais na descrição da opção, funcionando para múltiplos participantes.
+ */
+function updateDropdownsWithPriceDetails() {
+    // Se o priceCalculator não estiver pronto ou não houver participantes, limpa as descrições.
+        $('.accommodation-select option, .event-option-select option').each(function() {
+            const originalText = $(this).data('original-text');
+            if (originalText) {
+                $(this).text(originalText);
+            }
+        });
+        return; // <--- PROBLEMA AQUI
+
+    // Garante que o calculador tem a lista de participantes mais recente.
+    priceCalculator.updateParticipants(participants);
+
+    // --- 1. ATUALIZAR DROPDOWNS DE ACOMODAÇÃO (PARA CADA PARTICIPANTE) ---
+    $('.participant-block').each(function() {
+        const $participantBlock = $(this);
+        const participantId = $participantBlock.data('participant-id');
+        const currentParticipant = participants.find(p => p.id === participantId);
+        
+        // Se não encontrar o participante correspondente, pula este bloco.
+        if (!currentParticipant) return;
+
+        const $accommodationSelect = $participantBlock.find('.accommodation-select');
+        const $periodSelect = $participantBlock.find('.stay-period-select');
+
+        if ($accommodationSelect.length) {
+            $accommodationSelect.find('option').each(function() {
+                const $option = $(this);
+                const accommodationId = $option.val();
+
+                // Armazena o texto original da opção na primeira execução.
+                if (!$option.data('original-text')) {
+                    $option.data('original-text', $option.text());
+                }
+                
+                const originalText = $option.data('original-text');
+                if (!accommodationId) {
+                    $option.text(originalText); // Garante que a opção "Selecione" não tenha preços.
+                    return;
+                }
+
+                let priceDetails = [];
+                let totalForOption = 0;
+
+                // Calcula o preço para cada participante para esta opção de acomodação.
+                participants.forEach(p => {
+                    const simulatedData = {
+                        ...p,
+                        accommodation: accommodationId,
+                        stayPeriod: $periodSelect.val() // Pega o período do participante atual.
+                    };
+                    
+                    const value = priceCalculator.calculateLodgingValue(simulatedData);
+                    totalForOption += value;
+                    const participantName = p.name.split(' ')[0];
+                    priceDetails.push(`${participantName}: ${priceCalculator.formatCurrency(value)}`);
+                });
+
+                const detailsText = priceDetails.join(', ');
+                const totalText = priceCalculator.formatCurrency(totalForOption);
+                $option.text(`${originalText} (${detailsText}) - Total: ${totalText}`);
+            });
+        }
+    });
+
+    // --- 2. ATUALIZAR DROPDOWNS DE EVENTO (PARA CADA PARTICIPANTE) ---
+    $('.participant-block').each(function() {
+        const $participantBlock = $(this);
+        const participantId = $participantBlock.data('participant-id');
+        const currentParticipant = participants.find(p => p.id === participantId);
+
+        if (!currentParticipant) return;
+
+        const $eventSelect = $participantBlock.find('.event-option-select');
+        const $periodSelect = $participantBlock.find('.stay-period-select');
+
+        if ($eventSelect.length) {
+            $eventSelect.find('option').each(function() {
+                const $option = $(this);
+                const eventOptionId = $option.val();
+
+                if (!$option.data('original-text')) {
+                    $option.data('original-text', $option.text());
+                }
+
+                const originalText = $option.data('original-text');
+                if (!eventOptionId) {
+                    $option.text(originalText);
+                    return;
+                }
+
+                let priceDetails = [];
+                let totalForOption = 0;
+
+                participants.forEach(p => {
+                    const simulatedData = {
+                        ...p,
+                        eventOption: eventOptionId,
+                        stayPeriod: $periodSelect.val()
+                    };
+
+                    const value = priceCalculator.calculateEventValue(simulatedData);
+                    totalForOption += value;
+                    const participantName = p.name.split(' ')[0];
+                    priceDetails.push(`${participantName}: ${priceCalculator.formatCurrency(value)}`);
+                });
+
+                const detailsText = priceDetails.join(', ');
+                const totalText = priceCalculator.formatCurrency(totalForOption);
+                $option.text(`${originalText} (${detailsText}) - Total: ${totalText}`);
+            });
+        }
+    });
 }
