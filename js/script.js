@@ -340,9 +340,6 @@ function addParticipant() {
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
-
-    // NOVA LINHA: Atualizar valores no dropdown
-    updateDropdownsWithPriceDetails();
     
     console.log(`Participante ${participantNumber} adicionado`);
 }
@@ -693,7 +690,6 @@ function setupParticipantEventListeners($participant) {
     // Remover participante
     $participant.find('.btn-remove-participant').on('click', function() {
         removeParticipant($participant);
-        updateDropdownsWithPriceDetails();
     });
 
     // NOVO: Mudança de país do telefone
@@ -724,15 +720,6 @@ function setupParticipantEventListeners($participant) {
         
         updateResponsibleSections();
         updateBedPreferenceSection();
-
-        // 1. Atualiza os dados do participante no array 'participants'
-        updateParticipantData($participantBlock);
-        
-        // 2. Agora, com os dados garantidamente atualizados, recalcula os preços nos dropdowns
-        updateDropdownsWithPriceDetails();
-        
-        // 3. (Opcional, mas recomendado) Recalcula também os totais gerais do formulário
-        updateSummary(); 
         
         setTimeout(() => {
             updateAllCalculations();
@@ -785,7 +772,6 @@ function setupParticipantEventListeners($participant) {
 
         updateEventOptionsForPeriod($participant);
         updateAllCalculations();
-        updateDropdownsWithPriceDetails();
     });
     
     // Responsável pelo pagamento
@@ -2758,133 +2744,3 @@ function updatePaymentMethod() {
         }
     }
 }
-
-// =================================================================================
-// BLOCO DE CÓDIGO CORRIGIDO - SUBSTITUA O ANTERIOR POR ESTE
-// =================================================================================
-
-/**
- * Centraliza a atualização dos dados de um participante no array 'participants'.
- * Lê os valores dos campos do formulário e os salva no objeto do participante.
- * @param {jQuery} $participantBlock - O elemento jQuery do bloco do participante a ser atualizado.
- */
-function updateParticipantData($participantBlock) {
-    const participantId = $participantBlock.data('participant-id');
-    const participant = participants.find(p => p.id === participantId);
-
-    if (!participant) return;
-
-    // Lê e atualiza todos os dados do participante a partir dos campos do formulário
-    participant.name = $participantBlock.find('.full-name').val();
-    participant.birthDate = $participantBlock.find('.dob-input').val(); // Ponto crítico!
-    participant.phone = $participantBlock.find('.country-select').val() + $participantBlock.find('.phone-input').val();
-    participant.cpf = $participantBlock.find('.cpf-mask').val();
-    participant.gender = $participantBlock.find('.gender-select').val();
-    participant.email = $participantBlock.find('.email-input').val();
-    participant.stayPeriod = $participantBlock.find('.stay-period-select').val();
-    participant.accommodation = $participantBlock.find('.accommodation-select').val();
-    participant.eventOption = $participantBlock.find('.event-option-select').val();
-    participant.restrictions = $participantBlock.find('.restrictions-input').val();
-    participant.bedPreference = $participantBlock.find('.bed-preference-select').val();
-}
-
-
-/**
- * VERSÃO FINAL SIMPLIFICADA: Atualiza os dropdowns com os detalhes de preço.
- * Esta função agora calcula o preço de uma opção para um participante específico,
- * e também mostra o custo total daquela opção para todos os participantes.
- */
-function updateDropdownsWithPriceDetails() {
-        // Limpa descrições antigas se não houver participantes
-        $('.accommodation-select option, .event-option-select option').each(function() {
-            const originalText = $(this).data('original-text');
-            if (originalText) $(this).text(originalText);
-        });
-        return; // <--- ERRO CRÍTICO AQUI
-
-    // Garante que o calculador tenha a lista de participantes mais recente ANTES de qualquer cálculo.
-    priceCalculator.updateParticipants(participants);
-
-    // Itera sobre cada bloco de participante na tela
-    $('.participant-block').each(function() {
-        const $participantBlock = $(this);
-        const participantId = $participantBlock.data('participant-id');
-        const currentParticipant = participants.find(p => p.id === participantId);
-        if (!currentParticipant) return;
-
-        const $periodSelect = $participantBlock.find('.stay-period-select');
-
-        // --- 1. Atualiza Dropdown de Acomodação ---
-        $participantBlock.find('.accommodation-select option').each(function() {
-            const $option = $(this);
-            const accommodationId = $option.val();
-
-            if (!$option.data('original-text')) $option.data('original-text', $option.text());
-            const originalText = $option.data('original-text');
-
-            if (!accommodationId) {
-                $option.text(originalText);
-                return;
-            }
-
-            // Calcula o custo total desta opção para TODOS os participantes
-            let totalForOption = 0;
-            participants.forEach(p => {
-                totalForOption += priceCalculator.calculateLodgingValue({ ...p, accommodation: accommodationId, stayPeriod: $periodSelect.val() });
-            });
-
-            // Calcula o custo desta opção para o PARTICIPANTE ATUAL
-            const valueForCurrentParticipant = priceCalculator.calculateLodgingValue({ ...currentParticipant, accommodation: accommodationId, stayPeriod: $periodSelect.val() });
-
-            $option.text(`${originalText} (Seu custo: ${priceCalculator.formatCurrency(valueForCurrentParticipant)}) - Total: ${priceCalculator.formatCurrency(totalForOption)}`);
-        });
-
-        // --- 2. Atualiza Dropdown de Evento ---
-        $participantBlock.find('.event-option-select option').each(function() {
-            const $option = $(this);
-            const eventOptionId = $option.val();
-
-            if (!$option.data('original-text')) $option.data('original-text', $option.text());
-            const originalText = $option.data('original-text');
-            
-            if (!eventOptionId) {
-                $option.text(originalText);
-                return;
-            }
-
-            // Calcula o custo total desta opção para TODOS os participantes
-            let totalForOption = 0;
-            participants.forEach(p => {
-                totalForOption += priceCalculator.calculateEventValue({ ...p, eventOption: eventOptionId, stayPeriod: $periodSelect.val() });
-            });
-
-            // Calcula o custo desta opção para o PARTICIPANTE ATUAL
-            const valueForCurrentParticipant = priceCalculator.calculateEventValue({ ...currentParticipant, eventOption: eventOptionId, stayPeriod: $periodSelect.val() });
-
-            $option.text(`${originalText} (Seu custo: ${priceCalculator.formatCurrency(valueForCurrentParticipant)}) - Total: ${priceCalculator.formatCurrency(totalForOption)}`);
-        });
-    });
-}
-
-
-// Event listener unificado para qualquer mudança nos campos de um participante
-$(document).on('change', '.participant-block input, .participant-block select', function() {
-    const $participantBlock = $(this).closest('.participant-block');
-    
-    // 1. Atualiza os dados de TODOS os participantes no array 'participants' para garantir consistência
-    $('.participant-block').each(function() {
-        updateParticipantData($(this));
-    });
-    
-    // 2. Agora, com os dados garantidamente atualizados, recalcula os preços
-    updateDropdownsWithPriceDetails();
-    updateSummary(); // Atualiza o resumo de totais
-});
-
-// =================================================================================
-// FIM DO BLOCO DE CÓDIGO CORRIGIDO
-// =================================================================================
-
-// =================================================================================
-// FIM DO BLOCO DE CÓDIGO CORRIGIDO
-// =================================================================================
