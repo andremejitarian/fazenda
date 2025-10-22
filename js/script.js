@@ -720,6 +720,7 @@ function setupParticipantEventListeners($participant) {
         
         updateResponsibleSections();
         updateBedPreferenceSection();
+        updateChildDiscountInfo($participant);
         
         setTimeout(() => {
             updateAllCalculations();
@@ -2742,5 +2743,44 @@ function updatePaymentMethod() {
             $('#cancellation-policy-section').hide();
             $('#cancellation-policy-section .policy-content').empty();
         }
+    }
+}
+
+// Mostrar/ocultar aviso de desconto para crianças
+function updateChildDiscountInfo($participant) {
+    const birthDate = $participant.find('.dob-input').val();
+    const $childDiscountInfo = $participant.find('.child-discount-info');
+    
+    if (!birthDate) {
+        $childDiscountInfo.hide();
+        return;
+    }
+    
+    const age = priceCalculator.calculateAge(birthDate);
+    
+    // Verificar se é criança (tem desconto em hospedagem OU evento)
+    let hasDiscount = false;
+    
+    // Verificar desconto em hospedagem
+        currentEvent.tipo_formulario === 'hospedagem_apenas') {
+        const lodgingRule = priceCalculator.getAgeRule(age, 'hospedagem');
+        if (lodgingRule.percentual_valor_adulto < 1) {
+            hasDiscount = true;
+        }
+    }
+    
+    // Verificar desconto em evento
+        currentEvent.tipo_formulario === 'evento_apenas')) {
+        const eventRule = priceCalculator.getAgeRule(age, 'evento');
+        if (eventRule.percentual_valor_adulto < 1) {
+            hasDiscount = true;
+        }
+    }
+    
+    // Mostrar ou ocultar o aviso
+    if (hasDiscount) {
+        $childDiscountInfo.show();
+    } else {
+        $childDiscountInfo.hide();
     }
 }
