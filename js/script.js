@@ -713,6 +713,23 @@ function setupParticipantEventListeners($participant) {
         $(this).removeClass('error');
     });
 
+    // NOVO: Listener para controlar visibilidade do texto sobre desconto para crianças
+    $participant.find('.accommodation-select').on('change', function() {
+        const $participant = $(this).closest('.participant-block');
+        const $childDiscountInfo = $participant.find('.child-discount-info');
+        const dob = $participant.find('.dob-input').val();
+        
+        if (dob && $(this).val()) {
+            const age = calculateAge(dob);
+            
+            if (age < 12) { // Ajuste conforme sua regra
+                $childDiscountInfo.show();
+            } else {
+                $childDiscountInfo.hide();
+            }
+        }
+    });
+
     // NOVO: Listener para data de nascimento - controlar visibilidade dos campos
     $participant.find('.dob-input').on('change', function() {
         const birthDate = $(this).val();
