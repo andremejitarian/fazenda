@@ -366,7 +366,6 @@ function setupLodgingOptions($participant) {
     const $stayPeriodInfo = $participant.find('.stay-period-info');
     const $accommodationSelect = $participant.find('.accommodation-select');
     const $accommodationInfo = $participant.find('.accommodation-info');
-    const $childDiscountInfo = $participant.find('.child-discount-info');
     
     // Períodos de estadia
     const periodos = currentEvent.periodos_estadia_opcoes;
@@ -404,16 +403,6 @@ function setupLodgingOptions($participant) {
         const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
         $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
-
-
-        // ✅ ADICIONAR ESTAS LINHAS:
-        // Verificar se há desconto infantil e exibir a informação
-        if (currentEvent.desconto_crianca && currentEvent.desconto_crianca.ativo) {
-            $childDiscountInfo.show();
-        } else {
-            $childDiscountInfo.hide();
-        }
-        
     } else {
         // Múltiplas opções - mostrar dropdown COM VALORES
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
@@ -426,7 +415,6 @@ function setupLodgingOptions($participant) {
         });
         $accommodationSelect.show();
         $accommodationInfo.hide();
-        $childDiscountInfo.hide(); // Ocultar até que uma opção seja selecionada
     }
 }
 
