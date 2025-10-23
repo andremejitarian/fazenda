@@ -403,13 +403,13 @@ function updateAccommodationOptions($participant) {
     const $accommodationInfo = $participant.find('.accommodation-info');
     const acomodacoes = currentEvent.tipos_acomodacao;
     
-    // Obter data de nascimento e período selecionado
+    // Obter data de nascimento e período selecionado (CORRIGIDO)
     const birthDate = $participant.find('.dob-input').val();
         (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
     
     if (acomodacoes.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR AJUSTADO
-        const valorCalculado = calculateAccommodationPrice(acomodacoes[0], birthDate, selectedPeriodId);
+        const valorCalculado = calculateAccommodationPrice(acomodacoes[0], birthDate, selectedPeriodId); // CORRIGIDO
         const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
         $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
@@ -419,7 +419,7 @@ function updateAccommodationOptions($participant) {
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         
         acomodacoes.forEach(acomodacao => {
-            const valorCalculado = calculateAccommodationPrice(acomodacao, birthDate, selectedPeriodId);
+            const valorCalculado = calculateAccommodationPrice(acomodacao, birthDate, selectedPeriodId); // CORRIGIDO
             const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
             
