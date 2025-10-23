@@ -405,7 +405,7 @@ function updateAccommodationOptions($participant) {
     
     // Obter data de nascimento e período selecionado
     const birthDate = $participant.find('.dob-input').val();
-                            (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+        (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
     
     if (acomodacoes.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR AJUSTADO
