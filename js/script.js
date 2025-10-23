@@ -366,10 +366,10 @@ function setupLodgingOptions($participant) {
     const $stayPeriodInfo = $participant.find('.stay-period-info');
     const $accommodationSelect = $participant.find('.accommodation-select');
     const $accommodationInfo = $participant.find('.accommodation-info');
-
+    
     // Períodos de estadia
     const periodos = currentEvent.periodos_estadia_opcoes;
-
+    
     if (periodos.length === 1) {
         // Apenas uma opção - mostrar como texto
         $stayPeriodSelect.hide();
@@ -384,6 +384,7 @@ function setupLodgingOptions($participant) {
         $stayPeriodSelect.show();
         $stayPeriodInfo.hide();
 
+        // Se já houver um período selecionado (por markup, estado salvo, etc.), inicializa as datas:
         const selectedPeriodId = $stayPeriodSelect.val();
         if (selectedPeriodId) {
             const periodoInicial = periodos.find(p => String(p.id) === String(selectedPeriodId));
@@ -392,67 +393,29 @@ function setupLodgingOptions($participant) {
             }
         }
     }
-
-    // NOVA FUNÇÃO: Atualizar opções de acomodação com valores dinâmicos
-    updateAccommodationOptions($participant);
-}
-
-// NOVA FUNÇÃO: Atualizar opções de acomodação considerando idade
-function updateAccommodationOptions($participant) {
-    const $accommodationSelect = $participant.find('.accommodation-select');
-    const $accommodationInfo = $participant.find('.accommodation-info');
+    
+    // Tipos de acomodação
     const acomodacoes = currentEvent.tipos_acomodacao;
     
-    // Obter data de nascimento e período selecionado (CORRIGIDO)
-    const birthDate = $participant.find('.dob-input').val();
-        (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
-    
     if (acomodacoes.length === 1) {
-        // Apenas uma opção - mostrar como texto COM VALOR AJUSTADO
-        const valorCalculado = calculateAccommodationPrice(acomodacoes[0], birthDate, selectedPeriodId); // CORRIGIDO
-        const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
+        // Apenas uma opção - mostrar como texto COM VALOR
+        const valorDiaria = acomodacoes[0].valor_diaria_por_pessoa;
+        const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
         $accommodationSelect.hide();
         $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
     } else {
-        // Múltiplas opções - mostrar dropdown COM VALORES AJUSTADOS
-        const currentValue = $accommodationSelect.val(); // Salvar seleção atual
+        // Múltiplas opções - mostrar dropdown COM VALORES
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
-        
         acomodacoes.forEach(acomodacao => {
-            const valorCalculado = calculateAccommodationPrice(acomodacao, birthDate, selectedPeriodId); // CORRIGIDO
-            const valorFormatado = `R$ ${valorCalculado.toFixed(2).replace('.', ',')}`;
+            const valorDiaria = acomodacao.valor_diaria_por_pessoa;
+            const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
             
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
-        
-        // Restaurar seleção anterior se existir
-        if (currentValue) {
-            $accommodationSelect.val(currentValue);
-        }
-        
         $accommodationSelect.show();
         $accommodationInfo.hide();
     }
-}
-
-// NOVA FUNÇÃO: Calcular preço da acomodação considerando idade
-function calculateAccommodationPrice(acomodacao, birthDate, periodId) {
-    const valorBase = acomodacao.valor_diaria_por_pessoa;
-    
-    // Se não houver data de nascimento, retornar valor base
-    if (!birthDate) {
-        return valorBase;
-    }
-    
-    // Calcular idade
-    const age = priceCalculator.calculateAge(birthDate);
-    
-    // Obter regra de idade
-    const ageRule = priceCalculator.getAgeRule(age, 'hospedagem');
-    
-    // Aplicar percentual
-    return valorBase * ageRule.percentual_valor_adulto;
 }
 
 // Configurar opções de evento
@@ -750,37 +713,6 @@ function setupParticipantEventListeners($participant) {
         $(this).removeClass('error');
     });
 
-// Atualizar valores quando data de nascimento mudar
-$participant.find('.dob-input').on('change', function() {
-    const $participant = $(this).closest('.participant-block');
-    const dob = $(this).val();
-    
-    if (dob) {
-        const age = priceCalculator.calculateAge(dob);
-        const $childDiscountInfo = $participant.find('.child-discount-info');
-        
-        // Verificar se é criança (ajuste conforme sua regra)
-        if (age < 12) {
-            $childDiscountInfo.show();
-        } else {
-            $childDiscountInfo.hide();
-        }
-        
-        // NOVO: Atualizar opções de acomodação com valores ajustados
-        updateAccommodationOptions($participant);
-        
-        // NOVO: Atualizar opções de evento com valores ajustados (se aplicável)
-            currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-            updateEventOptions($participant);
-        }
-        
-        // Recalcular preços
-        updateParticipantPrice($participant);
-    }
-});
-
-
-    
     // NOVO: Listener para controlar visibilidade do texto sobre desconto para crianças
     $participant.find('.accommodation-select').on('change', function() {
         const $participant = $(this).closest('.participant-block');
@@ -857,7 +789,6 @@ $participant.find('.dob-input').on('change', function() {
 
         updateEventOptionsForPeriod($participant);
         updateAllCalculations();
-        updateAccommodationOptions($participant);
     });
     
     // Responsável pelo pagamento
