@@ -2784,3 +2784,163 @@ function updateChildDiscountInfo($participant) {
         $childDiscountInfo.hide();
     }
 }
+
+// ========================================
+// EVENTOS DE ATUALIZAÇÃO DE VALORES POR IDADE
+// ========================================
+
+// Evento de mudança da data de nascimento
+$(document).on('change', '.dob-input', function() {
+    console.log('📅 Data de nascimento alterada - atualizando valores');
+    
+    const $participant = $(this).closest('.participant-block');
+    
+    // Verificar se currentEvent está carregado
+    if (!currentEvent) {
+        console.warn('⚠️ Evento ainda não carregado');
+        return;
+    }
+    
+    // Atualizar valores de acomodação e evento baseados na idade
+        currentEvent.tipo_formulario === 'hospedagem_apenas') {
+        updateAccommodationValuesForAge($participant);
+    }
+    
+        currentEvent.tipo_formulario === 'evento_apenas') {
+        updateEventValuesForAge($participant);
+    }
+    
+    // Atualizar aviso de desconto para crianças
+    updateChildDiscountInfo($participant);
+    
+    // Recalcular preços
+    updateParticipantPrice($participant);
+});
+
+// Evento de mudança do período de estadia
+$(document).on('change', '.stay-period-select', function() {
+    console.log('🔄 Período de estadia alterado');
+    
+    const $participant = $(this).closest('.participant-block');
+    const selectedPeriodId = $(this).val();
+    
+    // Verificar se currentEvent está carregado
+    if (!currentEvent) {
+        console.warn('⚠️ Evento ainda não carregado');
+        return;
+    }
+    
+    if (selectedPeriodId) {
+        const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+        if (periodo) {
+            updateCheckInOutInfo($participant, periodo);
+        }
+    }
+    
+    // Atualizar opções de evento quando período mudar
+    if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+        console.log('🎯 Atualizando opções de evento para o período selecionado');
+        updateEventOptionsForPeriod($participant);
+        
+        // Se já tem data de nascimento, atualizar valores por idade
+        const birthDate = $participant.find('.dob-input').val();
+        if (birthDate) {
+            updateEventValuesForAge($participant);
+        }
+    }
+    
+    // Recalcular preços
+    updateParticipantPrice($participant);
+});
+
+// Atualizar valores de acomodação com base na idade
+function updateAccommodationValuesForAge($participant) {
+    const birthDate = $participant.find('.dob-input').val();
+    if (!birthDate) return;
+    
+    const age = priceCalculator.calculateAge(birthDate);
+    const $accommodationSelect = $participant.find('.accommodation-select');
+    
+    if ($accommodationSelect.is(':hidden')) return;
+    
+    const selectedValue = $accommodationSelect.val();
+    
+    $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
+    
+    currentEvent.tipos_acomodacao.forEach(acomodacao => {
+        const valorBaseDiaria = acomodacao.valor_diaria_por_pessoa;
+        const ageRule = priceCalculator.getAgeRule(age, 'hospedagem');
+        const valorAjustado = valorBaseDiaria * ageRule.percentual_valor_adulto;
+        const valorFormatado = `R$ ${valorAjustado.toFixed(2).replace('.', ',')}`;
+        
+        let optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
+        
+        if (ageRule.percentual_valor_adulto === 0) {
+            optionLabel += ' (GRATUITO)';
+        } else if (ageRule.percentual_valor_adulto < 1) {
+            const desconto = Math.round((1 - ageRule.percentual_valor_adulto) * 100);
+            optionLabel += ` (${desconto}% desc.)`;
+        }
+        
+        $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
+    });
+    
+    if (selectedValue) {
+        $accommodationSelect.val(selectedValue);
+    }
+}
+
+// Atualizar valores de evento com base na idade
+function updateEventValuesForAge($participant) {
+    const birthDate = $participant.find('.dob-input').val();
+    if (!birthDate) return;
+    
+    const age = priceCalculator.calculateAge(birthDate);
+    const $eventSelect = $participant.find('.event-option-select');
+    
+    if ($eventSelect.is(':hidden')) return;
+    
+    const selectedValue = $eventSelect.val();
+    
+    let eventOptions = [];
+    
+    if (currentEvent.tipo_formulario === 'evento_apenas') {
+        eventOptions = currentEvent.valores_evento_opcoes;
+    } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
+        const selectedPeriodId = $participant.find('.stay-period-select').val();
+        if (selectedPeriodId) {
+            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+            if (periodo && periodo.valores_evento_opcoes) {
+                eventOptions = periodo.valores_evento_opcoes;
+            }
+        }
+    }
+    
+    if (eventOptions.length === 0) return;
+    
+    $eventSelect.empty().append('<option value="">Selecione a participação</option>');
+    
+    eventOptions.forEach(opcao => {
+        const valorBase = opcao.valor;
+        const ageRule = priceCalculator.getAgeRule(age, 'evento');
+        const valorAjustado = valorBase * ageRule.percentual_valor_adulto;
+        const valorFormatado = `R$ ${valorAjustado.toFixed(2).replace('.', ',')}`;
+        
+        let optionLabel = `${opcao.label} - ${valorFormatado}`;
+        
+        if (ageRule.percentual_valor_adulto === 0) {
+            optionLabel += ' (GRATUITO)';
+        } else if (ageRule.percentual_valor_adulto < 1) {
+            const desconto = Math.round((1 - ageRule.percentual_valor_adulto) * 100);
+            optionLabel += ` (${desconto}% desc.)`;
+        }
+        
+        $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
+    });
+    
+    if (selectedValue) {
+        $eventSelect.val(selectedValue);
+    }
+}
+
+console.log('Script principal carregado com integração completa');
