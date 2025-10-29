@@ -63,6 +63,12 @@ function initializeForm() {
     
     // Inicializar integração com webhooks (SEM testes)
     initializeWebhookIntegration();
+
+    // NOVO: Inicializar validador de CEP
+    initializeCEPValidator();
+    
+    // NOVO: Inicializar gerenciador de endereço
+    initializeAddressManager();
     
     // Carregar dados do evento APENAS do JSON local
     console.log(`📂 Carregando evento: ${eventoId}`);
@@ -832,6 +838,12 @@ function setupParticipantEventListeners($participant) {
             attributeFilter: ['value']
         });
     }
+    
+    // NOVO: Configurar campos de endereço
+    if (addressManager) {
+        addressManager.setupAddressFields($participant);
+    }
+    
 }
 
 // NOVA FUNÇÃO: Controlar visibilidade dos campos baseado na idade
@@ -1289,6 +1301,22 @@ function validateParticipantsStep() {
             }
         }
     });
+
+    // NOVO: Validar endereço do responsável pelo pagamento
+    const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
+    let $payerParticipant = $responsiblePayer.length > 0 ? $responsiblePayer : $('#participants-container .participant-block').first();
+    
+    if ($payerParticipant.length > 0 && addressManager) {
+        const addressValidation = addressManager.validateAddressFields($payerParticipant);
+        
+        if (!addressValidation.isValid) {
+            isValid = false;
+            if (!firstErrorField) {
+                firstErrorField = addressValidation.firstErrorField;
+            }
+        }
+    }
+
     
     // Validar responsável pelo pagamento se múltiplos participantes
     if (participants.length > 1) {
@@ -1521,6 +1549,40 @@ function updateResponsibleChildSection() {
 function updateResponsibleSections() {
     updateResponsiblePayerSection();
     updateResponsibleChildSection();
+    updateAddressSection();
+}
+
+// NOVA FUNÇÃO: Atualizar visibilidade da seção de endereço
+function updateAddressSection() {
+    // Ocultar todas as seções de endereço primeiro
+    $('.address-section').hide();
+    $('.address-section .form-control').removeAttr('required');
+    
+    // Encontrar o responsável pelo pagamento
+    const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
+    
+    if ($responsiblePayer.length > 0) {
+        // Mostrar seção de endereço para o responsável
+        const $addressSection = $responsiblePayer.find('.address-section');
+        $addressSection.show();
+        
+        // Tornar campos obrigatórios (exceto complemento)
+        $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
+            .attr('required', true);
+        
+        console.log('📍 Seção de endereço habilitada para o responsável pelo pagamento');
+    } else if (participants.length === 1) {
+        // Se há apenas um participante, ele é o responsável
+        const $singleParticipant = $('#participants-container .participant-block').first();
+        const $addressSection = $singleParticipant.find('.address-section');
+        $addressSection.show();
+        
+        // Tornar campos obrigatórios
+        $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
+            .attr('required', true);
+        
+        console.log('📍 Seção de endereço habilitada para o único participante');
+    }
 }
 
 
@@ -1569,6 +1631,16 @@ function generateParticipantsSummary() {
                 </div>
             </div>
         `;
+    }
+
+    // NOVO: Adicionar endereço do responsável
+    if (addressManager && $responsiblePayer.length > 0) {
+            const addressData = addressManager.extractAddressData($responsiblePayer);
+            
+    // Verificar se há dados de endereço preenchidos
+    if (addressData.cep && addressData.logradouro) {
+                summaryHtml += addressManager.generateAddressSummaryHTML(addressData);
+            }
     }
 
     // Seção do responsável pela criança
@@ -1965,6 +2037,35 @@ function prepareFormData(inscricaoId) {
     
     // Identificar responsável pelo pagamento
     const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
+
+    // NOVO: Extrair dados de endereço do responsável
+    const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
+    const $payerElement = $responsiblePayerElement.length > 0 ? $responsiblePayerElement : $('#participants-container .participant-block').first();
+    
+    let addressData = null;
+    if (addressManager && $payerElement.length > 0) {
+        addressData = addressManager.extractAddressData($payerElement);
+    }
+    
+    // Preparar objeto do responsável com endereço
+    const responsavelCompleto = {
+        nome: responsiblePayer.fullName,
+        cpf: responsiblePayer.cpf,
+        email: responsiblePayer.email,
+        telefone: responsiblePayer.phone
+    };
+    
+    // NOVO: Adicionar endereço se disponível
+    if (addressData && addressData.cep) {
+        responsavelCompleto.endereco = {
+            cep: addressData.cep,
+            logradouro: addressData.logradouro,
+            numero: addressData.numero,
+            bairro: addressData.bairro,
+            cidade: addressData.cidade,
+            estado: addressData.estado
+        };
+    }
     
     // Preparar dados da forma de pagamento com descrição
     const formaPagamentoCompleta = {
@@ -2001,12 +2102,7 @@ function prepareFormData(inscricaoId) {
     return {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
-        responsavel: {
-            nome: responsiblePayer.fullName,
-            cpf: responsiblePayer.cpf,
-            email: responsiblePayer.email,
-            telefone: responsiblePayer.phone
-        },
+        responsavel: responsavelCompleto, // ATUALIZADO
         participantes: participantsData,
         totais: {
             subtotalHospedagem: summary.lodgingSubtotal,
