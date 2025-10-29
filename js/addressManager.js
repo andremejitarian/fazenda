@@ -14,37 +14,38 @@ class AddressManager {
             return;
         }
 
-        // Event listener para o campo CEP
+        // Campo CEP
         const $cepInput = $participant.find('.cep-input');
         
-        // Aplicar máscara
-        $cepInput.mask('00000-000');
+        // Aplicar máscara (protege caso o plugin não esteja disponível)
+        if (typeof $cepInput.mask === 'function') {
+            $cepInput.mask('00000-000');
+        }
+
+        // Função auxiliar para tentar buscar
+        const trySearch = async () => {
+            if (cepDigits.length === 8) {
+                await this.searchAndFillAddress($participant, cepDigits);
+            } else {
+                this.showError($participant, 'Informe um CEP válido com 8 dígitos.');
+                this.enableManualInput($participant);
+            }
+        };
 
         // Buscar ao sair do campo (blur)
-        $cepInput.on('blur', async () => {
-            const cep = $cepInput.val();
-            if (cep && cep.replace(/\D/g, '').length === 8) {
-                await this.searchAndFillAddress($participant, cep);
-            }
-        });
+        $cepInput.on('blur', trySearch);
 
-        // Buscar ao pressionar Enter
-        $cepInput.on('keypress', async (e) => {
-            if (e.which === 13) { // Enter
+        // Buscar ao pressionar Enter (keydown, não keypress)
+        $cepInput.on('keydown', async (e) => {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                const cep = $cepInput.val();
-                if (cep && cep.replace(/\D/g, '').length === 8) {
-                    await this.searchAndFillAddress($participant, cep);
-                }
+                await trySearch();
             }
         });
 
-        // Event listener para o botão de busca (se existir)
+        // Botão de busca (se existir)
         const $searchBtn = $participant.find('.btn-search-cep');
-        $searchBtn.on('click', async () => {
-            const cep = $cepInput.val();
-            await this.searchAndFillAddress($participant, cep);
-        });
+        $searchBtn.on('click', trySearch);
 
         console.log('✅ Campos de endereço configurados');
     }
@@ -56,17 +57,23 @@ class AddressManager {
             return;
         }
 
+        // Normaliza e valida o CEP
+        if (cepDigits.length !== 8) {
+            this.showError($participant, 'Informe um CEP válido com 8 dígitos.');
+            this.enableManualInput($participant);
+            return;
+        }
+
         this.isSearching = true;
 
-        // Mostrar loading
+        // Mostrar loading (e limpar estados anteriores)
         this.showLoading($participant);
 
         try {
-            // Buscar CEP usando o módulo cepValidation
-            const resultado = await buscarCEP(cep);
+            // Buscar CEP usando o módulo cepValidation (deve existir no escopo)
+            const resultado = await buscarCEP(cepDigits);
 
             if (resultado.erro) {
-                this.showError($participant, resultado.mensagem);
                 
                 // Se permitir manual, habilitar campos
                 if (resultado.permitirManual) {
@@ -75,7 +82,6 @@ class AddressManager {
             } else {
                 // Preencher campos com os dados
                 this.fillAddressFields($participant, resultado);
-                this.showSuccess($participant, `Endereço encontrado via ${resultado.fonte}`);
                 this.currentAddress = resultado;
             }
         } catch (error) {
@@ -90,11 +96,11 @@ class AddressManager {
 
     // Preencher campos de endereço
     fillAddressFields($participant, dados) {
-        $participant.find('.cep-input').val(dados.cep);
-        $participant.find('.logradouro-input').val(dados.logradouro);
-        $participant.find('.bairro-input').val(dados.bairro);
-        $participant.find('.cidade-input').val(dados.cidade);
-        $participant.find('.estado-select').val(dados.estado);
+        
+        const $estado = $participant.find('.estado-select');
+        if (typeof $estado.trigger === 'function') {
+            $estado.trigger('change');
+        }
 
         // Focar no campo número
         $participant.find('.numero-input').focus();
@@ -119,12 +125,14 @@ class AddressManager {
     // Mostrar loading
     showLoading($participant) {
         const $feedback = $participant.find('.cep-feedback');
-        $feedback.html('<span class="calculating-indicator"></span> Buscando CEP...')
+        $feedback
+            .stop(true, true)
+            .html('<span class="calculating-indicator"></span> Buscando CEP...')
             .removeClass('error-message success-message')
             .addClass('loading-message')
             .show();
 
-        $participant.find('.cep-input').prop('disabled', true);
+        $participant.find('.cep-input').removeClass('error success').prop('disabled', true);
     }
 
     // Ocultar loading
@@ -135,18 +143,16 @@ class AddressManager {
     // Mostrar erro
     showError($participant, mensagem) {
         const $feedback = $participant.find('.cep-feedback');
-        $feedback.text(mensagem)
             .removeClass('success-message loading-message')
             .addClass('error-message')
             .show();
 
-        $participant.find('.cep-input').addClass('error');
+        $participant.find('.cep-input').removeClass('success').addClass('error');
     }
 
     // Mostrar sucesso
     showSuccess($participant, mensagem) {
         const $feedback = $participant.find('.cep-feedback');
-        $feedback.text(mensagem)
             .removeClass('error-message loading-message')
             .addClass('success-message')
             .show();
@@ -160,35 +166,35 @@ class AddressManager {
     }
 
     // Validar campos de endereço
-validateAddressFields($participant) {
-    const requiredFields = [
-        { selector: '.cep-input', name: 'CEP' },
-        { selector: '.logradouro-input', name: 'Logradouro' },
-        { selector: '.numero-input', name: 'Número' },
-        { selector: '.bairro-input', name: 'Bairro' },
-        { selector: '.cidade-input', name: 'Cidade' },
-        { selector: '.estado-select', name: 'Estado' }
-    ];
+    validateAddressFields($participant) {
+        const requiredFields = [
+            { selector: '.cep-input', name: 'CEP' },
+            { selector: '.logradouro-input', name: 'Logradouro' },
+            { selector: '.numero-input', name: 'Número' },
+            { selector: '.bairro-input', name: 'Bairro' },
+            { selector: '.cidade-input', name: 'Cidade' },
+            { selector: '.estado-select', name: 'Estado' }
+        ];
 
-    let isValid = true;
-    let firstErrorField = null;
+        let isValid = true;
+        let firstErrorField = null;
 
-    requiredFields.forEach(field => {
-        const $field = $participant.find(field.selector);
+        requiredFields.forEach(field => {
+            const $field = $participant.find(field.selector);
 
-        if (!value) {
-            $field.addClass('error');
-            if (!firstErrorField) {
-                firstErrorField = $field;
+            if (!value) {
+                $field.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $field;
+                }
+                isValid = false;
+            } else {
+                $field.removeClass('error');
             }
-            isValid = false;
-        } else {
-            $field.removeClass('error');
-        }
-    });
+        });
 
-    return { isValid, firstErrorField };
-}
+        return { isValid, firstErrorField };
+    }
 
     // Extrair dados do endereço
     extractAddressData($participant) {
@@ -201,11 +207,7 @@ validateAddressFields($participant) {
         return `
             <div class="address-summary">
                 <h4>Endereço para Nota Fiscal</h4>
-                <p><strong>CEP:</strong> ${addressData.cep}</p>
-                <p><strong>Endereço:</strong> ${addressData.logradouro}, ${addressData.numero}</p>
                 ${addressData.complemento ? `<p><strong>Complemento:</strong> ${addressData.complemento}</p>` : ''}
-                <p><strong>Bairro:</strong> ${addressData.bairro}</p>
-                <p><strong>Cidade:</strong> ${addressData.cidade} - ${addressData.estado}</p>
             </div>
         `;
     }
