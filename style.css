@@ -1916,3 +1916,176 @@ html {
         max-width: 100% !important;
     }
 }
+
+/* ========================================
+   SEÇÃO DE ENDEREÇO
+   ======================================== */
+
+/* Container do CEP com botão de busca */
+.cep-input-container {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.cep-input-container .cep-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.btn-search-cep {
+    flex: 0 0 48px;
+    min-width: 48px;
+    padding: 12px 8px;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--border-color);
+    background: var(--background-color);
+    color: var(--color-dark-gray);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-search-cep:hover {
+    border-color: var(--color-dark-gray);
+    background: var(--color-dark-gray);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-search-cep:active {
+    transform: translateY(0);
+}
+
+.btn-search-cep:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Feedback do CEP */
+.cep-feedback {
+    font-size: 0.9em;
+    margin-top: 5px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cep-feedback.loading-message {
+    color: var(--warning-color);
+}
+
+.cep-feedback.error-message {
+    color: var(--error-color);
+}
+
+.cep-feedback.success-message {
+    color: var(--success-color);
+}
+
+/* Campos preenchidos automaticamente */
+.form-control.auto-filled {
+    background: linear-gradient(90deg, #fff 0%, #f0fff4 100%);
+    border-color: var(--success-color);
+    cursor: not-allowed;
+}
+
+.form-control.auto-filled:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* Seção de endereço no resumo */
+.address-summary {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.address-summary h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.address-summary p {
+    margin: 8px 0;
+    font-size: 0.95em;
+    color: var(--text-primary);
+    text-align: left;
+    
+    /* Alinhamento título/valor */
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 6px;
+    align-items: baseline;
+    justify-items: start;
+}
+
+.address-summary strong {
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .cep-input-container {
+        gap: 6px;
+    }
+    
+    .btn-search-cep {
+        flex: 0 0 44px;
+        min-width: 44px;
+        font-size: 1.1em;
+    }
+    
+    .address-summary {
+        padding: 15px;
+    }
+    
+    .address-summary p {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+    
+    .address-summary strong {
+        display: block;
+        margin-bottom: 2px;
+    }
+}
+
+/* Estados de validação para campos de endereço */
+.address-section .form-control.error {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.address-section .form-control.success {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* Animação para campos preenchidos automaticamente */
+@keyframes autoFillPulse {
+    0%, 100% {
+        background: linear-gradient(90deg, #fff 0%, #f0fff4 100%);
+    }
+    50% {
+        background: linear-gradient(90deg, #fff 0%, #e8f5e9 100%);
+    }
+}
+
+.form-control.auto-filled.just-filled {
+    animation: autoFillPulse 1s ease-in-out;
+}
