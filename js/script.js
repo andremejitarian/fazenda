@@ -65,7 +65,7 @@ function initializeForm() {
     initializeWebhookIntegration();
 
     // NOVO: Inicializar validador de CEP
-    // initializeCEPValidator();
+    initializeCEPValidator();
     
     // NOVO: Inicializar gerenciador de endereço
     initializeAddressManager();
