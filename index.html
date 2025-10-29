@@ -247,6 +247,88 @@
                     </div>
                 </div>
 
+                <!-- NOVA SEÇÃO: Endereço (visível apenas para responsável pelo pagamento) -->
+                <div class="address-section" style="display: none;">
+                    <div class="section-divider">
+                        <h4>📍 ENDEREÇO PARA NOTA FISCAL</h4>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CEP:</label>
+                            <div class="cep-input-container">
+                                <input type="text" class="form-control cep-input" placeholder="00000-000">
+                                <button type="button" class="btn btn-secondary btn-search-cep" title="Buscar CEP">
+                                    🔍
+                                </button>
+                            </div>
+                            <p class="feedback-message cep-feedback" style="display: none;"></p>
+                        </div>
+                        <div class="form-group">
+                            <label>Número:</label>
+                            <input type="text" class="form-control numero-input" placeholder="123">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Logradouro:</label>
+                            <input type="text" class="form-control logradouro-input" placeholder="Rua, Avenida, etc.">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Complemento (opcional):</label>
+                            <input type="text" class="form-control complemento-input" placeholder="Apto, Bloco, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Bairro:</label>
+                            <input type="text" class="form-control bairro-input" placeholder="Nome do bairro">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cidade:</label>
+                            <input type="text" class="form-control cidade-input" placeholder="Nome da cidade">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado:</label>
+                            <select class="form-control estado-select">
+                                <option value="">Selecione o estado</option>
+                                <option value="AC">Acre</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="BA">Bahia</option>
+                                <option value="CE">Ceará</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="GO">Goiás</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="PA">Pará</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="PR">Paraná</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PI">Piauí</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="RR">Roraima</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="TO">Tocantins</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Seção de Hospedagem -->
                 <div class="lodging-section" style="display: none;">
                     <div class="section-divider">
