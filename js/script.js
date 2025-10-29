@@ -65,10 +65,10 @@ function initializeForm() {
     initializeWebhookIntegration();
 
     // NOVO: Inicializar validador de CEP
-    initializeCEPValidator();
+    // initializeCEPValidator();
     
     // NOVO: Inicializar gerenciador de endereço
-    initializeAddressManager();
+    // initializeAddressManager();
     
     // Carregar dados do evento APENAS do JSON local
     console.log(`📂 Carregando evento: ${eventoId}`);
