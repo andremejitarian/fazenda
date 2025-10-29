@@ -74,27 +74,27 @@ class CEPValidator {
     // Buscar via ViaCEP
     async buscarViaCEP(cepLimpo) {
         const url = this.endpoints.viaCEP.replace('{cep}', cepLimpo);
-
+    
         const response = await Promise.race([
             fetch(url),
             new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Timeout ViaCEP')), this.timeout)
             )
         ]);
-
+    
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
-
+    
         const data = await response.json();
-
+    
         if (data.erro) {
             return {
                 erro: true,
                 mensagem: 'CEP não encontrado'
             };
         }
-
+    
         return {
             erro: false,
             cep: this.formatCEP(cepLimpo),
@@ -105,26 +105,27 @@ class CEPValidator {
     // Buscar via BrasilAPI
     async buscarBrasilAPI(cepLimpo) {
         const url = this.endpoints.brasilAPI.replace('{cep}', cepLimpo);
-
+    
         const response = await Promise.race([
             fetch(url),
             new Promise((_, reject) =>
                 setTimeout(() => reject(new Error('Timeout BrasilAPI')), this.timeout)
             )
         ]);
-
+    
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
-
+    
         const data = await response.json();
-
+    
         return {
             erro: false,
             cep: this.formatCEP(cepLimpo),
             fonte: 'BrasilAPI'
         };
     }
+    
 }
 
 // Instância global
