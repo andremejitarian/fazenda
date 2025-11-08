@@ -160,35 +160,36 @@ class AddressManager {
     }
 
     // Validar campos de endereço
-validateAddressFields($participant) {
-    const requiredFields = [
-        { selector: '.cep-input', name: 'CEP' },
-        { selector: '.logradouro-input', name: 'Logradouro' },
-        { selector: '.numero-input', name: 'Número' },
-        { selector: '.bairro-input', name: 'Bairro' },
-        { selector: '.cidade-input', name: 'Cidade' },
-        { selector: '.estado-select', name: 'Estado' }
-    ];
+    validateAddressFields($participant) {
+        const requiredFields = [
+            { selector: '.cep-input', name: 'CEP' },
+            { selector: '.logradouro-input', name: 'Logradouro' },
+            { selector: '.numero-input', name: 'Número' },
+            { selector: '.bairro-input', name: 'Bairro' },
+            { selector: '.cidade-input', name: 'Cidade' },
+            { selector: '.estado-select', name: 'Estado' }
+        ];
 
-    let isValid = true;
-    let firstErrorField = null;
+        let isValid = true;
+        let firstErrorField = null;
 
-    requiredFields.forEach(field => {
-        const $field = $participant.find(field.selector);
+        requiredFields.forEach(field => {
+            const $field = $participant.find(field.selector);
+            const value = $field.val()?.trim(); // ✅ Variável 'value' agora declarada
 
-        if (!value) {
-            $field.addClass('error');
-            if (!firstErrorField) {
-                firstErrorField = $field;
+            if (!value) {
+                $field.addClass('error');
+                if (!firstErrorField) {
+                    firstErrorField = $field;
+                }
+                isValid = false;
+            } else {
+                $field.removeClass('error');
             }
-            isValid = false;
-        } else {
-            $field.removeClass('error');
-        }
-    });
+        });
 
-    return { isValid, firstErrorField };
-}
+        return { isValid, firstErrorField };
+    }
 
     // Extrair dados do endereço
     extractAddressData($participant) {
