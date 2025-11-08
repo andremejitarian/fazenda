@@ -95,6 +95,7 @@ class CEPValidator {
             };
         }
     
+        // ✅ Retornar todos os campos necessários
         return {
             erro: false,
             cep: this.formatCEP(cepLimpo),
@@ -119,13 +120,14 @@ class CEPValidator {
     
         const data = await response.json();
     
+        // ✅ Retornar todos os campos necessários (mapeamento BrasilAPI)
         return {
             erro: false,
             cep: this.formatCEP(cepLimpo),
+            complemento: '',
             fonte: 'BrasilAPI'
         };
     }
-    
 }
 
 // Instância global
