@@ -2535,31 +2535,31 @@ function updateParticipantInCalculator(participantId, participantData) {
     }
 }
 
-// Atualizar cálculos de um participante específico
+// **FUNÇÃO CORRIGIDA**: Atualizar cálculos de um participante específico
 function updateParticipantCalculations($participant) {
     if (!window.priceCalculator) return;
 
     const participantData = extractParticipantData($participant);
     const participantId = $participant.attr('data-participant-id');
     
-    // **CORREÇÃO**: Garantir que o participantData tenha o ID
+    // Garantir que o participantData tenha o ID
     participantData.id = participantId;
-    
-    // **IMPORTANTE**: Atualizar TODOS os participantes no calculador antes de calcular valores
-    updateAllParticipantsInCalculator();
+
+    // Atualizar apenas este participante no calculador
+    updateParticipantInCalculator(participantId, participantData);
     
     // Calcular valores individuais usando os dados atualizados
     const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
     const eventValue = window.priceCalculator.calculateEventValue(participantData);
     
-    // **CORREÇÃO**: Calcular idade aqui para o debug
+    // Calcular idade para o debug
     const age = window.priceCalculator.calculateAge(participantData.birthDate);
     
-    // **CORREÇÃO**: Atualizar display dos valores com informações adicionais
+    // Atualizar display dos valores com informações adicionais
     updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
     
-    console.log(`🔍 DEBUG - Participante ${participantId}:`, {
-        idade: age, // ✅ CORRIGIDO: agora 'age' está definida
+    console.log(`Cálculos atualizados para participante ${participantId}:`, {
+        idade: age,
         posicaoNoArray: window.priceCalculator.participants.findIndex(p => p.id === participantId),
         totalParticipantes: window.priceCalculator.participants.length,
         elegiveisGratuidade: window.priceCalculator.getEligibleFreeParticipants('hospedagem').length,
@@ -2573,7 +2573,7 @@ function updateParticipantCalculations($participant) {
     }
 }
 
-// **NOVA FUNÇÃO**: Atualizar todos os participantes no calculador
+// **FUNÇÃO CORRIGIDA**: Atualizar todos os participantes no calculador
 function updateAllParticipantsInCalculator() {
     if (!window.priceCalculator) return;
 
@@ -2583,17 +2583,57 @@ function updateAllParticipantsInCalculator() {
     // Adicionar todos os participantes na ordem correta
     $('#participants-container .participant-block').each(function() {
         const $participant = $(this);
-        const participantData = extractParticipantData($participant);
         const participantId = $participant.attr('data-participant-id');
         
-        // Garantir que o participantData tenha o ID
+        // ✅ CORREÇÃO: Removida verificação redundante
+        const participantData = extractParticipantData($participant);
         participantData.id = participantId;
-        
-        // Adicionar ao calculador
         window.priceCalculator.participants.push(participantData);
     });
     
-    console.log('Todos os participantes atualizados no calculador:', window.priceCalculator.participants);
+    console.log('Todos os participantes atualizados no calculador:', window.priceCalculator.participants.length);
+}
+
+// **NOVA FUNÇÃO OTIMIZADA**: Atualizar todos os cálculos sem loop
+function updateAllCalculations() {
+    if (!window.priceCalculator) return;
+
+    // ✅ CORREÇÃO: Usar flag para evitar chamadas recursivas
+    if (window.isUpdatingCalculations) return;
+    window.isUpdatingCalculations = true;
+
+    try {
+        // Primeiro atualizar todos os participantes no calculador
+        updateAllParticipantsInCalculator();
+        
+        // Depois atualizar displays individuais
+        $('#participants-container .participant-block').each(function() {
+            const $participant = $(this);
+            const participantId = $participant.attr('data-participant-id');
+            
+            // Buscar dados do participante já no calculador
+            const participantData = window.priceCalculator.participants.find(p => p.id === participantId);
+            
+            if (participantData) {
+                // Calcular valores individuais
+                const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
+                const eventValue = window.priceCalculator.calculateEventValue(participantData);
+                
+                // Atualizar display
+                updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
+            }
+        });
+        
+        // Atualizar totais se estivermos na tela de resumo
+        if (currentStep === 3) {
+            updateSummaryTotals();
+        }
+    } finally {
+        // Liberar flag após 100ms para permitir novas atualizações
+        setTimeout(() => {
+            window.isUpdatingCalculations = false;
+        }, 100);
+    }
 }
 
 // **NOVA FUNÇÃO**: Atualizar display de valores do participante
@@ -2646,39 +2686,6 @@ function updateParticipantValueDisplay($participant, lodgingValue, eventValue, p
     } else {
         console.warn(`⚠️ Elemento .event-value não encontrado para participante ${participantId}`);
     }
-}
-
-// Atualizar todos os cálculos
-function updateAllCalculations() {
-    if (!window.priceCalculator) return;
-
-    // **CORREÇÃO**: Primeiro atualizar todos os participantes no calculador
-    updateAllParticipantsInCalculator();
-    
-    // **AGUARDAR** um tick para garantir que os dados estão sincronizados
-    setTimeout(() => {
-        // Depois atualizar displays individuais
-        $('#participants-container .participant-block').each(function() {
-            const $participant = $(this);
-            const participantData = extractParticipantData($participant);
-            const participantId = $participant.attr('data-participant-id');
-            
-            // Garantir que o participantData tenha o ID
-            participantData.id = participantId;
-            
-            // Calcular valores individuais
-            const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
-            const eventValue = window.priceCalculator.calculateEventValue(participantData);
-            
-            // Atualizar display
-            updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
-        });
-        
-        // Atualizar totais se estivermos na tela de resumo
-        if (currentStep === 3) {
-            updateSummaryTotals();
-        }
-    }, 0);
 }
 
 // Atualizar totais na tela de resumo
