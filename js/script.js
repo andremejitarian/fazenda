@@ -2883,61 +2883,6 @@ function validateCoupon() {
 
 console.log('Script principal carregado com integração completa');
 
-// Atualizar cálculos de um participante específico
-function updateParticipantCalculations($participant) {
-    if (!window.priceCalculator) return;
-
-    const participantData = extractParticipantData($participant);
-    const participantId = $participant.attr('data-participant-id');
-    
-    // Atualizar dados do participante no calculador
-    updateParticipantInCalculator(participantId, participantData);
-    
-    // Calcular valores individuais
-    const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
-    const eventValue = window.priceCalculator.calculateEventValue(participantData);
-    
-    // Atualizar display dos valores
-    $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
-    $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
-    
-    // Atualizar totais gerais se estivermos na tela de resumo
-    if (currentStep === 3) {
-        updateSummaryTotals();
-    }
-    
-    console.log(`Cálculos atualizados para participante ${participantId}:`, {
-        lodging: lodgingValue,
-        event: eventValue
-    });
-}
-
-// Atualizar todos os cálculos
-function updateAllCalculations() {
-    if (!window.priceCalculator) return;
-
-    // Atualizar dados de todos os participantes
-    $('#participants-container .participant-block').each(function() {
-        const $participant = $(this);
-        const participantData = extractParticipantData($participant);
-        const participantId = $participant.attr('data-participant-id');
-        
-        updateParticipantInCalculator(participantId, participantData);
-        
-        // Atualizar displays individuais
-        const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
-        const eventValue = window.priceCalculator.calculateEventValue(participantData);
-        
-        $participant.find('.lodging-value').text(window.priceCalculator.formatCurrency(lodgingValue));
-        $participant.find('.event-value').text(window.priceCalculator.formatCurrency(eventValue));
-    });
-    
-    // Atualizar totais se estivermos na tela de resumo
-    if (currentStep === 3) {
-        updateSummaryTotals();
-    }
-}
-
 // Aplicar cupom de desconto
 function applyCoupon(couponCode) {
     if (!window.priceCalculator) return;
