@@ -2437,6 +2437,15 @@ function extractParticipantData($participant) {
         }
     }
 
+        // ✅ CRÍTICO: Extrair dados de endereço (se visível e preenchido)
+    const $addressSection = $participant.find('.address-section');
+    if ($addressSection.is(':visible') && addressManager) {
+        data.address = addressManager.extractAddressData($participant);
+        console.log('✅ Endereço extraído:', data.address);
+    } else {
+        console.warn('⚠️ Seção de endereço não visível ou addressManager não disponível');
+    }
+
     // CORRIGIDO: Capturar dados sempre, independente da visibilidade
     const countryCode = $participant.find('.country-select').val() || '';
     const countryName = $participant.find('.country-select').find(':selected').data('country') || '';
