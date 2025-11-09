@@ -73,7 +73,8 @@ $(document).ready(function() {
     });
 
     // Delegação de Evento para o campo CEP (quando o usuário sai do campo)
-    $(document).on('blur', '.cep-input', async function() {
+    $(document).on('blur', '.cep-input', async function(e) {
+        e.preventDefault(); // Impede o envio do formulário
         const $participant = $(this).closest('.participant-block');
         const cep = $(this).val();
 
