@@ -54,18 +54,24 @@ $(document).ready(function() {
     console.log('Formulário iniciado');
     initializeForm();
 
-// ✨ INÍCIO DA SOLUÇÃO DEFINITIVA ✨
+    // ===================================================================
+    // ✨ INÍCIO DA SOLUÇÃO CENTRALIZADA E DEFINITIVA ✨
+    // ===================================================================
 
     // Delegação de Evento para o Botão de Busca de CEP
     $(document).on('click', '.btn-search-cep', async function(e) {
-        e.preventDefault(); // Impede o envio do formulário
+        // 1. Prevenir o comportamento padrão é a primeira e mais importante coisa!
+        e.preventDefault();
+        e.stopImmediatePropagation();
 
-        // Encontra o bloco do participante pai deste botão
+        console.log('CLIQUE NA LUPA DETECTADO (via script.js)! A página NÃO deve recarregar.');
+
+        // 2. Encontrar o contexto correto (o participante pai)
         const $participant = $(this).closest('.participant-block');
         const cep = $participant.find('.cep-input').val();
 
+        // 3. Chamar o AddressManager para fazer o trabalho pesado
         if (addressManager && cep && cep.replace(/\D/g, '').length === 8) {
-            // Chama o método do AddressManager para fazer a busca
             await addressManager.searchAndFillAddress($participant, cep);
         } else if (addressManager) {
             addressManager.showError($participant, 'Por favor, insira um CEP válido.');
@@ -73,8 +79,7 @@ $(document).ready(function() {
     });
 
     // Delegação de Evento para o campo CEP (quando o usuário sai do campo)
-    $(document).on('blur', '.cep-input', async function(e) {
-        e.preventDefault(); // Impede o envio do formulário
+    $(document).on('blur', '.cep-input', async function() {
         const $participant = $(this).closest('.participant-block');
         const cep = $(this).val();
 
@@ -83,7 +88,9 @@ $(document).ready(function() {
         }
     });
 
-    // ✨ FIM DA SOLUÇÃO DEFINITIVA ✨
+    // ===================================================================
+    // ✨ FIM DA SOLUÇÃO CENTRALIZADA E DEFINITIVA ✨
+    // ===================================================================
     
 });
 
