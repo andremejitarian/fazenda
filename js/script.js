@@ -2098,11 +2098,25 @@ function generateInscricaoId() {
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
-    // **CORREÇÃO**: Usar array participants global
-    const participantsData = participants.map((participantData) => {
-        // **CRÍTICO**: Calcular valores com o objeto correto que tem 'id'
+    // **CORREÇÃO**: Coletar dados dos participantes do DOM
+    const participantsData = [];
+    $('#participants-container .participant-block').each(function(index) {
+        const $participant = $(this);
+        const participantData = extractParticipantData($participant);
+        
+        // **CRÍTICO**: Adicionar campo 'id' e 'index' para o priceCalculator identificar a ordem
+        participantData.index = index;
+        
+        console.log(`📋 Participante ${index}:`, participantData);
+        
+        // **CRÍTICO**: Calcular valores com o objeto que agora tem 'id'
         const valorHospedagem = priceCalculator.calculateLodgingValue(participantData);
         const valorEvento = priceCalculator.calculateEventValue(participantData);
+        
+        console.log(`💰 Valores calculados para ${participantData.fullName}:`, {
+            valorHospedagem,
+            valorEvento
+        });
         
         // Preparar objeto do participante
         const participantForWebhook = {
@@ -2137,10 +2151,10 @@ function prepareFormData(inscricaoId) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
-        return participantForWebhook;
+        participantsData.push(participantForWebhook);
     });
     
-    console.log('📋 Participantes processados:', participantsData);
+    console.log('📋 Todos os participantes processados:', participantsData);
     
     // Identificar responsável pelo pagamento
     
@@ -2223,7 +2237,7 @@ function prepareFormData(inscricaoId) {
         timestamp: new Date().toISOString()
     };
     
-    console.log('📦 Form Data preparado:', formData);
+    console.log('📦 Form Data completo preparado:', formData);
     
     return formData;
 }
