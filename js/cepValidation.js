@@ -86,6 +86,7 @@ class CEPValidator {
         // CORREÇÃO: Retornar todos os campos necessários
         return {
             erro: false,
+            cep: this.formatCEP(cepLimpo),  // ← LINHA ADICIONADA
             logradouro: data.logradouro,
             complemento: data.complemento,
             bairro: data.bairro,
@@ -120,6 +121,7 @@ class CEPValidator {
         // CORREÇÃO: Retornar todos os campos necessários
         return {
             erro: false,
+            cep: this.formatCEP(cepLimpo),  // ← LINHA ADICIONADA
             logradouro: data.street,      // BrasilAPI usa 'street'
             complemento: '',              // API não fornece diretamente
             bairro: data.neighborhood,  // BrasilAPI usa 'neighborhood'
