@@ -41,7 +41,8 @@ class AddressManager {
 
         // Event listener para o botão de busca (se existir)
         const $searchBtn = $participant.find('.btn-search-cep');
-        $searchBtn.on('click', async () => {
+        $searchBtn.on('click', async (e) => { // <--- 1. Adicione o parâmetro 'e'
+            e.preventDefault(); // <--- 2. Adicione esta linha!
             const cep = $cepInput.val();
             await this.searchAndFillAddress($participant, cep);
         });
