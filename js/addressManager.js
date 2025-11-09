@@ -8,7 +8,6 @@ class AddressManager {
     // Configurar campos de endereço para um participante
     setupAddressFields($participant) {
         const $addressSection = $participant.find('.address-section');
-        
         if ($addressSection.length === 0) {
             console.warn('⚠️ Seção de endereço não encontrada no participante');
             return;
@@ -20,53 +19,8 @@ class AddressManager {
         // Aplicar máscara
         $cepInput.mask('00000-000');
 
-        // Buscar ao sair do campo (blur)
-        $cepInput.on('blur', async () => {
-            const cep = $cepInput.val();
-            if (cep && cep.replace(/\D/g, '').length === 8) {
-                await this.searchAndFillAddress($participant, cep);
-            }
-        });
-
-        // Buscar ao pressionar Enter
-        $cepInput.on('keypress', async (e) => {
-            if (e.which === 13) { // Enter
-                e.preventDefault();
-                const cep = $cepInput.val();
-                if (cep && cep.replace(/\D/g, '').length === 8) {
-                    await this.searchAndFillAddress($participant, cep);
-                }
-            }
-        });
-
-        // Event listener para o botão de busca (se existir)
-        const $searchBtn = $participant.find('.btn-search-cep');
-
-// ADICIONE ESTAS LINHAS PARA O PASSO 2
-        if ($searchBtn.length > 0) {
-            console.log('PASSO 2 (addressManager.js): Botão da lupa ENCONTRADO!', $searchBtn);
-        } else {
-            console.error('PASSO 2 (addressManager.js): FALHA! Botão da lupa NÃO encontrado dentro de:', $participant);
-            return; // Se não achou o botão, não adianta continuar
-        }
-
-        // ADICIONE ESTA LINHA PARA O PASSO 3
-        console.log('PASSO 3 (addressManager.js): Associando evento de clique AGORA.');
+        console.log(`✅ Máscara de CEP aplicada para o participante [${$participant.data('participant-id')}]`);
         
-        $searchBtn.off('click').on('click', async (e) => { // Usamos .off('click') para evitar múltiplos eventos
-            e.preventDefault(); // A linha mais importante!
-            e.stopImmediatePropagation(); // ✨ ADICIONE ESTA LINHA! Impede que outros eventos de clique neste botão sejam disparados.
-
-            // ADICIONE ESTA LINHA PARA VERIFICAR SE O CLIQUE FUNCIONA
-            console.log('CLIQUE NA LUPA DETECTADO! A página NÃO deve recarregar.');
-            
-            const cep = $cepInput.val();
-            await this.searchAndFillAddress($participant, cep);
-        });
-
-    
-
-        console.log('✅ Campos de endereço configurados');
     }
 
     // Buscar e preencher endereço
