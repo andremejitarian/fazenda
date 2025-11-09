@@ -2098,13 +2098,9 @@ function generateInscricaoId() {
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
-    // Coletar dados dos participantes
-    const participantsData = [];
-    $('#participants-container .participant-block').each(function() {
-        const $participant = $(this);
-        const participantData = extractParticipantData($participant);
-        
-        // Preparar objeto do participante SEM duplicação
+    // **CORREÇÃO**: Usar array participants global ao invés de extrair do DOM
+    const participantsData = participants.map((participantData) => {
+        // Preparar objeto do participante
         const participantForWebhook = {
             fullName: participantData.fullName,
             phone: participantData.phone,
@@ -2115,35 +2111,35 @@ function prepareFormData(inscricaoId) {
             stayPeriod: participantData.stayPeriod,
             accommodation: participantData.accommodation,
             eventOption: participantData.eventOption,
-            bedPreference: participantData.bedPreference, // Campo existente
-            restrictions: participantData.restrictions, // NOVA LINHA
+            bedPreference: participantData.bedPreference,
+            restrictions: participantData.restrictions,
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
+            // **CRÍTICO**: Agora calcula com o objeto correto que tem 'id'
             valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
             valorEvento: priceCalculator.calculateEventValue(participantData),
             idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
-        // Adicionar campos de hospedagem apenas se existirem (SEM duplicação)
-        if (participantData.numDiarias !== null) {
+        // Adicionar campos de hospedagem apenas se existirem
+        if (participantData.numDiarias !== null && participantData.numDiarias !== undefined) {
             participantForWebhook.num_diarias = participantData.numDiarias;
         }
         
-        if (participantData.dataCheckin !== null) {
+        if (participantData.dataCheckin !== null && participantData.dataCheckin !== undefined) {
             participantForWebhook.data_checkin = participantData.dataCheckin;
         }
         
-        if (participantData.dataCheckout !== null) {
+        if (participantData.dataCheckout !== null && participantData.dataCheckout !== undefined) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
-        participantsData.push(participantForWebhook);
+        return participantForWebhook;
     });
     
     // Identificar responsável pelo pagamento
-    const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
 
-    // NOVO: Extrair dados de endereço do responsável
+    // Extrair dados de endereço do responsável
     const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
     const $payerElement = $responsiblePayerElement.length > 0 ? $responsiblePayerElement : $('#participants-container .participant-block').first();
     
@@ -2160,7 +2156,7 @@ function prepareFormData(inscricaoId) {
         telefone: responsiblePayer.phone
     };
     
-    // NOVO: Adicionar endereço se disponível
+    // Adicionar endereço se disponível
     if (addressData && addressData.cep) {
         responsavelCompleto.endereco = {
             cep: addressData.cep,
@@ -2207,7 +2203,7 @@ function prepareFormData(inscricaoId) {
     return {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
-        responsavel: responsavelCompleto, // ATUALIZADO
+        responsavel: responsavelCompleto,
         participantes: participantsData,
         totais: {
             subtotalHospedagem: summary.lodgingSubtotal,
