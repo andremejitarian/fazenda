@@ -53,45 +53,6 @@ function scrollToAndFocusElement($element) {
 $(document).ready(function() {
     console.log('Formulário iniciado');
     initializeForm();
-
-    // ===================================================================
-    // ✨ INÍCIO DA SOLUÇÃO CENTRALIZADA E DEFINITIVA ✨
-    // ===================================================================
-
-    // Delegação de Evento para o Botão de Busca de CEP
-    $(document).on('click', '.btn-search-cep', async function(e) {
-        // 1. Prevenir o comportamento padrão é a primeira e mais importante coisa!
-        e.preventDefault();
-        e.stopImmediatePropagation();
-
-        console.log('CLIQUE NA LUPA DETECTADO (via script.js)! A página NÃO deve recarregar.');
-
-        // 2. Encontrar o contexto correto (o participante pai)
-        const $participant = $(this).closest('.participant-block');
-        const cep = $participant.find('.cep-input').val();
-
-        // 3. Chamar o AddressManager para fazer o trabalho pesado
-        if (addressManager && cep && cep.replace(/\D/g, '').length === 8) {
-            await addressManager.searchAndFillAddress($participant, cep);
-        } else if (addressManager) {
-            addressManager.showError($participant, 'Por favor, insira um CEP válido.');
-        }
-    });
-
-    // Delegação de Evento para o campo CEP (quando o usuário sai do campo)
-    $(document).on('blur', '.cep-input', async function() {
-        const $participant = $(this).closest('.participant-block');
-        const cep = $(this).val();
-
-        if (addressManager && cep && cep.replace(/\D/g, '').length === 8) {
-            await addressManager.searchAndFillAddress($participant, cep);
-        }
-    });
-
-    // ===================================================================
-    // ✨ FIM DA SOLUÇÃO CENTRALIZADA E DEFINITIVA ✨
-    // ===================================================================
-    
 });
 
 // Função principal de inicialização
@@ -1611,9 +1572,6 @@ function updateAddressSection() {
         // Mostrar seção de endereço para o responsável
         const $addressSection = $responsiblePayer.find('.address-section');
         $addressSection.show();
-
-               // ADICIONE ESTA LINHA
-        console.log('PASSO 1 (script.js): Chamando setup para o RESPONSÁVEL:', $responsiblePayer);
         
         // Tornar campos obrigatórios (exceto complemento)
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
@@ -1622,7 +1580,7 @@ function updateAddressSection() {
                       // ✨ ADICIONE A CORREÇÃO AQUI ✨
         if (addressManager) {
             addressManager.setupAddressFields($responsiblePayer);
-        } 
+        }
         
         console.log('📍 Seção de endereço habilitada para o responsável pelo pagamento');
     } else if (participants.length === 1) {
@@ -1630,9 +1588,6 @@ function updateAddressSection() {
         const $singleParticipant = $('#participants-container .participant-block').first();
         const $addressSection = $singleParticipant.find('.address-section');
         $addressSection.show();
-
-      // ADICIONE ESTA LINHA
-        console.log('PASSO 1 (script.js): Chamando setup para o PARTICIPANTE ÚNICO:', $singleParticipant);
         
         // Tornar campos obrigatórios
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
@@ -2493,14 +2448,10 @@ function extractParticipantData($participant) {
     }
 
         // ✅ CRÍTICO: Extrair dados de endereço (se visível e preenchido)
-    // 1. Declare uma variável para armazenar os dados do endereço
-    let addressData = null; 
-
     const $addressSection = $participant.find('.address-section');
     if ($addressSection.is(':visible') && addressManager) {
-        // 2. Atribua os dados à nossa nova variável
-        addressData = addressManager.extractAddressData($participant); 
-        console.log('✅ Endereço extraído:', addressData);
+        data.address = addressManager.extractAddressData($participant);
+        console.log('✅ Endereço extraído:', data.address);
     } else {
         console.warn('⚠️ Seção de endereço não visível ou addressManager não disponível');
     }
@@ -2543,8 +2494,7 @@ function extractParticipantData($participant) {
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias,
         dataCheckin: dataCheckin,
-        dataCheckout: dataCheckout,
-        address: addressData
+        dataCheckout: dataCheckout
     };
 }
 
