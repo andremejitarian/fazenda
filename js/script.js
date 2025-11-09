@@ -2098,8 +2098,12 @@ function generateInscricaoId() {
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
-    // **CORREÇÃO**: Usar array participants global ao invés de extrair do DOM
+    // **CORREÇÃO**: Usar array participants global
     const participantsData = participants.map((participantData) => {
+        // **CRÍTICO**: Calcular valores com o objeto correto que tem 'id'
+        const valorHospedagem = priceCalculator.calculateLodgingValue(participantData);
+        const valorEvento = priceCalculator.calculateEventValue(participantData);
+        
         // Preparar objeto do participante
         const participantForWebhook = {
             fullName: participantData.fullName,
@@ -2115,9 +2119,8 @@ function prepareFormData(inscricaoId) {
             restrictions: participantData.restrictions,
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
-            // **CRÍTICO**: Agora calcula com o objeto correto que tem 'id'
-            valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
-            valorEvento: priceCalculator.calculateEventValue(participantData),
+            valorHospedagem: valorHospedagem,
+            valorEvento: valorEvento,
             idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
@@ -2137,7 +2140,11 @@ function prepareFormData(inscricaoId) {
         return participantForWebhook;
     });
     
+    console.log('📋 Participantes processados:', participantsData);
+    
     // Identificar responsável pelo pagamento
+    
+    console.log('👤 Responsável pelo pagamento:', responsiblePayer);
 
     // Extrair dados de endereço do responsável
     const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
@@ -2200,7 +2207,7 @@ function prepareFormData(inscricaoId) {
         eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais;
     }
     
-    return {
+    const formData = {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
         responsavel: responsavelCompleto,
@@ -2215,6 +2222,10 @@ function prepareFormData(inscricaoId) {
         cupom: priceCalculator.appliedCoupon,
         timestamp: new Date().toISOString()
     };
+    
+    console.log('📦 Form Data preparado:', formData);
+    
+    return formData;
 }
 
 // Mostrar confirmação
