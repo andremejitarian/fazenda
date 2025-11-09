@@ -1572,6 +1572,9 @@ function updateAddressSection() {
         // Mostrar seção de endereço para o responsável
         const $addressSection = $responsiblePayer.find('.address-section');
         $addressSection.show();
+
+               // ADICIONE ESTA LINHA
+        console.log('PASSO 1 (script.js): Chamando setup para o RESPONSÁVEL:', $responsiblePayer);
         
         // Tornar campos obrigatórios (exceto complemento)
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
@@ -1580,7 +1583,7 @@ function updateAddressSection() {
                       // ✨ ADICIONE A CORREÇÃO AQUI ✨
         if (addressManager) {
             addressManager.setupAddressFields($responsiblePayer);
-        }
+        } 
         
         console.log('📍 Seção de endereço habilitada para o responsável pelo pagamento');
     } else if (participants.length === 1) {
@@ -1588,6 +1591,9 @@ function updateAddressSection() {
         const $singleParticipant = $('#participants-container .participant-block').first();
         const $addressSection = $singleParticipant.find('.address-section');
         $addressSection.show();
+
+      // ADICIONE ESTA LINHA
+        console.log('PASSO 1 (script.js): Chamando setup para o PARTICIPANTE ÚNICO:', $singleParticipant);
         
         // Tornar campos obrigatórios
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
