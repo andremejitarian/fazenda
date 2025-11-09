@@ -47,23 +47,6 @@ class AddressManager {
         });
 
         console.log('✅ Campos de endereço configurados');
-
-    console.log('🔵 setupAddressFields CHAMADA para participante:', $participant.attr('data-participant-id'));
-    
-    const $addressSection = $participant.find('.address-section');
-    
-    if ($addressSection.length === 0) {
-        console.warn('⚠️ Seção de endereço não encontrada no participante');
-        return;
-    }
-
-    console.log('✅ Seção de endereço encontrada, configurando CEP...');
-
-    // Event listener para o campo CEP
-    const $cepInput = $participant.find('.cep-input');
-    
-    console.log('🔍 Campo CEP encontrado:', $cepInput.length > 0);
-        
     }
 
     // Buscar e preencher endereço
@@ -104,7 +87,7 @@ class AddressManager {
             this.hideLoading($participant);
         }
     }
-    
+
     // Preencher campos de endereço
     fillAddressFields($participant, dados) {
         $participant.find('.cep-input').val(dados.cep);
