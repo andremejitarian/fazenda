@@ -364,6 +364,13 @@ function setupParticipantSections($participant) {
         $participant.find('.event-section').show();
         setupEventOptions($participant);
     }
+
+        // Configurar campos de endereço (CEP, logradouro, etc.)
+    if (addressManager) {
+        addressManager.setupAddressFields($participant);
+    } else {
+        console.warn('⚠️ addressManager não disponível ainda');
+    }
 }
 
 // Configurar opções de hospedagem
