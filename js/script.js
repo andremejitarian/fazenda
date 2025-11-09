@@ -2098,35 +2098,13 @@ function generateInscricaoId() {
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
-    // **PASSO 1**: Coletar TODOS os participantes do DOM primeiro (SEM calcular valores ainda)
-    const allParticipantsData = [];
-    $('#participants-container .participant-block').each(function(index) {
+    // Coletar dados dos participantes
+    const participantsData = [];
+    $('#participants-container .participant-block').each(function() {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         
-        // **CRÍTICO**: Adicionar campo 'id' para o priceCalculator identificar a ordem
-        participantData.index = index;
-        
-        allParticipantsData.push(participantData);
-    });
-    
-    console.log('📋 PASSO 1 - Todos os participantes coletados:', allParticipantsData);
-    
-    // **PASSO 2**: Atualizar o priceCalculator com TODOS os participantes
-    priceCalculator.updateParticipants(allParticipantsData);
-    console.log('🔄 PASSO 2 - PriceCalculator atualizado com todos os participantes');
-    
-    // **PASSO 3**: AGORA calcular valores individuais
-    const participantsData = allParticipantsData.map((participantData, index) => {
-        const valorHospedagem = priceCalculator.calculateLodgingValue(participantData);
-        const valorEvento = priceCalculator.calculateEventValue(participantData);
-        
-        console.log(`💰 PASSO 3 - Valores para ${participantData.fullName} (${priceCalculator.calculateAge(participantData.birthDate)} anos):`, {
-            valorHospedagem,
-            valorEvento
-        });
-        
-        // Preparar objeto do participante
+        // Preparar objeto do participante SEM duplicação
         const participantForWebhook = {
             fullName: participantData.fullName,
             phone: participantData.phone,
@@ -2137,42 +2115,35 @@ function prepareFormData(inscricaoId) {
             stayPeriod: participantData.stayPeriod,
             accommodation: participantData.accommodation,
             eventOption: participantData.eventOption,
-            bedPreference: participantData.bedPreference,
-            restrictions: participantData.restrictions,
+            bedPreference: participantData.bedPreference, // Campo existente
+            restrictions: participantData.restrictions, // NOVA LINHA
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
-            valorHospedagem: valorHospedagem,
-            valorEvento: valorEvento,
+            valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
+            valorEvento: priceCalculator.calculateEventValue(participantData),
             idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
-        // Adicionar campos de hospedagem apenas se existirem
-        if (participantData.numDiarias !== null && participantData.numDiarias !== undefined) {
+        // Adicionar campos de hospedagem apenas se existirem (SEM duplicação)
+        if (participantData.numDiarias !== null) {
             participantForWebhook.num_diarias = participantData.numDiarias;
         }
         
-        if (participantData.dataCheckin !== null && participantData.dataCheckin !== undefined) {
+        if (participantData.dataCheckin !== null) {
             participantForWebhook.data_checkin = participantData.dataCheckin;
         }
         
-        if (participantData.dataCheckout !== null && participantData.dataCheckout !== undefined) {
+        if (participantData.dataCheckout !== null) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
-        return participantForWebhook;
+        participantsData.push(participantForWebhook);
     });
     
-    console.log('✅ PASSO 4 - Todos os participantes processados:', participantsData);
-    
     // Identificar responsável pelo pagamento
-    
-    if (!responsiblePayer) {
-        throw new Error('Nenhum responsável pelo pagamento encontrado');
-    }
-    
-    console.log('👤 Responsável pelo pagamento:', responsiblePayer);
+    const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
 
-    // Extrair dados de endereço do responsável
+    // NOVO: Extrair dados de endereço do responsável
     const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
     const $payerElement = $responsiblePayerElement.length > 0 ? $responsiblePayerElement : $('#participants-container .participant-block').first();
     
@@ -2189,7 +2160,7 @@ function prepareFormData(inscricaoId) {
         telefone: responsiblePayer.phone
     };
     
-    // Adicionar endereço se disponível
+    // NOVO: Adicionar endereço se disponível
     if (addressData && addressData.cep) {
         responsavelCompleto.endereco = {
             cep: addressData.cep,
@@ -2233,10 +2204,10 @@ function prepareFormData(inscricaoId) {
         eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais;
     }
     
-    const formData = {
+    return {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
-        responsavel: responsavelCompleto,
+        responsavel: responsavelCompleto, // ATUALIZADO
         participantes: participantsData,
         totais: {
             subtotalHospedagem: summary.lodgingSubtotal,
@@ -2248,10 +2219,6 @@ function prepareFormData(inscricaoId) {
         cupom: priceCalculator.appliedCoupon,
         timestamp: new Date().toISOString()
     };
-    
-    console.log('📦 Form Data completo preparado:', formData);
-    
-    return formData;
 }
 
 // Mostrar confirmação
