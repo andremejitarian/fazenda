@@ -41,11 +41,29 @@ class AddressManager {
 
         // Event listener para o botão de busca (se existir)
         const $searchBtn = $participant.find('.btn-search-cep');
-        $searchBtn.on('click', async (e) => { // <--- 1. Adicione o parâmetro 'e'
-            e.preventDefault(); // <--- 2. Adicione esta linha!
+
+// ADICIONE ESTAS LINHAS PARA O PASSO 2
+        if ($searchBtn.length > 0) {
+            console.log('PASSO 2 (addressManager.js): Botão da lupa ENCONTRADO!', $searchBtn);
+        } else {
+            console.error('PASSO 2 (addressManager.js): FALHA! Botão da lupa NÃO encontrado dentro de:', $participant);
+            return; // Se não achou o botão, não adianta continuar
+        }
+
+        // ADICIONE ESTA LINHA PARA O PASSO 3
+        console.log('PASSO 3 (addressManager.js): Associando evento de clique AGORA.');
+        
+        $searchBtn.off('click').on('click', async (e) => { // Usamos .off('click') para evitar múltiplos eventos
+            e.preventDefault(); // A linha mais importante!
+
+            // ADICIONE ESTA LINHA PARA VERIFICAR SE O CLIQUE FUNCIONA
+            console.log('CLIQUE NA LUPA DETECTADO! A página NÃO deve recarregar.');
+            
             const cep = $cepInput.val();
             await this.searchAndFillAddress($participant, cep);
         });
+
+    
 
         console.log('✅ Campos de endereço configurados');
     }
