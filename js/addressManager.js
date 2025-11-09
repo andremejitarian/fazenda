@@ -57,23 +57,17 @@ class AddressManager {
         }
 
         this.isSearching = true;
-
-        // Mostrar loading
         this.showLoading($participant);
 
         try {
-            // Buscar CEP usando o módulo cepValidation
             const resultado = await buscarCEP(cep);
 
             if (resultado.erro) {
                 this.showError($participant, resultado.mensagem);
-                
-                // Se permitir manual, habilitar campos
                 if (resultado.permitirManual) {
                     this.enableManualInput($participant);
                 }
             } else {
-                // Preencher campos com os dados
                 this.fillAddressFields($participant, resultado);
                 this.showSuccess($participant, `Endereço encontrado via ${resultado.fonte}`);
                 this.currentAddress = resultado;
@@ -96,10 +90,8 @@ class AddressManager {
         $participant.find('.cidade-input').val(dados.cidade);
         $participant.find('.estado-select').val(dados.estado);
 
-        // Focar no campo número
         $participant.find('.numero-input').focus();
 
-        // Desabilitar campos preenchidos automaticamente
         $participant.find('.logradouro-input, .bairro-input, .cidade-input, .estado-select')
             .prop('readonly', true)
             .addClass('auto-filled');
@@ -153,7 +145,6 @@ class AddressManager {
 
         $participant.find('.cep-input').removeClass('error').addClass('success');
 
-        // Ocultar mensagem após 3 segundos
         setTimeout(() => {
             $feedback.fadeOut();
         }, 3000);
@@ -175,7 +166,7 @@ class AddressManager {
 
         requiredFields.forEach(field => {
             const $field = $participant.find(field.selector);
-            const value = $field.val()?.trim(); // ✅ Variável 'value' agora declarada
+            const value = $field.val()?.trim();
 
             if (!value) {
                 $field.addClass('error');
@@ -193,7 +184,15 @@ class AddressManager {
 
     // Extrair dados do endereço
     extractAddressData($participant) {
+        // CORREÇÃO: Implementada a extração dos dados do formulário
         return {
+            cep: $participant.find('.cep-input').val(),
+            logradouro: $participant.find('.logradouro-input').val(),
+            numero: $participant.find('.numero-input').val(),
+            complemento: $participant.find('.complemento-input').val(), // Assumindo um campo com a classe .complemento-input
+            bairro: $participant.find('.bairro-input').val(),
+            cidade: $participant.find('.cidade-input').val(),
+            estado: $participant.find('.estado-select').val()
         };
     }
 
@@ -212,10 +211,8 @@ class AddressManager {
     }
 }
 
-// Instância global
 let addressManager = null;
 
-// Inicializar gerenciador
 function initializeAddressManager() {
     addressManager = new AddressManager();
     console.log('🔗 Gerenciador de endereço inicializado');
