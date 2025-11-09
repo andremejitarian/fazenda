@@ -2094,49 +2094,17 @@ function generateInscricaoId() {
     return `${eventCode}${timestamp}${random}`;
 }
 
-
-// Converte "R$ 1.234,56" ou "1.234,56" em número 1234.56
-function parseBRLToNumber(text) {
-    if (!text) return 0;
-    const cleaned = String(text)
-        .replace(/\s/g, '')           // remove espaços
-        .replace(/[R$\u00A0]/gi, '')  // remove "R$" e espaços não separáveis
-        .replace(/\./g, '')           // remove separador de milhar
-        .replace(',', '.');           // troca vírgula decimal por ponto
-    const num = Number(cleaned);
-    return Number.isFinite(num) ? num : 0;
-}
-
 // Preparar dados do formulário
 function prepareFormData(inscricaoId) {
-    // Se houver rotina que atualiza a UI/totais, garanta que foi chamada antes do envio.
-    const summary = window.priceCalculator
-        ? window.priceCalculator.getCalculationSummary()
-        : { lodgingSubtotal: 0, eventSubtotal: 0, discount: 0, finalTotal: 0 };
-
+    const summary = priceCalculator.getCalculationSummary();
+    
+    // Coletar dados dos participantes
     const participantsData = [];
-
     $('#participants-container .participant-block').each(function() {
         const $participant = $(this);
-
-        // Usa sua própria função de extração (mantém campos cadastrais)
-        const participantData = (typeof extractParticipantData === 'function')
-            ? extractParticipantData($participant)
-            : {};
-
-        // Captura os valores exatamente como aparecem na tela
-        const lodgingText = $participant.find('.lodging-value').text();
-        const eventText = $participant.find('.event-value').text();
-
-        const valorHospedagemUI = parseBRLToNumber(lodgingText);
-        const valorEventoUI = parseBRLToNumber(eventText);
-
-        // Idade ainda pode vir do calculator (é determinística e não depende de render)
-        const idadeCalculada = window.priceCalculator
-            ? Number(window.priceCalculator.calculateAge(participantData.birthDate))
-            : null;
-
-        // MONTA os campos exatamente como você solicitou
+        const participantData = extractParticipantData($participant);
+        
+        // Preparar objeto do participante SEM duplicação
         const participantForWebhook = {
             fullName: participantData.fullName,
             phone: participantData.phone,
@@ -2147,48 +2115,52 @@ function prepareFormData(inscricaoId) {
             stayPeriod: participantData.stayPeriod,
             accommodation: participantData.accommodation,
             eventOption: participantData.eventOption,
-            bedPreference: participantData.bedPreference,
-            restrictions: participantData.restrictions,
+            bedPreference: participantData.bedPreference, // Campo existente
+            restrictions: participantData.restrictions, // NOVA LINHA
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
-
-            // IMPORTANTÍSSIMO: enviar os mesmos valores da UI
-            valorHospedagem: valorHospedagemUI,
-            valorEvento: valorEventoUI,
-
-            idade: idadeCalculada
+            valorHospedagem: priceCalculator.calculateLodgingValue(participantData),
+            valorEvento: priceCalculator.calculateEventValue(participantData),
+            idade: priceCalculator.calculateAge(participantData.birthDate)
         };
 
-        // Campos opcionais, se existirem no seu extractParticipantData
-        if (participantData.numDiarias !== null && participantData.numDiarias !== undefined) {
+        // Adicionar campos de hospedagem apenas se existirem (SEM duplicação)
+        if (participantData.numDiarias !== null) {
             participantForWebhook.num_diarias = participantData.numDiarias;
         }
-        if (participantData.dataCheckin) {
+        
+        if (participantData.dataCheckin !== null) {
             participantForWebhook.data_checkin = participantData.dataCheckin;
         }
-        if (participantData.dataCheckout) {
+        
+        if (participantData.dataCheckout !== null) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
         participantsData.push(participantForWebhook);
     });
+    
+    // Identificar responsável pelo pagamento
+    const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
 
-    // Responsável pelo pagamento
-
-    // Endereço do responsável (se addressManager estiver em uso)
-    let addressData = null;
+    // NOVO: Extrair dados de endereço do responsável
     const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
-    const $payerElement = $responsiblePayerElement.length > 0
-        ? $responsiblePayerElement
-        : $('#participants-container .participant-block').first();
-
-    if (window.addressManager && $payerElement.length > 0) {
-        addressData = window.addressManager.extractAddressData($payerElement);
+    const $payerElement = $responsiblePayerElement.length > 0 ? $responsiblePayerElement : $('#participants-container .participant-block').first();
+    
+    let addressData = null;
+    if (addressManager && $payerElement.length > 0) {
+        addressData = addressManager.extractAddressData($payerElement);
     }
-
+    
+    // Preparar objeto do responsável com endereço
     const responsavelCompleto = {
+        nome: responsiblePayer.fullName,
+        cpf: responsiblePayer.cpf,
+        email: responsiblePayer.email,
+        telefone: responsiblePayer.phone
     };
-
+    
+    // NOVO: Adicionar endereço se disponível
     if (addressData && addressData.cep) {
         responsavelCompleto.endereco = {
             cep: addressData.cep,
@@ -2199,45 +2171,52 @@ function prepareFormData(inscricaoId) {
             estado: addressData.estado
         };
     }
-
-    // Forma de pagamento (mantém coerência com o calculator se disponível)
-    const pm = (window.priceCalculator && window.priceCalculator.selectedPaymentMethod)
-
+    
+    // Preparar dados da forma de pagamento com descrição
     const formaPagamentoCompleta = {
-        id: pm.id,
-        label: pm.label,
-        tipo: pm.tipo,
-        descricao: pm.descricao,
-        taxa_gateway_percentual: pm.taxa_gateway_percentual,
-        ...(pm.parcelas_maximas !== undefined ? { parcelas_maximas: pm.parcelas_maximas } : {}),
-        ...(pm.juros !== undefined ? { juros: pm.juros } : {})
+        id: selectedPaymentMethod.id,
+        label: selectedPaymentMethod.label,
+        tipo: selectedPaymentMethod.tipo,
+        descricao: selectedPaymentMethod.descricao,
+        taxa_gateway_percentual: selectedPaymentMethod.taxa_gateway_percentual
     };
 
-    // Dados do evento
+    // Adicionar campos opcionais da forma de pagamento se existirem
+    if (selectedPaymentMethod.parcelas_maximas) {
+        formaPagamentoCompleta.parcelas_maximas = selectedPaymentMethod.parcelas_maximas;
+    }
+    if (selectedPaymentMethod.juros !== undefined) {
+        formaPagamentoCompleta.juros = selectedPaymentMethod.juros;
+    }
+
+    // Preparar dados completos do evento
     const eventoCompleto = {
-        id: window.currentEvent?.id,
-        nome: window.currentEvent?.nome,
-        tipo_formulario: window.currentEvent?.tipo_formulario,
-        descricao: window.currentEvent?.descricao,
-        politicas_evento_url: window.currentEvent?.politicas_evento_url,
-        planilha_url: window.currentEvent?.planilha_url,
-        ...(window.currentEvent?.observacoes_adicionais
-            ? { observacoes_adicionais: window.currentEvent.observacoes_adicionais }
-            : {})
+        id: currentEvent.id,
+        nome: currentEvent.nome,
+        tipo_formulario: currentEvent.tipo_formulario,
+        descricao: currentEvent.descricao,
+        politicas_evento_url: currentEvent.politicas_evento_url,
+        planilha_url: currentEvent.planilha_url,
     };
 
+    // Adicionar observações adicionais apenas se existirem
+    if (currentEvent.observacoes_adicionais) {
+        eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais;
+    }
+    
     return {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
-        responsavel: responsavelCompleto,
+        responsavel: responsavelCompleto, // ATUALIZADO
         participantes: participantsData,
         totais: {
-            subtotalHospedagem: Number(summary.lodgingSubtotal ?? 0),
-            subtotalEvento: Number(summary.eventSubtotal ?? 0),
-            desconto: Number(summary.discount ?? 0),
-            total: Number(summary.finalTotal ?? 0)
+            subtotalHospedagem: summary.lodgingSubtotal,
+            subtotalEvento: summary.eventSubtotal,
+            desconto: summary.discount,
+            total: summary.finalTotal
         },
         forma_pagamento: formaPagamentoCompleta,
+        cupom: priceCalculator.appliedCoupon,
         timestamp: new Date().toISOString()
     };
 }
