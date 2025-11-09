@@ -2486,10 +2486,14 @@ function extractParticipantData($participant) {
     }
 
         // ✅ CRÍTICO: Extrair dados de endereço (se visível e preenchido)
+    // 1. Declare uma variável para armazenar os dados do endereço
+    let addressData = null; 
+
     const $addressSection = $participant.find('.address-section');
     if ($addressSection.is(':visible') && addressManager) {
-        data.address = addressManager.extractAddressData($participant);
-        console.log('✅ Endereço extraído:', data.address);
+        // 2. Atribua os dados à nossa nova variável
+        addressData = addressManager.extractAddressData($participant); 
+        console.log('✅ Endereço extraído:', addressData);
     } else {
         console.warn('⚠️ Seção de endereço não visível ou addressManager não disponível');
     }
@@ -2532,7 +2536,8 @@ function extractParticipantData($participant) {
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias,
         dataCheckin: dataCheckin,
-        dataCheckout: dataCheckout
+        dataCheckout: dataCheckout,
+        address: addressData
     };
 }
 
