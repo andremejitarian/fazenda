@@ -336,15 +336,15 @@
             "percentual_valor_adulto": 0.0,
             "limite_gratuidade_por_reserva": 1,
             "regra_excedente_gratuito": {
-              "percentual_valor_adulto": 0.3,
-              "descricao": "Crianças 0-3 anos extras pagam 30% da hospedagem"
+              "percentual_valor_adulto": 0.5,
+              "descricao": "Crianças 0-3 anos extras pagam 50% da hospedagem"
             }
           },
           {
             "faixa_min_anos": 4,
             "faixa_max_anos": 10,
-            "percentual_valor_adulto": 0.6,
-            "descricao": "Crianças de 4 a 10 anos pagam 60% do valor de hospedagem"
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor de hospedagem"
           },
           {
             "faixa_min_anos": 11,
