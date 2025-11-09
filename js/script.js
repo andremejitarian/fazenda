@@ -698,159 +698,262 @@ function validatePhoneNumber($phoneInput, countryCode) {
     return isValid;
 }
 
-// Configurar event listeners para participante
+// Configurar event listeners para participante (VERSÃO CORRIGIDA)
 function setupParticipantEventListeners($participant) {
+    // ✅ CRÍTICO: Remover TODOS os listeners antigos primeiro
+    $participant.off('.participant');
+    $participant.find('*').off('.participant');
+    
+    const participantId = $participant.attr('data-participant-id');
+    
+    // ========================================
+    // EVENTOS QUE NÃO AFETAM CÁLCULOS
+    // ========================================
+    
     // Remover participante
-    $participant.find('.btn-remove-participant').on('click', function() {
-        removeParticipant($participant);
-    });
+    $participant.find('.btn-remove-participant')
+        .off('click.participant')
+        .on('click.participant', function() {
+            removeParticipant($participant);
+        });
 
-    // NOVO: Mudança de país do telefone
-    $participant.find('.country-select').on('change', function() {
-        const selectedCountry = $(this).find(':selected').data('country');
-        const $phoneInput = $participant.find('.phone-input');
-        
-        // Limpar valor atual e aplicar nova máscara
-        $phoneInput.val('');
-        applyPhoneMask($phoneInput, selectedCountry);
-        
-        console.log(`País alterado para: ${selectedCountry}`);
-    });
-
-    // NOVO: Listener para gênero
-    $participant.find('.gender-select').on('change', function() {
-        const selectedGender = $(this).val();
-        console.log(`Gênero alterado: ${selectedGender}`);
-        
-        // Remover classe de erro se havia
-        $(this).removeClass('error');
-    });
-
-    // NOVO: Listener para controlar visibilidade do texto sobre desconto para crianças
-    $participant.find('.accommodation-select').on('change', function() {
-        const $participant = $(this).closest('.participant-block');
-        const $childDiscountInfo = $participant.find('.child-discount-info');
-        const dob = $participant.find('.dob-input').val();
-        
-        if (dob && $(this).val()) {
-            const age = calculateAge(dob);
+    // Mudança de país do telefone
+    $participant.find('.country-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const selectedCountry = $(this).find(':selected').data('country');
+            const $phoneInput = $participant.find('.phone-input');
             
-            if (age < 12) { // Ajuste conforme sua regra
-                $childDiscountInfo.show();
-            } else {
-                $childDiscountInfo.hide();
-            }
-        }
-    });
+            // Limpar valor atual e aplicar nova máscara
+            $phoneInput.val('');
+            applyPhoneMask($phoneInput, selectedCountry);
+            
+            console.log(`País alterado para: ${selectedCountry}`);
+        });
 
-    // NOVO: Listener para data de nascimento - controlar visibilidade dos campos
-    $participant.find('.dob-input').on('change', function() {
-        const birthDate = $(this).val();
-        toggleAdultFields($participant, birthDate);
-        
-        updateResponsibleSections();
-        updateBedPreferenceSection();
-        
-        setTimeout(() => {
-            updateAllCalculations();
-        }, 10);
-    });
-    
-    // ATUALIZADO: Validação de telefone
-    $participant.find('.phone-input').on('blur', function() {
-        const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
-        validatePhoneNumber($(this), selectedCountry);
-    });
-    
-    // Validação de CPF
-    $participant.find('.cpf-mask').on('blur', function() {
-        validateCPF($(this));
-    });
-    
-    // NOVA: Validação de email
-    $participant.find('.email-input').on('blur', function() {
-        validateEmail($(this));
-    });
-    
-    // NOVA: Validação de email em tempo real (opcional)
-    $participant.find('.email-input').on('input', debounce(function() {
-        const email = $(this).val().trim();
-        if (email.length > 0) {
-            validateEmail($(this));
-        } else {
-            $(this).removeClass('error valid');
-        }
-    }, 500));
-    
-    // Listener para mudanças que afetam os cálculos diretamente
-    $participant.find('.full-name, .phone-mask, .cpf-mask, .email-input, .accommodation-select, .event-option-select').on('change', function() {
-        updateAllCalculations();
-    });
+    // Listener para gênero
+    $participant.find('.gender-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const selectedGender = $(this).val();
+            console.log(`Gênero alterado: ${selectedGender}`);
+            
+            // Remover classe de erro se havia
+            $(this).removeClass('error');
+        });
 
-    // Listener APENAS para o período de estadia
-    $participant.find('.stay-period-select').on('change', function() {
-        const selectedPeriodId = $(this).val();
-        const periodoSelecionado = currentEvent.periodos_estadia_opcoes
-            .find(p => String(p.id) === String(selectedPeriodId));
-
-        if (periodoSelecionado) {
-            updateCheckInOutInfo($participant, periodoSelecionado);
-        } else {
-            $participant.find('.checkin-datetime').text('');
-            $participant.find('.checkout-datetime').text('');
-        }
-
-        updateEventOptionsForPeriod($participant);
-        updateAllCalculations();
-    });
-    
     // Responsável pelo pagamento
-    $participant.find('.responsible-payer').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('.responsible-payer').not(this).prop('checked', false);
-        }
-    });
-    
-    // Responsável pela criança
-    $participant.find('.responsible-child').on('change', function() {
-        if ($(this).is(':checked')) {
-            $('.responsible-child').not(this).prop('checked', false);
-        }
-    });
-
-    // NOVO: Listener para preferência de cama
-    $participant.find('.bed-preference-select').on('change', function() {
-        const selectedPreference = $(this).val();
-        console.log(`Preferência de cama alterada: ${selectedPreference}`);
-    });
-
-    // Forçar atualização periódica na Etapa 2
-    if (currentStep === 2) {
-        const participantId = $participant.attr('data-participant-id');
-        
-        // Observer para mudanças nos campos
-        const observer = new MutationObserver(() => {
-            if (currentStep === 2) {
-                setTimeout(() => {
-                    updateParticipantCalculations($participant);
-                }, 50);
+    $participant.find('.responsible-payer')
+        .off('change.participant')
+        .on('change.participant', function() {
+            if ($(this).is(':checked')) {
+                $('.responsible-payer').not(this).prop('checked', false);
             }
         });
+    
+    // Responsável pela criança
+    $participant.find('.responsible-child')
+        .off('change.participant')
+        .on('change.participant', function() {
+            if ($(this).is(':checked')) {
+                $('.responsible-child').not(this).prop('checked', false);
+            }
+        });
+
+    // Preferência de cama
+    $participant.find('.bed-preference-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const selectedPreference = $(this).val();
+            console.log(`Preferência de cama alterada: ${selectedPreference}`);
+        });
+
+    // ========================================
+    // VALIDAÇÕES (SEM CÁLCULO)
+    // ========================================
+    
+    // Validação de telefone
+    $participant.find('.phone-input')
+        .off('blur.participant')
+        .on('blur.participant', function() {
+            const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
+            validatePhoneNumber($(this), selectedCountry);
+        });
+    
+    // Validação de CPF
+    $participant.find('.cpf-mask')
+        .off('blur.participant')
+        .on('blur.participant', function() {
+            validateCPF($(this));
+        });
+    
+    // Validação de email (blur)
+    $participant.find('.email-input')
+        .off('blur.participant')
+        .on('blur.participant', function() {
+            validateEmail($(this));
+        });
+    
+    // Validação de email em tempo real (input com debounce)
+    $participant.find('.email-input')
+        .off('input.participant')
+        .on('input.participant', debounce(function() {
+            const email = $(this).val().trim();
+            if (email.length > 0) {
+                validateEmail($(this));
+            } else {
+                $(this).removeClass('error valid');
+            }
+        }, 500));
+
+    // ========================================
+    // EVENTOS QUE AFETAM CÁLCULOS (COM DEBOUNCE)
+    // ========================================
+    
+    // Data de nascimento - CRÍTICO para cálculos
+    $participant.find('.dob-input')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const $p = $(this).closest('.participant-block');
+            const birthDate = $(this).val();
+            
+            // Atualizar visibilidade de campos
+            toggleAdultFields($p, birthDate);
+            updateResponsibleSections();
+            updateBedPreferenceSection();
+            
+            // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
+            clearTimeout($p.data('dobTimer'));
+            const timer = setTimeout(() => {
+                updateParticipantCalculations($p);
+            }, 300);
+            $p.data('dobTimer', timer);
+        });
+    
+    // Acomodação - afeta cálculos E visibilidade
+    $participant.find('.accommodation-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const $p = $(this).closest('.participant-block');
+            const $childDiscountInfo = $p.find('.child-discount-info');
+            const dob = $p.find('.dob-input').val();
+            
+            // Atualizar visibilidade de info de desconto
+            if (dob && $(this).val()) {
+                const age = window.priceCalculator ? window.priceCalculator.calculateAge(dob) : calculateAge(dob);
+                
+                if (age < 12) {
+                    $childDiscountInfo.show();
+                } else {
+                    $childDiscountInfo.hide();
+                }
+            }
+            
+            // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
+            clearTimeout($p.data('accommodationTimer'));
+            const timer = setTimeout(() => {
+                updateParticipantCalculations($p);
+            }, 300);
+            $p.data('accommodationTimer', timer);
+        });
+
+    // Período de estadia - afeta opções de evento E cálculos
+    $participant.find('.stay-period-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const $p = $(this).closest('.participant-block');
+            const selectedPeriodId = $(this).val();
+            const periodoSelecionado = currentEvent.periodos_estadia_opcoes
+                .find(p => String(p.id) === String(selectedPeriodId));
+
+            // Atualizar informações de check-in/out
+            if (periodoSelecionado) {
+                updateCheckInOutInfo($p, periodoSelecionado);
+            } else {
+                $p.find('.checkin-datetime').text('');
+                $p.find('.checkout-datetime').text('');
+            }
+
+            // Atualizar opções de evento disponíveis
+            updateEventOptionsForPeriod($p);
+            
+            // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
+            clearTimeout($p.data('periodTimer'));
+            const timer = setTimeout(() => {
+                updateParticipantCalculations($p);
+            }, 300);
+            $p.data('periodTimer', timer);
+        });
+    
+    // Opção de evento - afeta cálculos
+    $participant.find('.event-option-select')
+        .off('change.participant')
+        .on('change.participant', function() {
+            const $p = $(this).closest('.participant-block');
+            
+            // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
+            clearTimeout($p.data('eventTimer'));
+            const timer = setTimeout(() => {
+                updateParticipantCalculations($p);
+            }, 300);
+            $p.data('eventTimer', timer);
+        });
+
+    // ========================================
+    // CAMPOS DE TEXTO (SEM CÁLCULO IMEDIATO)
+    // ========================================
+    
+    // Nome, telefone - apenas para coleta de dados
+    $participant.find('.full-name, .phone-mask')
+        .off('change.participant blur.participant')
+        .on('blur.participant', function() {
+            // Apenas validação visual, sem recálculo
+            const value = $(this).val().trim();
+            if (value.length === 0) {
+                $(this).addClass('error');
+            } else {
+                $(this).removeClass('error');
+            }
+        });
+
+    // ========================================
+    // OBSERVER PARA ETAPA 2 (OPCIONAL)
+    // ========================================
+    
+    // Remover observer antigo se existir
+    if ($participant.data('mutationObserver')) {
+        $participant.data('mutationObserver').disconnect();
+    }
+    
+    // Criar novo observer apenas na Etapa 2
+    if (currentStep === 2) {
+        const observer = new MutationObserver(debounce(() => {
+            if (currentStep === 2) {
+                updateParticipantCalculations($participant);
+            }
+        }, 500)); // Debounce de 500ms para observer
         
         // Observar mudanças nos campos do participante
         observer.observe($participant[0], {
             childList: true,
             subtree: true,
             attributes: true,
-            attributeFilter: ['value']
+            attributeFilter: ['value', 'data-age']
         });
+        
+        // Guardar referência para limpeza posterior
+        $participant.data('mutationObserver', observer);
     }
     
-    // NOVO: Configurar campos de endereço
-    if (addressManager) {
+    // ========================================
+    // CONFIGURAÇÃO DE ENDEREÇO
+    // ========================================
+    
+    if (typeof addressManager !== 'undefined' && addressManager) {
         addressManager.setupAddressFields($participant);
     }
     
+    console.log(`✅ Event listeners configurados para ${participantId}`);
 }
 
 // NOVA FUNÇÃO: Controlar visibilidade dos campos baseado na idade
