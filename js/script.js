@@ -1576,6 +1576,11 @@ function updateAddressSection() {
         // Tornar campos obrigatórios (exceto complemento)
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
             .attr('required', true);
+
+                      // ✨ ADICIONE A CORREÇÃO AQUI ✨
+        if (addressManager) {
+            addressManager.setupAddressFields($responsiblePayer);
+        }
         
         console.log('📍 Seção de endereço habilitada para o responsável pelo pagamento');
     } else if (participants.length === 1) {
@@ -1587,6 +1592,11 @@ function updateAddressSection() {
         // Tornar campos obrigatórios
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
             .attr('required', true);
+
+                // ✨ ADICIONE A CORREÇÃO AQUI TAMBÉM ✨
+        if (addressManager) {
+            addressManager.setupAddressFields($singleParticipant);
+        }
         
         console.log('📍 Seção de endereço habilitada para o único participante');
     }
