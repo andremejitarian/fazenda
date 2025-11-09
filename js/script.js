@@ -929,35 +929,6 @@ function setupParticipantEventListeners($participant) {
                 $(this).removeClass('error');
             }
         });
-
-    // ========================================
-    // OBSERVER PARA ETAPA 2 (OPCIONAL)
-    // ========================================
-    
-    // Remover observer antigo se existir
-    if ($participant.data('mutationObserver')) {
-        $participant.data('mutationObserver').disconnect();
-    }
-    
-    // Criar novo observer apenas na Etapa 2
-    if (currentStep === 2) {
-        const observer = new MutationObserver(debounce(() => {
-            if (currentStep === 2) {
-                updateParticipantCalculations($participant);
-            }
-        }, 500)); // Debounce de 500ms para observer
-        
-        // Observar mudanças nos campos do participante
-        observer.observe($participant[0], {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['value', 'data-age']
-        });
-        
-        // Guardar referência para limpeza posterior
-        $participant.data('mutationObserver', observer);
-    }
     
     // ========================================
     // CONFIGURAÇÃO DE ENDEREÇO
