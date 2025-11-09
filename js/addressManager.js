@@ -55,6 +55,7 @@ class AddressManager {
         
         $searchBtn.off('click').on('click', async (e) => { // Usamos .off('click') para evitar múltiplos eventos
             e.preventDefault(); // A linha mais importante!
+            e.stopImmediatePropagation(); // ✨ ADICIONE ESTA LINHA! Impede que outros eventos de clique neste botão sejam disparados.
 
             // ADICIONE ESTA LINHA PARA VERIFICAR SE O CLIQUE FUNCIONA
             console.log('CLIQUE NA LUPA DETECTADO! A página NÃO deve recarregar.');
