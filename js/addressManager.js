@@ -8,6 +8,7 @@ class AddressManager {
     // Configurar campos de endereço para um participante
     setupAddressFields($participant) {
         const $addressSection = $participant.find('.address-section');
+        
         if ($addressSection.length === 0) {
             console.warn('⚠️ Seção de endereço não encontrada no participante');
             return;
@@ -19,8 +20,34 @@ class AddressManager {
         // Aplicar máscara
         $cepInput.mask('00000-000');
 
-        console.log(`✅ Máscara de CEP aplicada para o participante [${$participant.data('participant-id')}]`);
-        
+        // Buscar ao sair do campo (blur)
+        $cepInput.on('blur', async () => {
+            const cep = $cepInput.val();
+            if (cep && cep.replace(/\D/g, '').length === 8) {
+                await this.searchAndFillAddress($participant, cep);
+            }
+        });
+
+        // Buscar ao pressionar Enter
+        $cepInput.on('keypress', async (e) => {
+            if (e.which === 13) { // Enter
+                e.preventDefault();
+                const cep = $cepInput.val();
+                if (cep && cep.replace(/\D/g, '').length === 8) {
+                    await this.searchAndFillAddress($participant, cep);
+                }
+            }
+        });
+
+        // Event listener para o botão de busca (se existir)
+        const $searchBtn = $participant.find('.btn-search-cep');
+        $searchBtn.on('click', async (e) => { // <--- 1. Adicione o parâmetro 'e'
+            e.preventDefault(); // <--- 2. Adicione esta linha!
+            const cep = $cepInput.val();
+            await this.searchAndFillAddress($participant, cep);
+        });
+
+        console.log('✅ Campos de endereço configurados');
     }
 
     // Buscar e preencher endereço
