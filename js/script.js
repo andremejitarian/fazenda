@@ -2098,22 +2098,30 @@ function generateInscricaoId() {
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
     
-    // **CORREÇÃO**: Coletar dados dos participantes do DOM
-    const participantsData = [];
+    // **PASSO 1**: Coletar TODOS os participantes do DOM primeiro (SEM calcular valores ainda)
+    const allParticipantsData = [];
     $('#participants-container .participant-block').each(function(index) {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         
-        // **CRÍTICO**: Adicionar campo 'id' e 'index' para o priceCalculator identificar a ordem
+        // **CRÍTICO**: Adicionar campo 'id' para o priceCalculator identificar a ordem
         participantData.index = index;
         
-        console.log(`📋 Participante ${index}:`, participantData);
-        
-        // **CRÍTICO**: Calcular valores com o objeto que agora tem 'id'
+        allParticipantsData.push(participantData);
+    });
+    
+    console.log('📋 PASSO 1 - Todos os participantes coletados:', allParticipantsData);
+    
+    // **PASSO 2**: Atualizar o priceCalculator com TODOS os participantes
+    priceCalculator.updateParticipants(allParticipantsData);
+    console.log('🔄 PASSO 2 - PriceCalculator atualizado com todos os participantes');
+    
+    // **PASSO 3**: AGORA calcular valores individuais
+    const participantsData = allParticipantsData.map((participantData, index) => {
         const valorHospedagem = priceCalculator.calculateLodgingValue(participantData);
         const valorEvento = priceCalculator.calculateEventValue(participantData);
         
-        console.log(`💰 Valores calculados para ${participantData.fullName}:`, {
+        console.log(`💰 PASSO 3 - Valores para ${participantData.fullName} (${priceCalculator.calculateAge(participantData.birthDate)} anos):`, {
             valorHospedagem,
             valorEvento
         });
@@ -2151,12 +2159,16 @@ function prepareFormData(inscricaoId) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
-        participantsData.push(participantForWebhook);
+        return participantForWebhook;
     });
     
-    console.log('📋 Todos os participantes processados:', participantsData);
+    console.log('✅ PASSO 4 - Todos os participantes processados:', participantsData);
     
     // Identificar responsável pelo pagamento
+    
+    if (!responsiblePayer) {
+        throw new Error('Nenhum responsável pelo pagamento encontrado');
+    }
     
     console.log('👤 Responsável pelo pagamento:', responsiblePayer);
 
