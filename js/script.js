@@ -7,6 +7,20 @@ let selectedPaymentMethod = null;
 let submissionInProgress = false;
 let paymentLinkGenerated = false;
 
+
+// Função debounce para evitar execuções excessivas
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // Function to format ISO date-time string for display (e.g., "DD/MM/YYYY HH:MM")
 function formatDateTimeForDisplay(isoDateTimeString) {
     if (!isoDateTimeString) return '';
