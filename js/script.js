@@ -53,6 +53,37 @@ function scrollToAndFocusElement($element) {
 $(document).ready(function() {
     console.log('Formulário iniciado');
     initializeForm();
+
+// ✨ INÍCIO DA SOLUÇÃO DEFINITIVA ✨
+
+    // Delegação de Evento para o Botão de Busca de CEP
+    $(document).on('click', '.btn-search-cep', async function(e) {
+        e.preventDefault(); // Impede o envio do formulário
+
+        // Encontra o bloco do participante pai deste botão
+        const $participant = $(this).closest('.participant-block');
+        const cep = $participant.find('.cep-input').val();
+
+        if (addressManager && cep && cep.replace(/\D/g, '').length === 8) {
+            // Chama o método do AddressManager para fazer a busca
+            await addressManager.searchAndFillAddress($participant, cep);
+        } else if (addressManager) {
+            addressManager.showError($participant, 'Por favor, insira um CEP válido.');
+        }
+    });
+
+    // Delegação de Evento para o campo CEP (quando o usuário sai do campo)
+    $(document).on('blur', '.cep-input', async function() {
+        const $participant = $(this).closest('.participant-block');
+        const cep = $(this).val();
+
+        if (addressManager && cep && cep.replace(/\D/g, '').length === 8) {
+            await addressManager.searchAndFillAddress($participant, cep);
+        }
+    });
+
+    // ✨ FIM DA SOLUÇÃO DEFINITIVA ✨
+    
 });
 
 // Função principal de inicialização
