@@ -2447,15 +2447,6 @@ function extractParticipantData($participant) {
         }
     }
 
-        // ✅ CRÍTICO: Extrair dados de endereço (se visível e preenchido)
-    const $addressSection = $participant.find('.address-section');
-    if ($addressSection.is(':visible') && addressManager) {
-        data.address = addressManager.extractAddressData($participant);
-        console.log('✅ Endereço extraído:', data.address);
-    } else {
-        console.warn('⚠️ Seção de endereço não visível ou addressManager não disponível');
-    }
-
     // CORRIGIDO: Capturar dados sempre, independente da visibilidade
     const countryCode = $participant.find('.country-select').val() || '';
     const countryName = $participant.find('.country-select').find(':selected').data('country') || '';
@@ -2474,6 +2465,13 @@ function extractParticipantData($participant) {
         emailVisible: $participant.find('.email-input').closest('.form-group').is(':visible')
     });
 
+    // Extrair dados de endereço (apenas se visível - responsável pelo pagamento)
+    let addressData = null;
+    const $addressSection = $participant.find('.address-section');
+    if ($addressSection.is(':visible') && addressManager) {
+        addressData = addressManager.extractAddressData($participant);
+    }
+    
     return {
         fullName: $participant.find('.full-name').val() || '',
         phone: phoneNumber,
@@ -2494,7 +2492,8 @@ function extractParticipantData($participant) {
         isResponsibleChild: $participant.find('.responsible-child').is(':checked'),
         numDiarias: numDiarias,
         dataCheckin: dataCheckin,
-        dataCheckout: dataCheckout
+        dataCheckout: dataCheckout,
+        address: addressData
     };
 }
 
