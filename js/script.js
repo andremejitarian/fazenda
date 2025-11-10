@@ -1738,15 +1738,30 @@ function generateParticipantsSummary() {
         `;
     }
 
-    // NOVO: Adicionar endereço do responsável
-    if (addressManager && $responsiblePayer.length > 0) {
-            const addressData = addressManager.extractAddressData($responsiblePayer);
+        // ✅ ADICIONE ESTA SEÇÃO DE ENDEREÇO AQUI (SUBSTITUA O BLOCO ANTIGO):
+        if (responsiblePayerData && $responsiblePayer.length > 0) {
+            // Extrair dados de endereço
+            const cep = $responsiblePayer.find('.cep-input').val();
+            const logradouro = $responsiblePayer.find('.logradouro-input').val();
+            const numero = $responsiblePayer.find('.numero-input').val();
+            const complemento = $responsiblePayer.find('.complemento-input').val();
+            const bairro = $responsiblePayer.find('.bairro-input').val();
+            const cidade = $responsiblePayer.find('.cidade-input').val();
+            const estado = $responsiblePayer.find('.estado-select').val();
             
-    // Verificar se há dados de endereço preenchidos
-    if (addressData.cep && addressData.logradouro) {
-                summaryHtml += addressManager.generateAddressSummaryHTML(addressData);
+            // Verificar se há dados de endereço preenchidos
+            if (cep && logradouro) {
+                summaryHtml += `
+                    <div class="address-summary">
+                        <h3>Endereço do Responsável</h3>
+                        <div class="address-info">
+                            <p><strong>CEP:</strong> ${cep}</p>
+                            <p><strong>Logradouro:</strong> ${logradouro}</p>
+                        </div>
+                    </div>
+                `;
             }
-    }
+        }
 
     // Seção do responsável pela criança
     if (hasMinors()) {
