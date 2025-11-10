@@ -1738,6 +1738,17 @@ function generateParticipantsSummary() {
         `;
     }
 
+    // ✅ ADICIONE ESTA SEÇÃO DE ENDEREÇO AQUI:
+    if (responsavel.endereco) {
+        summaryHTML += `
+            <div class="address-summary">
+                <h3>Endereço do Responsável</h3>
+                <div class="address-info">
+                </div>
+            </div>
+        `;
+    }
+
     // NOVO: Adicionar endereço do responsável
     if (addressManager && $responsiblePayer.length > 0) {
             const addressData = addressManager.extractAddressData($responsiblePayer);
