@@ -2197,6 +2197,7 @@ function prepareFormData(inscricaoId) {
         descricao: currentEvent.descricao,
         politicas_evento_url: currentEvent.politicas_evento_url,
         planilha_url: currentEvent.planilha_url,
+        regrasIdadePrecificacao: currentEvent.regras_idade_precificacao,
     };
 
     // Adicionar observações adicionais apenas se existirem
