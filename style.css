@@ -902,7 +902,7 @@ body {
     border: none;
     border-radius: var(--border-radius);
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .responsible-payer-summary h3 {
@@ -2007,12 +2007,12 @@ html {
     border: none;
     border-radius: var(--border-radius);
     padding: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .address-summary h3 {
     color: var(--primary-color);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-size: 1.1em;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
@@ -2021,7 +2021,7 @@ html {
 .address-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 10px;
 }
 
 .address-info p {
