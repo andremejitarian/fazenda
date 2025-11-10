@@ -1755,8 +1755,13 @@ function generateParticipantsSummary() {
                     <div class="address-summary">
                         <h3>Endereço do Responsável</h3>
                         <div class="address-info">
-                            <p><strong>CEP:</strong> ${cep}</p>
                             <p><strong>Logradouro:</strong> ${logradouro}</p>
+                            <p><strong>Número:</strong> ${numero}</p>
+                            <p><strong>Complemento:</strong> ${complemento}</p>
+                            <p><strong>CEP:</strong> ${cep}</p>
+                            <p><strong>Bairro:</strong> ${bairro}</p>
+                            <p><strong>Cidade:</strong> ${cidade}</p>
+                            <p><strong>Estado:</strong> ${estado}</p>
                         </div>
                     </div>
                 `;
