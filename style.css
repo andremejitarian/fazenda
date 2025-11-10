@@ -1998,30 +1998,37 @@ html {
     box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
 }
 
-/* Seção de endereço no resumo */
+/* ========================================
+   SEÇÃO DE ENDEREÇO - FORMATAÇÃO IGUAL AO RESPONSÁVEL
+   ======================================== */
+
 .address-summary {
-    background: var(--background-color);
-    border: 1px solid var(--border-color);
+    background: none;
+    border: none;
     border-radius: var(--border-radius);
-    padding: 20px;
-    margin: 20px 0;
+    padding: 10px;
+    margin-bottom: 30px;
 }
 
-.address-summary h4 {
+.address-summary h3 {
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     font-size: 1.1em;
-    font-weight: 600;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
 }
 
-.address-summary p {
-    margin: 8px 0;
+.address-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.address-info p {
+    margin: 0;
     font-size: 0.95em;
     color: var(--text-primary);
-    text-align: left;
     
     /* Alinhamento título/valor */
     display: grid;
@@ -2029,39 +2036,35 @@ html {
     gap: 6px;
     align-items: baseline;
     justify-items: start;
+    text-align: left;
 }
 
-.address-summary strong {
-    color: var(--secondary-color);
-    font-weight: 600;
+.address-info strong {
+    color: var(--primary-color);
     text-align: left;
     white-space: nowrap;
 }
 
 /* Responsividade para mobile */
 @media (max-width: 768px) {
-    .cep-input-container {
-        gap: 6px;
-    }
-    
-    .btn-search-cep {
-        flex: 0 0 44px;
-        min-width: 44px;
-        font-size: 1.1em;
+    .address-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
     
     .address-summary {
-        padding: 15px;
+        padding-left: 0;
     }
     
-    .address-summary p {
-        grid-template-columns: 1fr;
-        gap: 2px;
+    .address-summary h3 {
+        padding-left: 0;
+        margin-left: 0;
     }
     
-    .address-summary strong {
-        display: block;
-        margin-bottom: 2px;
+    .address-info p {
+        padding-left: 0;
+        margin-left: 0;
+        text-align: left;
     }
 }
 
