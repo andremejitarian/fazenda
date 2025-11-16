@@ -2157,6 +2157,14 @@ function prepareFormData(inscricaoId) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
 
+        if (participantData.primeiraRefeicao !== null) {
+            participantForWebhook.primeira_refeicao = participantData.primeiraRefeicao;
+        }
+        
+        if (participantData.ultimaRefeicao !== null) {
+            participantForWebhook.ultima_refeicao = participantData.ultimaRefeicao;
+        }
+
         participantsData.push(participantForWebhook);
     });
     
@@ -2537,6 +2545,8 @@ function extractParticipantData($participant) {
     let numDiarias = null;
     let dataCheckin = null;
     let dataCheckout = null;
+    let primeiraRefeicao = null;
+    let ultimaRefeicao = null;
     
     if (stayPeriodId && currentEvent.periodos_estadia_opcoes) {
         const periodoSelecionado = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
@@ -2552,6 +2562,14 @@ function extractParticipantData($participant) {
             }
             if (periodoSelecionado.data_fim) {
                 dataCheckout = periodoSelecionado.data_fim;
+            }
+
+            // ✅ NOVO: Capturar informações de refeições
+            if (periodoSelecionado.primeira_refeicao) {
+                primeiraRefeicao = periodoSelecionado.primeira_refeicao;
+            }
+            if (periodoSelecionado.ultima_refeicao) {
+                ultimaRefeicao = periodoSelecionado.ultima_refeicao;
             }
         }
     }
@@ -2569,6 +2587,8 @@ function extractParticipantData($participant) {
         phoneNumber,
         cpfValue,
         emailValue,
+        primeiraRefeicao,
+        ultimaRefeicao,
         phoneVisible: $participant.find('.phone-input').closest('.form-group').is(':visible'),
         cpfVisible: $participant.find('.cpf-mask').closest('.form-group').is(':visible'),
         emailVisible: $participant.find('.email-input').closest('.form-group').is(':visible')
@@ -2602,6 +2622,8 @@ function extractParticipantData($participant) {
         numDiarias: numDiarias,
         dataCheckin: dataCheckin,
         dataCheckout: dataCheckout,
+        primeiraRefeicao: primeiraRefeicao,
+        ultimaRefeicao: ultimaRefeicao,
         address: addressData
     };
 }
