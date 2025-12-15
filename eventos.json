@@ -2,7 +2,7 @@
   "eventos": [
     {
       "id": "G001",
-      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1VJi_wOgxZRrKGfVT9GnvRwRyQ1Vx4I0uZe_5AoFdEvQ/edit?gid=0#gid=0",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
@@ -367,33 +367,39 @@
     },
     {
       "id": "G003c",
-      "planilha_url": "https://docs.google.com/spreadsheets/d/1ABC123XYZ/edit",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1VJi_wOgxZRrKGfVT9GnvRwRyQ1Vx4I0uZe_5AoFdEvQ/edit?gid=0#gid=0",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Reserva de Hospedagem",
       "descricao": "Hospedagem avulsa em nossos quartos aconchegantes.",
-      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G003",
-      "observacoes_adicionais": "Não inclui acesso a eventos ou alimentação. Check-out até 12h.",
+      "politicas_evento_url": "https://drive.google.com/file/d/1IuRoFRJbBzBihsu1XjIf_js9qVExIqLB/view",
+      "observacoes_adicionais": "Espaço dísponivel para observações adicionais",
       "tipo_formulario": "hospedagem_apenas",
       "tipos_acomodacao": [
         {
-          "id": "padrao_duplo",
-          "label": "Quarto Padrão Duplo",
-          "descricao": "Acomodação para duas pessoas.",
-          "valor_diaria_por_pessoa": 150.00
-        }
+          "id": "compart",
+          "label": "Quarto Compartilhado",
+          "descricao": "Acomodação compartilhada com outras pessoas",
+          "valor_diaria_por_pessoa": 540.00
+        },
+        {
+          "id": "indiv",
+          "label": "Quarto Individual",
+          "descricao": "Acomodação individual, não compartilhada com outras pessoas",
+          "valor_diaria_por_pessoa": 840.00
+        },
       ],
 
       "periodos_estadia_opcoes": [
         {
           "id": "duas_noites",
-          "label": "2 Noites (20/10 - 22/10)",
-          "data_inicio": "2025-10-20T14:00",
-          "data_fim": "2025-10-22T12:00",
-          "primeira_refeicao": "Jantar do dia 10/10",
-          "ultima_refeicao": "Almoço do dia 12/10",
+          "label": "2 Noites (27/11 - 29/11)",
+          "data_inicio": "2026-11-27T18:00",
+          "data_fim": "2026-11-29T12:00",
+          "primeira_refeicao": "Jantar do dia 27/11",
+          "ultima_refeicao": "Almoço do dia 29/11",
           "num_diarias": 2
         }
       ],
@@ -402,18 +408,38 @@
 
       "formas_pagamento_opcoes": [
         {
-          "id": "cartao_credito",
-          "label": "Cartão de Crédito em até 6x",
-          "tipo": "cartao",
-          "descricao": " testeee",
+          "id": "pix_vista",
+          "label": "PIX à Vista",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de <b>70%</b> deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -8.00
+        },      
+        {
+          "id": "cartao_parcelado",
+          "label": "Cartão Parcelado (até 6x sem juros)",
+          "tipo": "cartao_parcelado",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.00
         },
         {
-          "id": "pix_vista2",
-          "label": "PIX à Vista com 5% de desconto",
-          "tipo": "pix",
-          "descricao": " outro testeeee ",
-          "taxa_gateway_percentual": -0.05
+          "id": "cartao_vista",
+          "label": "Cartão Á vista",
+          "tipo": "cartao",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": -4.00
+        },
+        {
+          "id": "pix_sinal",
+          "label": "Pix sinal 30% e 70%",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": -8.00
         }
       ],
 
@@ -446,10 +472,10 @@
 
       "cupons_desconto": [
         {
-          "codigo": "HOSPEDAGEM15",
+          "codigo": "HOSPEDAGEM10",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.15,
-          "data_validade_fim": "2025-11-15T23:59:59",
+          "valor_desconto": 0.10,
+          "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
       ]
