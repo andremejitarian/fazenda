@@ -518,8 +518,8 @@
           "label": "2 Noites (22/05 - 24/05)",
           "data_inicio": "2026-05-22T16:00",
           "data_fim": "2026-05-24T16:00",
-          "primeira_refeicao": "Jantar do dia 22/05",
-          "ultima_refeicao": "Almoço do dia 24/05",
+          "primeira_refeicao": "Jantar",
+          "ultima_refeicao": "Almoço",
           "num_diarias": 2
         }
       ],
