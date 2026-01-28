@@ -533,7 +533,7 @@
           "tipo": "cartao_parcelado",
           "parcelas_maximas": 6,
           "juros": false,
-          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.<br></p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": 0.00
         },
         {
@@ -542,14 +542,14 @@
           "tipo": "cartao",
           "parcelas_maximas": 1,
           "juros": false,
-          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.<br></p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.04
         },
         {
           "id": "pix_vista",
           "label": "PIX à Vista com 8% de desconto",
           "tipo": "pix",
-          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.<br></p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
         },      
         {
