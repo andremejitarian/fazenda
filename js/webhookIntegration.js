@@ -2,7 +2,7 @@
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
-            submission: 'https://criadordigital-n8n-webhook.kttqgl.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
+            submission: 'https://auto-n8n-webhook.rbnawr.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
         };
         this.timeout = 15000;
         this.retryAttempts = 1;
