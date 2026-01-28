@@ -485,7 +485,12 @@
       "planilha_url": "https://docs.google.com/spreadsheets/d/1yUzQwRvb3hWfsBGO7EnPAVJ8BUG-tNjMBAk5FHwJsRI/edit?gid=0#gid=0",
       "header": {
         "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
-        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+        "partner_logos": [
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1769627224/Screenshot_2026-01-28_at_16.06.23_jukg13.png"
+        ],
+        "logo_duplo": true
       },
       "nome": "Imersão com Antonio Gomides",
       "descricao": "Com sensibilidade e profundidade, Antônio Gomides apresenta a agrofloresta como um caminho de regeneração do solo, das relações e dos valores humanos.",
