@@ -502,13 +502,13 @@
           "id": "compart",
           "label": "Alojamento com até 6 pessoas (quarto coletivo)",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 525.00
+          "valor_diaria_por_pessoa": 579.00
         },
         {
           "id": "indiv",
           "label": "Quartos privativos para casais, amigos e famílias",
           "descricao": "Acomodação individual, não compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 635.00
+          "valor_diaria_por_pessoa": 699.50
         }
       ],
 
