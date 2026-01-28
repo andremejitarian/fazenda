@@ -2220,6 +2220,7 @@ function prepareFormData(inscricaoId) {
     // Preparar dados completos do evento
     const eventoCompleto = {
         id: currentEvent.id,
+        external_reference: currentEvent.external_reference,
         nome: currentEvent.nome,
         tipo_formulario: currentEvent.tipo_formulario,
         descricao: currentEvent.descricao,
