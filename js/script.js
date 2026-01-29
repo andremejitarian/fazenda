@@ -2295,9 +2295,6 @@ function setupPaymentLink(paymentLink, formData) {
         $paymentBtn.off('click').on('click', function () {
             // Abrir link em nova aba
             window.open(paymentLink, '_blank');
-
-            // Mostrar opções adicionais
-            showPaymentOptions(paymentLink);
         });
     } else {
         // Modo offline ou erro no link
@@ -2334,7 +2331,6 @@ async function generatePaymentLinkManually(formData) {
             $paymentBtn.prop('disabled', false).text('Ir para Pagamento');
             $paymentBtn.off('click').on('click', function () {
                 window.open(linkResult.link, '_blank');
-                showPaymentOptions(linkResult.link);
             });
 
             showPaymentSuccess(linkResult);
@@ -2350,74 +2346,7 @@ async function generatePaymentLinkManually(formData) {
     }
 }
 
-// Mostrar opções de pagamento
-function showPaymentOptions(paymentLink) {
-    const optionsHtml = `
-        <div class="payment-options">
-            <h4>Opções de Pagamento</h4>
-            <div class="payment-actions">
-                <button class="btn btn-secondary" onclick="copyPaymentLink('${paymentLink}')">
-                    📋 Copiar Link
-                </button>
-                <button class="btn btn-secondary" onclick="sharePaymentLink('${paymentLink}')">
-                    📤 Compartilhar
-                </button>
-            </div>
-            <div class="qr-code-container" id="qr-code-container">
-                <!-- QR Code seria gerado aqui -->
-            </div>
-        </div>
-    `;
 
-    if ($('.payment-options').length === 0) {
-        $('.payment-link-btn').after(optionsHtml);
-    }
-}
-
-// Copiar link de pagamento
-function copyPaymentLink(link) {
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(link).then(() => {
-            showToast('Link copiado para a área de transferência!', 'success');
-        }).catch(() => {
-            fallbackCopyText(link);
-        });
-    } else {
-        fallbackCopyText(link);
-    }
-}
-
-// Fallback para copiar texto
-function fallbackCopyText(text) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-
-    try {
-        document.execCommand('copy');
-        showToast('Link copiado!', 'success');
-    } catch (err) {
-        console.error('Erro ao copiar:', err);
-        showToast('Erro ao copiar link', 'error');
-    }
-
-    document.body.removeChild(textArea);
-}
-
-// Compartilhar link de pagamento
-function sharePaymentLink(link) {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Link de Pagamento - Fazenda Serrinha',
-            text: 'Complete seu pagamento através deste link:',
-            url: link
-        }).catch(err => console.log('Erro ao compartilhar:', err));
-    } else {
-        // Fallback: copiar link
-        copyPaymentLink(link);
-    }
-}
 
 // Mostrar sucesso na geração do link
 function showPaymentSuccess(linkResult) {
