@@ -2194,6 +2194,7 @@ function prepareFormData(inscricaoId) {
             cep: addressData.cep,
             logradouro: addressData.logradouro,
             numero: addressData.numero,
+            complemento: addressData.complemento,
             bairro: addressData.bairro,
             cidade: addressData.cidade,
             estado: addressData.estado
