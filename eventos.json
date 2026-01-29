@@ -610,7 +610,7 @@
         {
           "id": "sem_acomodacao",
           "label": "sem acomodação",
-          "descricao": "sem acomodação",
+          "descricao": "sem pernoite",
           "valor_diaria_por_pessoa": 441.50
         }
       ],
