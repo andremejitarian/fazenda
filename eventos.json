@@ -484,6 +484,110 @@
         }
       ]
     },
+    {
+      "id": "G004e",
+      "external_reference": "4a4837d1-f779-4307-b4a8-79b9e4753cc4",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1yUzQwRvb3hWfsBGO7EnPAVJ8BUG-tNjMBAk5FHwJsRI/edit?gid=0#gid=0",
+      "header": {
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+        "partner_logos": [
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+          "https://res.cloudinary.com/ddjlqajrd/image/upload/v1769628002/Screenshot_2026-01-28_at_16.18.50_fj2kjv.png"
+        ],
+        "logo_duplo": true
+      },
+      "nome": "Imersão com Antonio Gomides",
+      "descricao": "Com sensibilidade e profundidade, Antônio Gomides apresenta a agrofloresta como um caminho de regeneração do solo, das relações e dos valores humanos.",
+      "politicas_evento_url": "https://drive.google.com/file/d/1IuRoFRJbBzBihsu1XjIf_js9qVExIqLB/view",
+      "observacoes_adicionais": "A vivência acontece de 22 a 24 de maio de 2026 na Fazenda Serrinha.",
+      "tipo_formulario": "evento_apenas",
+      "tipos_acomodacao": [],
+      "periodos_estadia_opcoes": [],
+      
+      "valores_evento_opcoes": [
+        {
+          "id": "sem_pernoite",
+          "label": "Sem pernoite, com almoço e café da tarde",
+          "valor": 883.00,
+          "descricao": "Sem pernoite, com almoço e café da tarde"
+        }
+      ],
+
+      "formas_pagamento_opcoes": [
+        {
+          "id": "cartao_parcelado",
+          "label": "Cartão Parcelado (até 6x sem juros)",
+          "tipo": "cartao_parcelado",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": 0.00
+        },
+        {
+          "id": "cartao_vista",
+          "label": "Cartão Á vista com 4% de desconto",
+          "tipo": "cartao",
+          "parcelas_maximas": 1,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.04
+        },
+        {
+          "id": "pix_vista",
+          "label": "PIX à Vista com 8% de desconto",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.08
+        },      
+        {
+          "id": "pix_sinal",
+          "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.08
+        }
+      ],
+
+      "regras_idade_precificacao": {
+        "hospedagem": [],
+        "evento": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 0.5,
+              "descricao": "Crianças 0-3 anos extras pagam 50% da hospedagem"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 10 anos pagam valor integral de hospedagem"
+          }
+        ]
+      },
+
+      "cupons_desconto": [
+        {
+          "codigo": "WORKSHOP10",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.10,
+          "data_validade_fim": "2025-09-30T23:59:59",
+          "aplicacao": "total"
+        }
+      ]
+    },
         {
       "id": "G004",
       "external_reference": "4a4837d1-f779-4307-b4a8-79b9e4753cc4",
