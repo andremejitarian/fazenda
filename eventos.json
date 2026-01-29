@@ -608,10 +608,10 @@
       "tipo_formulario": "hospedagem_apenas",
       "tipos_acomodacao": [
         {
-          "id": "sem_pernoite",
-          "label": "sem acomodação, por ser day-use",
-          "descricao": "sem acomodação, por ser day-use",
-          "valor_diaria_por_pessoa": 883.00
+          "id": "sem_acomodacao",
+          "label": "sem acomodação",
+          "descricao": "sem acomodação",
+          "valor_diaria_por_pessoa": 441.50
         }
       ],
 
@@ -619,7 +619,7 @@
         {
           "id": "sem_pernoite",
           "label": "22 a 24 de maio, sem pernoite, com almoço e café da tarde",
-          "data_inicio": "2026-05-22T9:00",
+          "data_inicio": "2026-05-22T09:00",
           "data_fim": "2026-05-24T18:00",
           "primeira_refeicao": "Almoço",
           "ultima_refeicao": "Café da tarde",
