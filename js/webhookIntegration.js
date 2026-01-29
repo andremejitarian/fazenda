@@ -4,7 +4,7 @@ class WebhookIntegration {
         this.endpoints = {
             submission: 'https://auto-n8n-webhook.rbnawr.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
         };
-        this.timeout = 15000;
+        this.timeout = 60000;
         this.retryAttempts = 1;
         this.submissionInProgress = false;
     }
@@ -29,12 +29,12 @@ class WebhookIntegration {
             console.log('=== ENVIANDO FORMULÁRIO PARA WEBHOOK ===');
             console.log('URL:', this.endpoints.submission);
             console.log('Dados enviados:', JSON.stringify(formData, null, 2));
-            
+
             const response = await this.makeRequest('POST', this.endpoints.submission, formData);
-            
+
             if (response) {
                 console.log('✅ Resposta do webhook recebida:', response);
-                
+
                 return {
                     success: true,
                     data: {
@@ -59,11 +59,11 @@ class WebhookIntegration {
 
     async makeRequest(method, url, data = null) {
         let lastError = null;
-        
+
         for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
             try {
                 console.log(`🔄 Tentativa ${attempt}/${this.retryAttempts} para ${method} ${url}`);
-                
+
                 const config = {
                     method: method,
                     headers: {
@@ -80,7 +80,7 @@ class WebhookIntegration {
 
                 const response = await Promise.race([
                     fetch(url, config),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Timeout da requisição')), this.timeout)
                     )
                 ]);
@@ -95,7 +95,7 @@ class WebhookIntegration {
 
                 const contentType = response.headers.get('content-type');
                 let result;
-                
+
                 if (contentType && contentType.includes('application/json')) {
                     result = await response.json();
                 } else {
@@ -113,7 +113,7 @@ class WebhookIntegration {
             } catch (error) {
                 lastError = error;
                 console.warn(`⚠️ Tentativa ${attempt} falhou:`, error.message);
-                
+
                 if (attempt < this.retryAttempts) {
                     const delay = 1000 * attempt;
                     console.log(`⏳ Aguardando ${delay}ms antes da próxima tentativa...`);
