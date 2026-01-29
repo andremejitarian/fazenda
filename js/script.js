@@ -38,23 +38,23 @@ function formatDateTimeForDisplay(isoDateTimeString) {
 // Função para rolar suavemente até um elemento e focá-lo
 function scrollToAndFocusElement($element) {
     if ($element.length === 0) return;
-    
+
     // Calcular posição considerando header fixo (se houver)
     const headerHeight = 80; // Ajuste conforme necessário
     const elementTop = $element.offset().top - headerHeight;
-    
+
     // Rolar suavemente até o elemento
     $('html, body').animate({
         scrollTop: elementTop
-    }, 500, function() {
+    }, 500, function () {
         // Após a animação, focar no elemento
         $element.focus();
-        
+
         // Para campos select, abrir o dropdown
         if ($element.is('select')) {
             $element.trigger('click');
         }
-        
+
         // Adicionar efeito visual temporário
         $element.addClass('field-highlight');
         setTimeout(() => {
@@ -64,7 +64,7 @@ function scrollToAndFocusElement($element) {
 }
 
 // Inicialização
-$(document).ready(function() {
+$(document).ready(function () {
     console.log('Formulário iniciado');
     initializeForm();
 });
@@ -74,30 +74,30 @@ function initializeForm() {
     // Detectar parâmetro de evento na URL
     const urlParams = new URLSearchParams(window.location.search);
     const eventoId = urlParams.get('evento') || 'G001'; // Fallback para G001
-    
+
     // Inicializar integração com webhooks (SEM testes)
     initializeWebhookIntegration();
 
     // NOVO: Inicializar validador de CEP
     initializeCEPValidator();
-    
+
     // NOVO: Inicializar gerenciador de endereço
     initializeAddressManager();
-    
+
     // Carregar dados do evento APENAS do JSON local
     console.log(`📂 Carregando evento: ${eventoId}`);
-    
+
     // Mostrar estado de loading
     showLoadingState();
-    
+
     loadEventFromJSON(eventoId).then(eventoData => {
         if (eventoData) {
             currentEvent = eventoData;
             console.log('📋 Evento carregado do JSON:', currentEvent);
-            
+
             // Configurar interface com dados do evento
             setupEventInterface();
-            
+
             // Ocultar loading e mostrar conteúdo
             hideLoadingState();
         } else {
@@ -107,10 +107,10 @@ function initializeForm() {
         console.error('❌ Erro ao carregar evento:', error);
         showErrorState(error.message);
     });
-    
+
     // Configurar event listeners
     setupEventListeners();
-    
+
     // Configurar máscaras de input
     setupInputMasks();
 }
@@ -123,16 +123,16 @@ async function loadEventFromJSON(eventoId) {
         if (!response.ok) {
             throw new Error('Erro ao carregar dados dos eventos');
         }
-        
+
         const data = await response.json();
         const evento = data.eventos.find(e => e.id === eventoId);
-        
+
         if (evento) {
             console.log('✅ Evento encontrado:', evento.nome);
         } else {
             console.warn('⚠️ Evento não encontrado:', eventoId);
         }
-        
+
         return evento;
     } catch (error) {
         console.error('❌ Erro ao carregar JSON local:', error);
@@ -146,23 +146,23 @@ function setupEventInterface() {
     if (currentEvent.header) {
         setupEventHeader();
     }
-    
+
     // Preencher informações básicas
     $('#event-title').text(currentEvent.nome);
     $('#event-description').text(currentEvent.descricao);
-    
+
     if (currentEvent.observacoes_adicionais) {
         $('#event-observations').text(currentEvent.observacoes_adicionais).show();
     } else {
         $('#event-observations').hide();
     }
-    
+
     // Configurar link dos termos
     $('#terms-link').attr('href', currentEvent.politicas_evento_url);
-    
+
     // Inicializar calculador de preços
     initializePriceCalculator(currentEvent);
-    
+
     // Mostrar botão de avançar
     $('#start-form-btn').show();
 }
@@ -170,19 +170,19 @@ function setupEventInterface() {
 // Configurar header do evento
 function setupEventHeader() {
     const header = currentEvent.header;
-    
+
     // Configurar banner
     if (header.banner_url) {
         $('.header-banner').css('background-image', `url(${header.banner_url})`);
     }
-    
+
     // Configurar logo(s)
     const logoContainer = $('.logo-container');
     logoContainer.empty();
-    
-    if (header.partner_logos && header.partner_logos.length === 2 && 
+
+    if (header.partner_logos && header.partner_logos.length === 2 &&
         (header.logo_duplo || currentEvent.tipo_formulario === 'hospedagem_e_evento')) {
-        
+
         // Logo duplo para parceiros
         logoContainer.append(`
             <img src="${header.partner_logos[0]}" alt="Logo Principal" class="partner-logo logo-main">
@@ -220,34 +220,34 @@ function showErrorState(message) {
 // Configurar event listeners
 function setupEventListeners() {
     // Botão iniciar formulário
-    $('#start-form-btn').on('click', function() {
+    $('#start-form-btn').on('click', function () {
         goToStep(2);
     });
-    
+
     // Botão adicionar participante
     $('#add-participant-btn').on('click', addParticipant);
-    
+
     // Navegação entre etapas
-    $('.back-btn').on('click', function() {
+    $('.back-btn').on('click', function () {
         const currentStepNum = getCurrentStepNumber();
         if (currentStepNum > 1) {
             goToStep(currentStepNum - 1);
         }
     });
-    
-    $('.next-btn').on('click', function() {
+
+    $('.next-btn').on('click', function () {
         if (validateCurrentStep()) {
             const currentStepNum = getCurrentStepNumber();
             goToStep(currentStepNum + 1);
         }
     });
-    
+
     // Botão finalizar
     $('.submit-btn').on('click', submitForm);
-    
+
     // Cupom de desconto
     $('#coupon-code').on('input', debounce(validateCoupon, 500));
-    
+
     // Forma de pagamento
     $('#payment-method').on('change', updatePaymentMethod);
 }
@@ -261,15 +261,15 @@ function setupInputMasks() {
 function goToStep(stepNumber) {
     // Ocultar todas as etapas
     $('.form-content').hide();
-    
+
     // Mostrar etapa específica
     $(`#step-${stepNumber}`).show();
-    
+
     // Atualizar step atual
     currentStep = stepNumber;
-    
+
     // Configurações específicas por etapa
-    switch(stepNumber) {
+    switch (stepNumber) {
         case 2:
             setupParticipantsStep();
             break;
@@ -280,7 +280,7 @@ function goToStep(stepNumber) {
             setupConfirmationStep();
             break;
     }
-    
+
     // Scroll para o topo
     $('html, body').animate({ scrollTop: 0 }, 300);
 }
@@ -295,7 +295,7 @@ function setupParticipantsStep() {
     if (participants.length === 0) {
         addParticipant();
     }
-    
+
     // Configurar formas de pagamento
     setupPaymentMethods();
 }
@@ -304,32 +304,32 @@ function setupParticipantsStep() {
 function addParticipant() {
     const participantNumber = participants.length + 1;
     const template = $('#participant-template').html();
-    
+
     // Criar novo participante
     const participantHtml = template.replace(/PARTICIPANTE 1/g, `PARTICIPANTE ${participantNumber}`);
     const $participant = $(participantHtml);
-    
+
     // Configurar ID único
     const participantId = `participant-${participantNumber}`;
     $participant.attr('data-participant-id', participantId);
-    
+
     // Configurar número do participante
     $participant.find('.participant-number').text(participantNumber);
-    
+
     // Mostrar botão remover se não for o primeiro
     if (participantNumber > 1) {
         $participant.find('.btn-remove-participant').show();
     }
-    
+
     // Configurar seções baseadas no tipo de formulário
     setupParticipantSections($participant);
-    
+
     // Adicionar ao container
     $('#participants-container').append($participant);
-    
+
     // Configurar máscaras para este participante
     setupParticipantMasks($participant);
-    
+
     // Configurar event listeners para este participante
     setupParticipantEventListeners($participant);
 
@@ -337,16 +337,16 @@ function addParticipant() {
     const $cpfGroup = $participant.find('.cpf-mask').closest('.form-group');
     const $emailGroup = $participant.find('.email-input').closest('.form-group');
     const $phoneGroup = $participant.find('.phone-input').closest('.form-group');
-    
+
     $cpfGroup.hide();
     $emailGroup.hide();
     $phoneGroup.hide();
-    
+
     // Remover obrigatoriedade inicial
     $participant.find('.cpf-mask').removeAttr('required');
     $participant.find('.email-input').removeAttr('required');
     $participant.find('.phone-input').removeAttr('required');
-    
+
     // Adicionar aos dados
     participants.push({
         id: participantId,
@@ -354,32 +354,32 @@ function addParticipant() {
         data: {},
         element: $participant
     });
-    
+
     // Atualizar seções de responsáveis (pagamento e criança)
     updateResponsibleSections();
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
-    
+
     console.log(`Participante ${participantNumber} adicionado`);
 }
 
 // Configurar seções do participante baseado no tipo de formulário
 function setupParticipantSections($participant) {
     const tipoFormulario = currentEvent.tipo_formulario;
-    
+
     // Mostrar/ocultar seções baseado no tipo
     if (tipoFormulario === 'hospedagem_apenas' || tipoFormulario === 'hospedagem_e_evento') {
         $participant.find('.lodging-section').show();
         setupLodgingOptions($participant);
     }
-    
+
     if (tipoFormulario === 'evento_apenas' || tipoFormulario === 'hospedagem_e_evento') {
         $participant.find('.event-section').show();
         setupEventOptions($participant);
     }
 
-        // Configurar campos de endereço (CEP, logradouro, etc.)
+    // Configurar campos de endereço (CEP, logradouro, etc.)
     if (addressManager) {
         addressManager.setupAddressFields($participant);
     } else {
@@ -393,10 +393,10 @@ function setupLodgingOptions($participant) {
     const $stayPeriodInfo = $participant.find('.stay-period-info');
     const $accommodationSelect = $participant.find('.accommodation-select');
     const $accommodationInfo = $participant.find('.accommodation-info');
-    
+
     // Períodos de estadia
     const periodos = currentEvent.periodos_estadia_opcoes;
-    
+
     if (periodos.length === 1) {
         // Apenas uma opção - mostrar como texto
         $stayPeriodSelect.hide();
@@ -420,10 +420,10 @@ function setupLodgingOptions($participant) {
             }
         }
     }
-    
+
     // Tipos de acomodação
     const acomodacoes = currentEvent.tipos_acomodacao;
-    
+
     if (acomodacoes.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR
         const valorDiaria = acomodacoes[0].valor_diaria_por_pessoa;
@@ -437,7 +437,7 @@ function setupLodgingOptions($participant) {
             const valorDiaria = acomodacao.valor_diaria_por_pessoa;
             const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
-            
+
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
         $accommodationSelect.show();
@@ -449,9 +449,9 @@ function setupLodgingOptions($participant) {
 function setupEventOptions($participant) {
     const $eventSelect = $participant.find('.event-option-select');
     const $eventInfo = $participant.find('.event-option-info');
-    
+
     let eventOptions = [];
-    
+
     if (currentEvent.tipo_formulario === 'evento_apenas') {
         eventOptions = currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
@@ -466,7 +466,7 @@ function setupEventOptions($participant) {
             eventOptions = [];
         }
     }
-    
+
     // ✅ Processar as opções (com valores formatados)
     if (eventOptions.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR
@@ -479,7 +479,7 @@ function setupEventOptions($participant) {
         eventOptions.forEach(opcao => {
             const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${opcao.label} - ${valorFormatado}`;
-            
+
             $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
         });
         $eventSelect.show();
@@ -505,7 +505,7 @@ function updateCheckInOutInfo($participant, periodo) {
 
     $participant.find('.checkin-datetime').text(checkinFormatted);
     $participant.find('.checkout-datetime').text(checkoutFormatted);
-    
+
     // NOVO: Atualizar informações de refeições
     if (periodo.primeira_refeicao) {
         $participant.find('.primeira-refeicao-text').text(periodo.primeira_refeicao);
@@ -513,14 +513,14 @@ function updateCheckInOutInfo($participant, periodo) {
     } else {
         $participant.find('.primeira-refeicao-info').hide();
     }
-    
+
     if (periodo.ultima_refeicao) {
         $participant.find('.ultima-refeicao-text').text(periodo.ultima_refeicao);
         $participant.find('.ultima-refeicao-info').show();
     } else {
         $participant.find('.ultima-refeicao-info').hide();
     }
-    
+
     console.log('Informações de refeições atualizadas:', {
         primeira: periodo.primeira_refeicao,
         ultima: periodo.ultima_refeicao
@@ -538,9 +538,9 @@ function setupParticipantMasks($participant) {
 function applyPhoneMask($phoneInput, countryCode) {
     // Remover máscara existente
     $phoneInput.unmask();
-    
+
     // Aplicar máscara baseada no país
-    switch(countryCode) {
+    switch (countryCode) {
         case 'BR':
             $phoneInput.mask('(00) 00000-0000');
             $phoneInput.attr('placeholder', '(11) 99999-9999');
@@ -620,12 +620,12 @@ function applyPhoneMask($phoneInput, countryCode) {
 // NOVA FUNÇÃO: Validar telefone baseado no país
 function validatePhoneNumber($phoneInput, countryCode) {
     const phoneValue = $phoneInput.val().replace(/\D/g, ''); // Remove caracteres não numéricos
-    
+
     let isValid = false;
     let minLength = 0;
     let maxLength = 0;
-    
-    switch(countryCode) {
+
+    switch (countryCode) {
         case 'BR':
             minLength = 10;
             maxLength = 11;
@@ -700,15 +700,15 @@ function validatePhoneNumber($phoneInput, countryCode) {
             maxLength = 15;
             break;
     }
-    
+
     isValid = phoneValue.length >= minLength && phoneValue.length <= maxLength;
-    
+
     if (isValid) {
         $phoneInput.removeClass('error').addClass('valid');
     } else {
         $phoneInput.addClass('error').removeClass('valid');
     }
-    
+
     return isValid;
 }
 
@@ -717,41 +717,41 @@ function setupParticipantEventListeners($participant) {
     // ✅ CRÍTICO: Remover TODOS os listeners antigos primeiro
     $participant.off('.participant');
     $participant.find('*').off('.participant');
-    
+
     const participantId = $participant.attr('data-participant-id');
-    
+
     // ========================================
     // EVENTOS QUE NÃO AFETAM CÁLCULOS
     // ========================================
-    
+
     // Remover participante
     $participant.find('.btn-remove-participant')
         .off('click.participant')
-        .on('click.participant', function() {
+        .on('click.participant', function () {
             removeParticipant($participant);
         });
 
     // Mudança de país do telefone
     $participant.find('.country-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const selectedCountry = $(this).find(':selected').data('country');
             const $phoneInput = $participant.find('.phone-input');
-            
+
             // Limpar valor atual e aplicar nova máscara
             $phoneInput.val('');
             applyPhoneMask($phoneInput, selectedCountry);
-            
+
             console.log(`País alterado para: ${selectedCountry}`);
         });
 
     // Listener para gênero
     $participant.find('.gender-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const selectedGender = $(this).val();
             console.log(`Gênero alterado: ${selectedGender}`);
-            
+
             // Remover classe de erro se havia
             $(this).removeClass('error');
         });
@@ -759,16 +759,16 @@ function setupParticipantEventListeners($participant) {
     // Responsável pelo pagamento
     $participant.find('.responsible-payer')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             if ($(this).is(':checked')) {
                 $('.responsible-payer').not(this).prop('checked', false);
             }
         });
-    
+
     // Responsável pela criança
     $participant.find('.responsible-child')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             if ($(this).is(':checked')) {
                 $('.responsible-child').not(this).prop('checked', false);
             }
@@ -777,7 +777,7 @@ function setupParticipantEventListeners($participant) {
     // Preferência de cama
     $participant.find('.bed-preference-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const selectedPreference = $(this).val();
             console.log(`Preferência de cama alterada: ${selectedPreference}`);
         });
@@ -785,33 +785,33 @@ function setupParticipantEventListeners($participant) {
     // ========================================
     // VALIDAÇÕES (SEM CÁLCULO)
     // ========================================
-    
+
     // Validação de telefone
     $participant.find('.phone-input')
         .off('blur.participant')
-        .on('blur.participant', function() {
+        .on('blur.participant', function () {
             const selectedCountry = $participant.find('.country-select').find(':selected').data('country');
             validatePhoneNumber($(this), selectedCountry);
         });
-    
+
     // Validação de CPF
     $participant.find('.cpf-mask')
         .off('blur.participant')
-        .on('blur.participant', function() {
+        .on('blur.participant', function () {
             validateCPF($(this));
         });
-    
+
     // Validação de email (blur)
     $participant.find('.email-input')
         .off('blur.participant')
-        .on('blur.participant', function() {
+        .on('blur.participant', function () {
             validateEmail($(this));
         });
-    
+
     // Validação de email em tempo real (input com debounce)
     $participant.find('.email-input')
         .off('input.participant')
-        .on('input.participant', debounce(function() {
+        .on('input.participant', debounce(function () {
             const email = $(this).val().trim();
             if (email.length > 0) {
                 validateEmail($(this));
@@ -823,19 +823,19 @@ function setupParticipantEventListeners($participant) {
     // ========================================
     // EVENTOS QUE AFETAM CÁLCULOS (COM DEBOUNCE)
     // ========================================
-    
+
     // Data de nascimento - CRÍTICO para cálculos
     $participant.find('.dob-input')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const $p = $(this).closest('.participant-block');
             const birthDate = $(this).val();
-            
+
             // Atualizar visibilidade de campos
             toggleAdultFields($p, birthDate);
             updateResponsibleSections();
             updateBedPreferenceSection();
-            
+
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
             clearTimeout($p.data('dobTimer'));
             const timer = setTimeout(() => {
@@ -843,26 +843,26 @@ function setupParticipantEventListeners($participant) {
             }, 300);
             $p.data('dobTimer', timer);
         });
-    
+
     // Acomodação - afeta cálculos E visibilidade
     $participant.find('.accommodation-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const $p = $(this).closest('.participant-block');
             const $childDiscountInfo = $p.find('.child-discount-info');
             const dob = $p.find('.dob-input').val();
-            
+
             // Atualizar visibilidade de info de desconto
             if (dob && $(this).val()) {
                 const age = window.priceCalculator ? window.priceCalculator.calculateAge(dob) : calculateAge(dob);
-                
+
                 if (age < 12) {
                     $childDiscountInfo.show();
                 } else {
                     $childDiscountInfo.hide();
                 }
             }
-            
+
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
             clearTimeout($p.data('accommodationTimer'));
             const timer = setTimeout(() => {
@@ -874,7 +874,7 @@ function setupParticipantEventListeners($participant) {
     // Período de estadia - afeta opções de evento E cálculos
     $participant.find('.stay-period-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const $p = $(this).closest('.participant-block');
             const selectedPeriodId = $(this).val();
             const periodoSelecionado = currentEvent.periodos_estadia_opcoes
@@ -890,7 +890,7 @@ function setupParticipantEventListeners($participant) {
 
             // Atualizar opções de evento disponíveis
             updateEventOptionsForPeriod($p);
-            
+
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
             clearTimeout($p.data('periodTimer'));
             const timer = setTimeout(() => {
@@ -898,13 +898,13 @@ function setupParticipantEventListeners($participant) {
             }, 300);
             $p.data('periodTimer', timer);
         });
-    
+
     // Opção de evento - afeta cálculos
     $participant.find('.event-option-select')
         .off('change.participant')
-        .on('change.participant', function() {
+        .on('change.participant', function () {
             const $p = $(this).closest('.participant-block');
-            
+
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
             clearTimeout($p.data('eventTimer'));
             const timer = setTimeout(() => {
@@ -916,11 +916,11 @@ function setupParticipantEventListeners($participant) {
     // ========================================
     // CAMPOS DE TEXTO (SEM CÁLCULO IMEDIATO)
     // ========================================
-    
+
     // Nome, telefone - apenas para coleta de dados
     $participant.find('.full-name, .phone-mask')
         .off('change.participant blur.participant')
-        .on('blur.participant', function() {
+        .on('blur.participant', function () {
             // Apenas validação visual, sem recálculo
             const value = $(this).val().trim();
             if (value.length === 0) {
@@ -929,15 +929,15 @@ function setupParticipantEventListeners($participant) {
                 $(this).removeClass('error');
             }
         });
-    
+
     // ========================================
     // CONFIGURAÇÃO DE ENDEREÇO
     // ========================================
-    
+
     if (typeof addressManager !== 'undefined' && addressManager) {
         addressManager.setupAddressFields($participant);
     }
-    
+
     console.log(`✅ Event listeners configurados para ${participantId}`);
 }
 
@@ -948,53 +948,53 @@ function toggleAdultFields($participant, birthDate) {
     const $phoneField = $participant.find('.phone-input');
     const $countrySelect = $participant.find('.country-select');
     const $genderField = $participant.find('.gender-select');
-    
+
     // Elementos containers dos campos
     const $cpfGroup = $cpfField.closest('.form-group');
     const $emailGroup = $emailField.closest('.form-group');
     const $phoneGroup = $phoneField.closest('.form-group');
-    
+
     if (!birthDate) {
         // Se não há data de nascimento, ocultar todos os campos adultos
         $cpfGroup.hide();
         $emailGroup.hide();
         $phoneGroup.hide();
-        
+
         // Remover obrigatoriedade e limpar valores
         $cpfField.removeAttr('required').val('').removeClass('error valid');
         $emailField.removeAttr('required').val('').removeClass('error valid');
         $phoneField.removeAttr('required').val('').removeClass('error valid');
         $countrySelect.val('+55'); // Reset para Brasil
-        
+
         console.log('Campos adultos ocultados - sem data de nascimento');
         return;
     }
-    
+
     const age = calculateAge(birthDate);
-    
+
     if (age !== null && age > 10) {
         // Pessoa com mais de 10 anos - mostrar e tornar obrigatórios
         $cpfGroup.show();
         $emailGroup.show();
         $phoneGroup.show();
-        
+
         $cpfField.attr('required', true);
         $emailField.attr('required', true);
         $phoneField.attr('required', true);
-        
+
         console.log(`Campos adultos exibidos para idade: ${age} anos`);
     } else {
         // Pessoa com 10 anos ou menos - ocultar e remover obrigatoriedade
         $cpfGroup.hide();
         $emailGroup.hide();
         $phoneGroup.hide();
-        
+
         // Remover obrigatoriedade e limpar valores
         $cpfField.removeAttr('required').val('').removeClass('error valid');
         $emailField.removeAttr('required').val('').removeClass('error valid');
         $phoneField.removeAttr('required').val('').removeClass('error valid');
         $countrySelect.val('+55'); // Reset para Brasil
-        
+
         console.log(`Campos adultos ocultados para idade: ${age} anos`);
     }
 }
@@ -1002,34 +1002,34 @@ function toggleAdultFields($participant, birthDate) {
 // Remover participante
 function removeParticipant($participant) {
     const participantId = $participant.attr('data-participant-id');
-    
+
     // Remover dos dados
     participants = participants.filter(p => p.id !== participantId);
-    
+
     // Remover do DOM
     $participant.remove();
-    
+
     // Renumerar participantes
     renumberParticipants();
-    
+
     // **CORREÇÃO**: Atualizar todos os cálculos após remoção
     updateAllCalculations();
-    
+
     // Atualizar seções de responsáveis (pagamento e criança)
     updateResponsibleSections();
 
     // NOVA LINHA: Atualizar seção de preferência de cama
     updateBedPreferenceSection();
-    
+
     console.log(`Participante ${participantId} removido`);
 }
 
 // Renumerar participantes
 function renumberParticipants() {
-    $('#participants-container .participant-block').each(function(index) {
+    $('#participants-container .participant-block').each(function (index) {
         const newNumber = index + 1;
         $(this).find('.participant-number').text(newNumber);
-        
+
         // Atualizar dados
         if (participants[index]) {
             participants[index].number = newNumber;
@@ -1040,18 +1040,18 @@ function renumberParticipants() {
 // Atualizar seção de responsável pelo pagamento
 function updateResponsiblePayerSection() {
     // Para cada participante, verificar se deve mostrar a seção
-    $('#participants-container .participant-block').each(function() {
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const $section = $participant.find('.responsible-payer-section');
         const birthDate = $participant.find('.dob-input').val();
-        
+
         // Verificar se este participante é menor de idade
         let isMinor = false;
         if (birthDate) {
             const age = calculateAge(birthDate);
             isMinor = (age !== null && age < 18);
         }
-        
+
         // Se há mais de um participante E este participante NÃO é menor, mostrar a seção
         if (participants.length > 1 && !isMinor && birthDate) { // ADICIONADO: && birthDate
             $section.show();
@@ -1061,16 +1061,16 @@ function updateResponsiblePayerSection() {
             $participant.find('.responsible-payer').prop('checked', false);
         }
     });
-    
+
     // Se só há um participante adulto, ele é automaticamente o responsável
-    const adultParticipants = $('#participants-container .participant-block').filter(function() {
+    const adultParticipants = $('#participants-container .participant-block').filter(function () {
         const birthDate = $(this).find('.dob-input').val();
         if (!birthDate) return false; // CORRIGIDO: Não considera adulto se não há data
-        
+
         const age = calculateAge(birthDate);
         return age !== null && age >= 18; // CORRIGIDO: Só adultos com data válida
     });
-    
+
     if (adultParticipants.length === 1) {
         adultParticipants.find('.responsible-payer').prop('checked', true);
     }
@@ -1079,11 +1079,11 @@ function updateResponsiblePayerSection() {
 // NOVA FUNÇÃO: Verificar se há múltiplos adultos
 function hasMultipleAdults() {
     let adultCount = 0;
-    
-    $('#participants-container .participant-block').each(function() {
+
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const birthDate = $participant.find('.dob-input').val();
-        
+
         // CORREÇÃO: Só considera adulto se há data de nascimento E idade >= 18
         if (birthDate) {
             const age = calculateAge(birthDate);
@@ -1093,7 +1093,7 @@ function hasMultipleAdults() {
         }
         // REMOVIDO: Não considera mais participantes sem data como adultos automaticamente
     });
-    
+
     console.log(`🔍 DEBUG hasMultipleAdults: ${adultCount} adultos encontrados`);
     return adultCount > 1;
 }
@@ -1101,19 +1101,19 @@ function hasMultipleAdults() {
 // NOVA FUNÇÃO: Atualizar seção de preferência de cama
 function updateBedPreferenceSection() {
     const showBedPreference = hasMultipleAdults();
-    
-    $('#participants-container .participant-block').each(function() {
+
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const $bedSection = $participant.find('.bed-preference-section');
         const birthDate = $participant.find('.dob-input').val();
-        
+
         // Verificar se este participante é adulto
         let isAdult = false; // CORRIGIDO: Padrão false
         if (birthDate) {
             const age = calculateAge(birthDate);
             isAdult = (age !== null && age >= 18); // CORRIGIDO: Só adulto com data válida
         }
-        
+
         // Mostrar seção apenas para adultos quando há múltiplos adultos
         if (showBedPreference && isAdult) {
             $bedSection.show();
@@ -1123,8 +1123,8 @@ function updateBedPreferenceSection() {
             $participant.find('.bed-preference-select').val('');
         }
     });
-    
-    console.log(`Preferência de cama ${showBedPreference ? 'habilitada' : 'desabilitada'} - Adultos: ${$('#participants-container .participant-block').filter(function() {
+
+    console.log(`Preferência de cama ${showBedPreference ? 'habilitada' : 'desabilitada'} - Adultos: ${$('#participants-container .participant-block').filter(function () {
         const birthDate = $(this).find('.dob-input').val();
         if (!birthDate) return false; // CORRIGIDO
         const age = calculateAge(birthDate);
@@ -1135,16 +1135,16 @@ function updateBedPreferenceSection() {
 // Atualizar opções de evento baseado no período selecionado
 function updateEventOptionsForPeriod($participant) {
     if (currentEvent.tipo_formulario !== 'hospedagem_e_evento') return;
-    
+
     const selectedPeriodId = $participant.find('.stay-period-select').val();
     if (!selectedPeriodId) return;
-    
+
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
-    
+
     const $eventSelect = $participant.find('.event-option-select');
     const $eventInfo = $participant.find('.event-option-info');
     const eventOptions = periodo.valores_evento_opcoes;
-    
+
     if (eventOptions.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR
         const valorFormatado = `R$ ${eventOptions[0].valor.toFixed(2).replace('.', ',')}`;
@@ -1156,7 +1156,7 @@ function updateEventOptionsForPeriod($participant) {
         eventOptions.forEach(opcao => {
             const valorFormatado = `R$ ${opcao.valor.toFixed(2).replace('.', ',')}`;
             const optionLabel = `${opcao.label} - ${valorFormatado}`;
-            
+
             $eventSelect.append(`<option value="${opcao.id}">${optionLabel}</option>`);
         });
         $eventSelect.show();
@@ -1169,13 +1169,13 @@ function setupPaymentMethods() {
     const $paymentSelect = $('#payment-method');
     const $paymentDescription = $('#payment-method-description');
     const formasPagamento = currentEvent.formas_pagamento_opcoes;
-    
+
     $paymentSelect.empty().append('<option value="">Selecione a forma de pagamento</option>');
-    
+
     formasPagamento.forEach(forma => {
         $paymentSelect.append(`<option value="${forma.id}">${forma.label}</option>`);
     });
-    
+
     // Se apenas uma opção, selecionar automaticamente
     if (formasPagamento.length === 1) {
         $paymentSelect.val(formasPagamento[0].id);
@@ -1188,16 +1188,16 @@ function setupPaymentMethods() {
 function updatePaymentMethod() {
     const selectedId = $('#payment-method').val();
     const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
-    
+
     if (forma) {
         $('#payment-method-description').text(forma.descricao);
         selectedPaymentMethod = forma;
-        
+
         // Atualizar calculador
         if (priceCalculator) {
             priceCalculator.setPaymentMethod(forma);
         }
-        
+
         // Recalcular totais com nova taxa de gateway
         updateAllCalculations();
     }
@@ -1218,7 +1218,7 @@ function debounce(func, wait) {
 
 // Validação de etapa atual
 function validateCurrentStep() {
-    switch(currentStep) {
+    switch (currentStep) {
         case 2:
             return validateParticipantsStep();
         case 3:
@@ -1232,17 +1232,17 @@ function validateCurrentStep() {
 function validateEmail($emailField) {
     const email = $emailField.val().trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    
+
     if (!email) {
         $emailField.addClass('error').removeClass('valid');
         return false;
     }
-    
+
     if (!emailRegex.test(email)) {
         $emailField.addClass('error').removeClass('valid');
         return false;
     }
-    
+
     $emailField.removeClass('error').addClass('valid');
     return true;
 }
@@ -1251,11 +1251,11 @@ function validateEmail($emailField) {
 function validateParticipantsStep() {
     let isValid = true;
     let firstErrorField = null;
-    
+
     // Validar cada participante
-    $('#participants-container .participant-block').each(function() {
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
-        
+
         // Campos sempre obrigatórios
         const alwaysRequiredFields = [
             { selector: '.full-name', name: 'Nome Completo' },
@@ -1268,7 +1268,7 @@ function validateParticipantsStep() {
             { selector: '.cpf-mask', name: 'CPF' },
             { selector: '.email-input', name: 'E-mail' }
         ];
-        
+
         // Validar campos sempre obrigatórios
         alwaysRequiredFields.forEach(field => {
             const $field = $participant.find(field.selector);
@@ -1287,7 +1287,7 @@ function validateParticipantsStep() {
         conditionalFields.forEach(field => {
             const $field = $participant.find(field.selector);
             const $fieldGroup = $field.closest('.form-group');
-            
+
             // Só validar se o campo estiver visível
             if ($fieldGroup.is(':visible')) {
                 if (!$field.val().trim()) {
@@ -1313,8 +1313,8 @@ function validateParticipantsStep() {
         } else {
             $genderField.removeClass('error');
         }
-        
-               // Validações específicas apenas para campos visíveis
+
+        // Validações específicas apenas para campos visíveis
         const $cpfField = $participant.find('.cpf-mask');
         if ($cpfField.closest('.form-group').is(':visible') && !validateCPF($cpfField)) {
             if (!firstErrorField) {
@@ -1322,7 +1322,7 @@ function validateParticipantsStep() {
             }
             isValid = false;
         }
-        
+
         const $emailField = $participant.find('.email-input');
         if ($emailField.closest('.form-group').is(':visible') && !validateEmail($emailField)) {
             if (!firstErrorField) {
@@ -1345,7 +1345,7 @@ function validateParticipantsStep() {
         // NOVA VALIDAÇÃO: Preferência de cama (se visível)
         const $bedPreferenceSection = $participant.find('.bed-preference-section');
         const $bedPreferenceField = $participant.find('.bed-preference-select');
-        
+
         if ($bedPreferenceSection.is(':visible') && !$bedPreferenceField.val()) {
             $bedPreferenceField.addClass('error');
             if (!firstErrorField) {
@@ -1355,12 +1355,12 @@ function validateParticipantsStep() {
         } else {
             $bedPreferenceField.removeClass('error');
         }
-        
+
         // Validar seleções baseadas no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             const $stayPeriod = $participant.find('.stay-period-select');
             const $accommodation = $participant.find('.accommodation-select');
-            
+
             if ($stayPeriod.is(':visible') && !$stayPeriod.val()) {
                 $stayPeriod.addClass('error');
                 if (!firstErrorField) {
@@ -1370,7 +1370,7 @@ function validateParticipantsStep() {
             } else {
                 $stayPeriod.removeClass('error');
             }
-            
+
             if ($accommodation.is(':visible') && !$accommodation.val()) {
                 $accommodation.addClass('error');
                 if (!firstErrorField) {
@@ -1381,10 +1381,10 @@ function validateParticipantsStep() {
                 $accommodation.removeClass('error');
             }
         }
-        
+
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             const $eventOption = $participant.find('.event-option-select');
-            
+
             if ($eventOption.is(':visible') && !$eventOption.val()) {
                 $eventOption.addClass('error');
                 if (!firstErrorField) {
@@ -1400,10 +1400,10 @@ function validateParticipantsStep() {
     // NOVO: Validar endereço do responsável pelo pagamento
     const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
     let $payerParticipant = $responsiblePayer.length > 0 ? $responsiblePayer : $('#participants-container .participant-block').first();
-    
+
     if ($payerParticipant.length > 0 && addressManager) {
         const addressValidation = addressManager.validateAddressFields($payerParticipant);
-        
+
         if (!addressValidation.isValid) {
             isValid = false;
             if (!firstErrorField) {
@@ -1412,7 +1412,7 @@ function validateParticipantsStep() {
         }
     }
 
-    
+
     // Validar responsável pelo pagamento se múltiplos participantes
     if (participants.length > 1) {
         const hasResponsible = $('.responsible-payer:checked').length > 0;
@@ -1436,20 +1436,20 @@ function validateParticipantsStep() {
             isValid = false;
         }
     }
-    
+
     // Se há erro, rolar até o primeiro campo com problema
     if (!isValid && firstErrorField) {
         scrollToAndFocusElement(firstErrorField);
         showValidationMessage(firstErrorField);
     }
-    
+
     return isValid;
 }
 
 // Validar etapa de resumo
 function validateSummaryStep() {
     let firstErrorField = null;
-    
+
     // Verificar se forma de pagamento foi selecionada
     if (!selectedPaymentMethod) {
         const $paymentField = $('#payment-method');
@@ -1458,7 +1458,7 @@ function validateSummaryStep() {
     } else {
         $('#payment-method').removeClass('error');
     }
-    
+
     // Verificar se termos foram aceitos
     if (!$('#terms-conditions').is(':checked')) {
         const $termsField = $('#terms-conditions');
@@ -1466,14 +1466,14 @@ function validateSummaryStep() {
             firstErrorField = $termsField.closest('.terms-section');
         }
     }
-    
+
     // Se há erro, rolar até o primeiro campo com problema
     if (firstErrorField) {
         scrollToAndFocusElement(firstErrorField);
         showValidationMessage(firstErrorField);
         return false;
     }
-    
+
     return true;
 }
 
@@ -1487,12 +1487,12 @@ function showValidationMessage($field) {
     } else if ($field.closest('.terms-section').length > 0) {
         $field.closest('.terms-section').addClass('error');
     }
-    
+
     // Log específico para diferentes tipos de erro (opcional, para debug)
     if ($field.hasClass('email-input')) {
         console.log('Email inválido detectado:', $field.val());
     }
-    
+
     // Remover classes de erro após alguns segundos
     setTimeout(() => {
         $('.responsible-payer-section, .responsible-child-section, .terms-section').removeClass('error');
@@ -1505,13 +1505,13 @@ function setupSummaryStep() {
     if (selectedPaymentMethod) {
         priceCalculator.setPaymentMethod(selectedPaymentMethod);
     }
-    
+
     // Gerar resumo dos participantes
     generateParticipantsSummary();
-    
+
     // Atualizar todos os cálculos
     updateAllCalculations();
-    
+
     // Configurar cupom se já havia um aplicado
     const currentCoupon = $('#coupon-code').val();
     if (currentCoupon) {
@@ -1521,7 +1521,7 @@ function setupSummaryStep() {
     // --- NOVO: Carregar e exibir Política de Confirmação e Cancelamento ---
     loadCancellationPolicy();
     // FIM DO NOVO BLOCO
-    
+
 }
 
 // FUNÇÃO SIMPLIFICADA: Carregar descrição da forma de pagamento selecionada
@@ -1533,14 +1533,14 @@ function loadCancellationPolicy() {
     if (selectedPaymentMethod && selectedPaymentMethod.descricao) {
         // Usar a descrição da forma de pagamento selecionada (qualquer conteúdo)
         const descricaoSelecionada = selectedPaymentMethod.descricao;
-        
+
         // Adicionar classe específica para política
         $policySection.addClass('policy-section');
-        
+
         // Usar .html() porque a descrição pode conter tags HTML
         $policyContent.html(descricaoSelecionada);
         $policySection.show();
-        
+
         console.log('Descrição carregada da forma de pagamento selecionada:', selectedPaymentMethod.label);
     } else {
         // Se não há forma de pagamento selecionada, ocultar a seção
@@ -1553,27 +1553,27 @@ function loadCancellationPolicy() {
 // Função para calcular idade
 function calculateAge(birthDate) {
     if (!birthDate) return null;
-    
+
     const today = new Date();
     const birth = new Date(birthDate);
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
         age--;
     }
-    
+
     return age;
 }
 
 // Função para verificar se há menores de idade
 function hasMinors() {
     let hasMinor = false;
-    
-    $('#participants-container .participant-block').each(function() {
+
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const birthDate = $participant.find('.dob-input').val();
-        
+
         if (birthDate) {
             const age = calculateAge(birthDate);
             if (age !== null && age < 18) {
@@ -1582,25 +1582,25 @@ function hasMinors() {
             }
         }
     });
-    
+
     return hasMinor;
 }
 
 // Atualizar seção de responsável pela criança
 function updateResponsibleChildSection() {
     // Para cada participante, verificar se deve mostrar a seção
-    $('#participants-container .participant-block').each(function() {
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const $section = $participant.find('.responsible-child-section');
         const birthDate = $participant.find('.dob-input').val();
-        
+
         // Verificar se este participante é menor de idade
         let isMinor = false;
         if (birthDate) {
             const age = calculateAge(birthDate);
             isMinor = (age !== null && age < 18);
         }
-        
+
         // Se há menores no formulário E este participante NÃO é menor, mostrar a seção
         if (hasMinors() && !isMinor) {
             $section.show();
@@ -1610,27 +1610,27 @@ function updateResponsibleChildSection() {
             $participant.find('.responsible-child').prop('checked', false);
         }
     });
-    
+
     // **NOVA LÓGICA: SEMPRE SUGERIR O PRIMEIRO ADULTO**
     if (hasMinors()) {
         // Limpar todas as seleções primeiro
         $('.responsible-child').prop('checked', false);
-        
+
         // Encontrar o primeiro participante adulto na ordem do formulário
         let firstAdultFound = false;
-        $('#participants-container .participant-block').each(function() {
+        $('#participants-container .participant-block').each(function () {
             if (firstAdultFound) return; // Parar no primeiro adulto encontrado
-            
+
             const $participant = $(this);
             const birthDate = $participant.find('.dob-input').val();
-            
+
             // Verificar se é adulto
             let isAdult = true; // Considera adulto se não há data de nascimento
             if (birthDate) {
                 const age = calculateAge(birthDate);
                 isAdult = (age === null || age >= 18);
             }
-            
+
             if (isAdult) {
                 $participant.find('.responsible-child').prop('checked', true);
                 firstAdultFound = true;
@@ -1652,40 +1652,40 @@ function updateAddressSection() {
     // Ocultar todas as seções de endereço primeiro
     $('.address-section').hide();
     $('.address-section .form-control').removeAttr('required');
-    
+
     // Encontrar o responsável pelo pagamento
     const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
-    
+
     if ($responsiblePayer.length > 0) {
         // Mostrar seção de endereço para o responsável
         const $addressSection = $responsiblePayer.find('.address-section');
         $addressSection.show();
-        
+
         // Tornar campos obrigatórios (exceto complemento)
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
             .attr('required', true);
 
-                      // ✨ ADICIONE A CORREÇÃO AQUI ✨
+        // ✨ ADICIONE A CORREÇÃO AQUI ✨
         if (addressManager) {
             addressManager.setupAddressFields($responsiblePayer);
         }
-        
+
         console.log('📍 Seção de endereço habilitada para o responsável pelo pagamento');
     } else if (participants.length === 1) {
         // Se há apenas um participante, ele é o responsável
         const $singleParticipant = $('#participants-container .participant-block').first();
         const $addressSection = $singleParticipant.find('.address-section');
         $addressSection.show();
-        
+
         // Tornar campos obrigatórios
         $addressSection.find('.cep-input, .logradouro-input, .numero-input, .bairro-input, .cidade-input, .estado-select')
             .attr('required', true);
 
-                // ✨ ADICIONE A CORREÇÃO AQUI TAMBÉM ✨
+        // ✨ ADICIONE A CORREÇÃO AQUI TAMBÉM ✨
         if (addressManager) {
             addressManager.setupAddressFields($singleParticipant);
         }
-        
+
         console.log('📍 Seção de endereço habilitada para o único participante');
     }
 }
@@ -1695,32 +1695,32 @@ function updateAddressSection() {
 function generateParticipantsSummary() {
     const $summaryContent = $('#summary-content');
     let summaryHtml = '';
-    
+
     // **IMPORTANTE**: Atualizar dados do calculador antes de gerar o resumo
     updateAllCalculations();
-    
+
     // Identificar responsável pelo pagamento
     const $responsiblePayer = $('.responsible-payer:checked').closest('.participant-block');
     let responsiblePayerData = null;
-    
+
     if ($responsiblePayer.length > 0) {
         responsiblePayerData = extractParticipantData($responsiblePayer);
     } else if (participants.length === 1) {
         // Se só há um participante, ele é o responsável
         responsiblePayerData = extractParticipantData($('#participants-container .participant-block').first());
     }
-    
+
     // Seção do responsável pelo pagamento
     if (responsiblePayerData) {
         console.log('🔍 DEBUG Responsável Pagamento:', responsiblePayerData);
-        
+
         summaryHtml += `
             <div class="responsible-payer-summary">
                 <h3>Responsável pelo Pagamento</h3>
                 <div class="payer-info">
                     <p><strong>Nome:</strong> ${responsiblePayerData.fullName}</p>
         `;
-        
+
         // CORRIGIDO: Só mostrar campos se eles têm valor
         if (responsiblePayerData.cpf && responsiblePayerData.cpf.trim()) {
             summaryHtml += `<p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>`;
@@ -1731,27 +1731,27 @@ function generateParticipantsSummary() {
         if (responsiblePayerData.phone && responsiblePayerData.phone.trim()) {
             summaryHtml += `<p><strong>Telefone:</strong> ${responsiblePayerData.phone}</p>`;
         }
-        
+
         summaryHtml += `
                 </div>
             </div>
         `;
     }
 
-        // ✅ ADICIONE ESTA SEÇÃO DE ENDEREÇO AQUI (SUBSTITUA O BLOCO ANTIGO):
-        if (responsiblePayerData && $responsiblePayer.length > 0) {
-            // Extrair dados de endereço
-            const cep = $responsiblePayer.find('.cep-input').val();
-            const logradouro = $responsiblePayer.find('.logradouro-input').val();
-            const numero = $responsiblePayer.find('.numero-input').val();
-            const complemento = $responsiblePayer.find('.complemento-input').val();
-            const bairro = $responsiblePayer.find('.bairro-input').val();
-            const cidade = $responsiblePayer.find('.cidade-input').val();
-            const estado = $responsiblePayer.find('.estado-select').val();
-            
-            // Verificar se há dados de endereço preenchidos
-            if (cep && logradouro) {
-                summaryHtml += `
+    // ✅ ADICIONE ESTA SEÇÃO DE ENDEREÇO AQUI (SUBSTITUA O BLOCO ANTIGO):
+    if (responsiblePayerData && $responsiblePayer.length > 0) {
+        // Extrair dados de endereço
+        const cep = $responsiblePayer.find('.cep-input').val();
+        const logradouro = $responsiblePayer.find('.logradouro-input').val();
+        const numero = $responsiblePayer.find('.numero-input').val();
+        const complemento = $responsiblePayer.find('.complemento-input').val();
+        const bairro = $responsiblePayer.find('.bairro-input').val();
+        const cidade = $responsiblePayer.find('.cidade-input').val();
+        const estado = $responsiblePayer.find('.estado-select').val();
+
+        // Verificar se há dados de endereço preenchidos
+        if (cep && logradouro) {
+            summaryHtml += `
                     <div class="address-summary">
                         <h3>Endereço do Responsável</h3>
                         <div class="address-info">
@@ -1765,25 +1765,25 @@ function generateParticipantsSummary() {
                         </div>
                     </div>
                 `;
-            }
         }
+    }
 
     // Seção do responsável pela criança
     if (hasMinors()) {
         const $responsibleChild = $('.responsible-child:checked').closest('.participant-block');
         let responsibleChildData = null;
-        
+
         if ($responsibleChild.length > 0) {
             responsibleChildData = extractParticipantData($responsibleChild);
             console.log('🔍 DEBUG Responsável Criança:', responsibleChildData);
-            
+
             summaryHtml += `
                 <div class="responsible-payer-summary">
                     <h3>Responsável pela Criança</h3>
                     <div class="payer-info">
                         <p><strong>Nome:</strong> ${responsibleChildData.fullName}</p>
             `;
-            
+
             // CORRIGIDO: Só mostrar campos se eles têm valor
             if (responsibleChildData.cpf && responsibleChildData.cpf.trim()) {
                 summaryHtml += `<p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>`;
@@ -1794,34 +1794,34 @@ function generateParticipantsSummary() {
             if (responsibleChildData.phone && responsibleChildData.phone.trim()) {
                 summaryHtml += `<p><strong>Telefone:</strong> ${responsibleChildData.phone}</p>`;
             }
-            
+
             summaryHtml += `
                     </div>
                 </div>
             `;
         }
     }
-    
+
     // Detalhamento por participante
     summaryHtml += `
         <div class="participants-summary">
             <h3>Detalhamento por Participante</h3>
     `;
-    
-    $('#participants-container .participant-block').each(function(index) {
+
+    $('#participants-container .participant-block').each(function (index) {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
         const participantNumber = index + 1;
-        
+
         console.log(`🔍 DEBUG Participante ${participantNumber}:`, participantData);
-        
+
         // **CORREÇÃO**: Buscar valores do calculador usando o ID correto
         const participantId = $participant.attr('data-participant-id');
         const calculatorParticipant = window.priceCalculator.participants.find(p => p.id === participantId);
-        
+
         let lodgingValue = 0;
         let eventValue = 0;
-        
+
         if (calculatorParticipant) {
             // Usar dados do calculador que já foram processados
             lodgingValue = window.priceCalculator.calculateLodgingValue(calculatorParticipant);
@@ -1831,7 +1831,7 @@ function generateParticipantsSummary() {
             lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
             eventValue = window.priceCalculator.calculateEventValue(participantData);
         }
-        
+
         // Obter descrições das opções selecionadas
         const stayPeriodLabel = getStayPeriodLabel(participantData.stayPeriod);
         const accommodationLabel = getAccommodationLabel(participantData.accommodation);
@@ -1860,14 +1860,14 @@ function generateParticipantsSummary() {
             };
             return genderLabels[gender] || gender;
         }
-        
+
         summaryHtml += `
             <div class="participant-summary-item">
                 <h4>Participante ${participantNumber}: ${participantData.fullName}</h4>
                 <div class="participant-details">
                 <p><strong>Gênero:</strong> ${formatGenderForDisplay(participantData.gender)}</p>
         `;
-        
+
         // CORRIGIDO: Só mostrar dados pessoais se existirem E tiverem valor
         if (participantData.cpf && participantData.cpf.trim()) {
             summaryHtml += `<p><strong>CPF:</strong> ${participantData.cpf}</p>`;
@@ -1878,7 +1878,7 @@ function generateParticipantsSummary() {
         if (participantData.phone && participantData.phone.trim()) {
             summaryHtml += `<p><strong>Telefone:</strong> ${participantData.phone}</p>`;
         }
-        
+
         // Resto do código permanece igual...
         // Mostrar detalhes baseado no tipo de formulário
         if (currentEvent.tipo_formulario === 'hospedagem_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
@@ -1899,7 +1899,7 @@ function generateParticipantsSummary() {
                 const bedPreferenceLabel = participantData.bedPreference === 'casal' ? 'Cama de Casal' : 'Cama de Solteiro';
                 summaryHtml += `<p><strong>Preferência de Cama:</strong> ${bedPreferenceLabel}</p>`;
             }
-            
+
             // NOVO: Buscar informações de refeições do período selecionado
             let refeicoesInfo = '';
             if (participantData.stayPeriod) {
@@ -1913,7 +1913,7 @@ function generateParticipantsSummary() {
                     }
                 }
             }
-            
+
             summaryHtml += `
                 <p><strong>Hospedagem:</strong> ${accommodationLabel}</p>
                 ${checkinInfo ? `<p><strong>Check-in:</strong> ${checkinInfo}</p>` : ''}
@@ -1922,7 +1922,7 @@ function generateParticipantsSummary() {
                 <p><strong>Valor da Hospedagem:</strong> ${window.priceCalculator.formatCurrency(lodgingValue)}${lodgingInfo}</p>
             `;
         }
-        
+
         if (currentEvent.tipo_formulario === 'evento_apenas' || currentEvent.tipo_formulario === 'hospedagem_e_evento') {
             // **CORREÇÃO**: Adicionar informação sobre gratuidade/desconto
             let eventInfo = '';
@@ -1935,7 +1935,7 @@ function generateParticipantsSummary() {
                     eventInfo = ' <span class="discount-indicator">(50% - Excedente)</span>';
                 }
             }
-            
+
             summaryHtml += `
                 <p><strong>Evento:</strong> ${eventOptionLabel}</p>
                 <p><strong>Valor do Evento:</strong> ${window.priceCalculator.formatCurrency(eventValue)}${eventInfo}</p>
@@ -1946,22 +1946,22 @@ function generateParticipantsSummary() {
         if (participantData.restrictions && participantData.restrictions.length > 0) {
             summaryHtml += `<p><strong>Restrições/Observações:</strong> ${participantData.restrictions}</p>`;
         }
-        
+
         summaryHtml += `
                 </div>
             </div>
         `;
     });
-    
+
     summaryHtml += '</div>';
-    
+
     $summaryContent.html(summaryHtml);
 }
 
 // Obter label do período de estadia
 function getStayPeriodLabel(stayPeriodId) {
     if (!stayPeriodId) return 'Não selecionado';
-    
+
     const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
     return periodo ? periodo.label : 'Período não encontrado';
 }
@@ -1969,7 +1969,7 @@ function getStayPeriodLabel(stayPeriodId) {
 // Obter label da acomodação
 function getAccommodationLabel(accommodationId) {
     if (!accommodationId) return 'Não selecionado';
-    
+
     const acomodacao = currentEvent.tipos_acomodacao.find(a => a.id === accommodationId);
     return acomodacao ? acomodacao.label : 'Acomodação não encontrada';
 }
@@ -1977,16 +1977,16 @@ function getAccommodationLabel(accommodationId) {
 // Obter label da opção de evento
 function getEventOptionLabel(eventOptionId, stayPeriodId) {
     if (!eventOptionId) return 'Não selecionado';
-    
+
     let eventOptions = [];
-    
+
     if (currentEvent.tipo_formulario === 'evento_apenas') {
         eventOptions = currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento' && stayPeriodId) {
         const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
         eventOptions = periodo ? (periodo.valores_evento_opcoes || []) : [];
     }
-    
+
     const eventOption = eventOptions.find(e => e.id === eventOptionId);
     return eventOption ? eventOption.label : 'Opção não encontrada';
 }
@@ -1996,25 +1996,25 @@ async function submitForm() {
     if (!validateSummaryStep() || submissionInProgress) {
         return;
     }
-    
+
     submissionInProgress = true;
-    
+
     try {
         console.log('=== INICIANDO SUBMISSÃO ===');
-        
+
         // Mostrar estado de carregamento
         showSubmissionLoading();
-        
+
         // Gerar ID único da inscrição
         const inscricaoId = generateInscricaoId();
-        
+
         // Preparar dados para envio
         const formData = prepareFormData(inscricaoId);
-        
+
         console.log('📦 Dados preparados para webhook:', formData);
-        
+
         let submissionResult = null;
-        
+
         if (webhookIntegration) {
             console.log('📡 Enviando para webhook...');
             submissionResult = await webhookIntegration.submitForm(formData);
@@ -2022,25 +2022,25 @@ async function submitForm() {
             console.log('⚠️ Webhook não inicializado, usando modo offline...');
             submissionResult = await simulateOfflineSubmission(formData);
         }
-        
+
         console.log('📨 Resultado da submissão:', submissionResult);
-        
+
         if (submissionResult.success) {
             console.log('✅ Formulário enviado com sucesso');
-            
+
             // Verificar se recebeu link de pagamento
             if (submissionResult.data && submissionResult.data.link) {
                 console.log('💳 Link de pagamento recebido:', submissionResult.data.link);
             } else {
                 console.warn('⚠️ Link de pagamento não encontrado na resposta');
             }
-            
+
             // Ir para tela de confirmação
             showConfirmation(inscricaoId, formData, submissionResult.data);
         } else {
             throw new Error(submissionResult.error || 'Erro desconhecido no envio');
         }
-        
+
     } catch (error) {
         console.error('💥 Erro na submissão:', error);
         showSubmissionError(error.message);
@@ -2052,19 +2052,34 @@ async function submitForm() {
 
 // Mostrar estado de carregamento da submissão
 function showSubmissionLoading() {
-    const $submitBtn = $('.submit-btn');
-    $submitBtn.prop('disabled', true);
-    $submitBtn.html(`
-        <span class="calculating-indicator"></span>
-        Enviando inscrição...
-    `);
+    $('.submission-overlay').fadeIn(300);
+
+    // Simular progresso nas etapas
+    setTimeout(() => {
+        $('#step-sending').removeClass('active').addClass('completed');
+        $('#step-sending .step-icon').text('✅');
+        $('#step-processing').addClass('active');
+    }, 2000);
+
+    setTimeout(() => {
+        $('#step-processing').removeClass('active').addClass('completed');
+        $('#step-processing .step-icon').text('✅');
+        $('#step-finalizing').addClass('active');
+    }, 15000); // 15 segundos depois
 }
 
 // Ocultar estado de carregamento da submissão
 function hideSubmissionLoading() {
-    const $submitBtn = $('.submit-btn');
-    $submitBtn.prop('disabled', false);
-    $submitBtn.html('Confirmar Inscrição e Prosseguir');
+    $('.submission-overlay').fadeOut(300);
+
+    // Resetar etapas para a próxima vez
+    setTimeout(() => {
+        $('.processing-step').removeClass('active completed');
+        $('#step-sending').addClass('active');
+        $('#step-sending .step-icon').text('🔄');
+        $('#step-processing .step-icon').text('⚙️');
+        $('#step-finalizing .step-icon').text('🏁');
+    }, 500);
 }
 
 // Mostrar erro na submissão
@@ -2078,12 +2093,12 @@ function showSubmissionError(errorMessage) {
             <button class="btn btn-primary" onclick="submitForm()">Tentar Novamente</button>
         </div>
     `;
-    
+
     // Mostrar modal ou seção de erro
     if ($('.submission-error').length === 0) {
         $('#step-3').append(errorHtml);
     }
-    
+
     // Scroll para o erro
     $('.submission-error')[0].scrollIntoView({ behavior: 'smooth' });
 }
@@ -2091,7 +2106,7 @@ function showSubmissionError(errorMessage) {
 // Simular envio offline (fallback)
 function simulateOfflineSubmission(formData) {
     console.log('Modo offline: simulando envio...');
-    
+
     // Simular delay de rede
     return new Promise(resolve => {
         setTimeout(() => {
@@ -2117,13 +2132,13 @@ function generateInscricaoId() {
 // Preparar dados do formulário
 function prepareFormData(inscricaoId) {
     const summary = priceCalculator.getCalculationSummary();
-    
+
     // Coletar dados dos participantes
     const participantsData = [];
-    $('#participants-container .participant-block').each(function() {
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const participantData = extractParticipantData($participant);
-        
+
         // Preparar objeto do participante SEM duplicação
         const participantForWebhook = {
             fullName: participantData.fullName,
@@ -2148,11 +2163,11 @@ function prepareFormData(inscricaoId) {
         if (participantData.numDiarias !== null) {
             participantForWebhook.num_diarias = participantData.numDiarias;
         }
-        
+
         if (participantData.dataCheckin !== null) {
             participantForWebhook.data_checkin = participantData.dataCheckin;
         }
-        
+
         if (participantData.dataCheckout !== null) {
             participantForWebhook.data_checkout = participantData.dataCheckout;
         }
@@ -2160,26 +2175,26 @@ function prepareFormData(inscricaoId) {
         if (participantData.primeiraRefeicao !== null) {
             participantForWebhook.primeira_refeicao = participantData.primeiraRefeicao;
         }
-        
+
         if (participantData.ultimaRefeicao !== null) {
             participantForWebhook.ultima_refeicao = participantData.ultimaRefeicao;
         }
 
         participantsData.push(participantForWebhook);
     });
-    
+
     // Identificar responsável pelo pagamento
     const responsiblePayer = participantsData.find(p => p.isResponsiblePayer) || participantsData[0];
 
     // NOVO: Extrair dados de endereço do responsável
     const $responsiblePayerElement = $('.responsible-payer:checked').closest('.participant-block');
     const $payerElement = $responsiblePayerElement.length > 0 ? $responsiblePayerElement : $('#participants-container .participant-block').first();
-    
+
     let addressData = null;
     if (addressManager && $payerElement.length > 0) {
         addressData = addressManager.extractAddressData($payerElement);
     }
-    
+
     // Preparar objeto do responsável com endereço
     const responsavelCompleto = {
         nome: responsiblePayer.fullName,
@@ -2187,7 +2202,7 @@ function prepareFormData(inscricaoId) {
         email: responsiblePayer.email,
         telefone: responsiblePayer.phone
     };
-    
+
     // NOVO: Adicionar endereço se disponível
     if (addressData && addressData.cep) {
         responsavelCompleto.endereco = {
@@ -2200,7 +2215,7 @@ function prepareFormData(inscricaoId) {
             estado: addressData.estado
         };
     }
-    
+
     // Preparar dados da forma de pagamento com descrição
     const formaPagamentoCompleta = {
         id: selectedPaymentMethod.id,
@@ -2234,7 +2249,7 @@ function prepareFormData(inscricaoId) {
     if (currentEvent.observacoes_adicionais) {
         eventoCompleto.observacoes_adicionais = currentEvent.observacoes_adicionais;
     }
-    
+
     return {
         inscricao_id: inscricaoId,
         evento: eventoCompleto,
@@ -2258,15 +2273,15 @@ function showConfirmation(inscricaoId, formData, responseData) {
     $('#confirmation-id').text(`#${inscricaoId}`);
     $('#confirmation-total').text(priceCalculator.formatCurrency(formData.totais.total));
     $('#confirmation-payment-method').text(formData.forma_pagamento.label);
-    
+
     // Configurar link de pagamento se disponível
     if (responseData && responseData.link) {
         setupPaymentLink(responseData.link, formData);
     }
-    
+
     // Ir para tela de confirmação
     goToStep(4);
-    
+
     // Salvar dados localmente para recuperação
     saveFormDataLocally(inscricaoId, formData);
 }
@@ -2274,20 +2289,20 @@ function showConfirmation(inscricaoId, formData, responseData) {
 // Configurar link de pagamento
 function setupPaymentLink(paymentLink, formData) {
     const $paymentBtn = $('.payment-link-btn');
-    
+
     if (paymentLink && paymentLink !== '#pagamento-offline') {
         $paymentBtn.show();
-        $paymentBtn.off('click').on('click', function() {
+        $paymentBtn.off('click').on('click', function () {
             // Abrir link em nova aba
             window.open(paymentLink, '_blank');
-            
+
             // Mostrar opções adicionais
             showPaymentOptions(paymentLink);
         });
     } else {
         // Modo offline ou erro no link
         $paymentBtn.show().text('Gerar Link de Pagamento');
-        $paymentBtn.off('click').on('click', function() {
+        $paymentBtn.off('click').on('click', function () {
             generatePaymentLinkManually(formData);
         });
     }
@@ -2296,9 +2311,9 @@ function setupPaymentLink(paymentLink, formData) {
 // Gerar link de pagamento manualmente
 async function generatePaymentLinkManually(formData) {
     if (paymentLinkGenerated) return;
-    
+
     paymentLinkGenerated = true;
-    
+
     try {
         // Mostrar carregamento
         const $paymentBtn = $('.payment-link-btn');
@@ -2306,27 +2321,27 @@ async function generatePaymentLinkManually(formData) {
             <span class="calculating-indicator"></span>
             Gerando link...
         `);
-        
+
         // Tentar gerar via webhook
         let linkResult = null;
-        
+
         if (webhookIntegration && webhookConnected) {
             linkResult = await webhookIntegration.generatePaymentLink(formData);
         }
-        
+
         if (linkResult && linkResult.success) {
             // Link gerado com sucesso
             $paymentBtn.prop('disabled', false).text('Ir para Pagamento');
-            $paymentBtn.off('click').on('click', function() {
+            $paymentBtn.off('click').on('click', function () {
                 window.open(linkResult.link, '_blank');
                 showPaymentOptions(linkResult.link);
             });
-            
+
             showPaymentSuccess(linkResult);
         } else {
             throw new Error(linkResult?.error || 'Erro ao gerar link de pagamento');
         }
-        
+
     } catch (error) {
         console.error('Erro ao gerar link:', error);
         showPaymentLinkError(error.message);
@@ -2353,7 +2368,7 @@ function showPaymentOptions(paymentLink) {
             </div>
         </div>
     `;
-    
+
     if ($('.payment-options').length === 0) {
         $('.payment-link-btn').after(optionsHtml);
     }
@@ -2378,7 +2393,7 @@ function fallbackCopyText(text) {
     textArea.value = text;
     document.body.appendChild(textArea);
     textArea.select();
-    
+
     try {
         document.execCommand('copy');
         showToast('Link copiado!', 'success');
@@ -2386,7 +2401,7 @@ function fallbackCopyText(text) {
         console.error('Erro ao copiar:', err);
         showToast('Erro ao copiar link', 'error');
     }
-    
+
     document.body.removeChild(textArea);
 }
 
@@ -2413,7 +2428,7 @@ function showPaymentSuccess(linkResult) {
             ${linkResult.expiresAt ? `<p class="expires-info">Válido até: ${new Date(linkResult.expiresAt).toLocaleString('pt-BR')}</p>` : ''}
         </div>
     `;
-    
+
     $('.payment-link-btn').after(successHtml);
 }
 
@@ -2421,7 +2436,7 @@ function showPaymentSuccess(linkResult) {
 function showPaymentLinkError(errorMessage) {
     const $paymentBtn = $('.payment-link-btn');
     $paymentBtn.prop('disabled', false).text('Tentar Novamente');
-    
+
     const errorHtml = `
         <div class="payment-link-error">
             <div class="error-icon">❌</div>
@@ -2430,7 +2445,7 @@ function showPaymentLinkError(errorMessage) {
             <p>Entre em contato conosco para finalizar o pagamento.</p>
         </div>
     `;
-    
+
     if ($('.payment-link-error').length === 0) {
         $('.payment-link-btn').after(errorHtml);
     }
@@ -2445,7 +2460,7 @@ function saveFormDataLocally(inscricaoId, formData) {
             timestamp: new Date().toISOString(),
             evento: currentEvent.id
         };
-        
+
         localStorage.setItem(`fazenda_serrinha_${inscricaoId}`, JSON.stringify(dataToSave));
         console.log(`Dados salvos localmente para inscrição ${inscricaoId}`);
     } catch (error) {
@@ -2461,16 +2476,16 @@ function showToast(message, type = 'info') {
             <button class="toast-close" onclick="this.parentElement.remove()">×</button>
         </div>
     `;
-    
+
     // Remover toasts existentes
     $('.toast').remove();
-    
+
     // Adicionar novo toast
     $('body').append(toastHtml);
-    
+
     // Auto-remover após 5 segundos
     setTimeout(() => {
-        $('.toast').fadeOut(300, function() {
+        $('.toast').fadeOut(300, function () {
             $(this).remove();
         });
     }, 5000);
@@ -2480,7 +2495,7 @@ function showToast(message, type = 'info') {
 function setupConfirmationStep() {
     // Verificar se há dados salvos para recuperação
     checkForSavedData();
-    
+
     // Configurar botões de ação
     setupConfirmationActions();
 }
@@ -2489,14 +2504,14 @@ function setupConfirmationStep() {
 function checkForSavedData() {
     const urlParams = new URLSearchParams(window.location.search);
     const inscricaoId = urlParams.get('inscricao');
-    
+
     if (inscricaoId) {
         const savedData = localStorage.getItem(`fazenda_serrinha_${inscricaoId}`);
         if (savedData) {
             try {
                 const data = JSON.parse(savedData);
                 console.log('Dados recuperados:', data);
-                
+
                 // Preencher dados da confirmação
                 $('#confirmation-id').text(`#${data.inscricaoId}`);
                 $('#confirmation-total').text(data.formData.totais.total);
@@ -2512,7 +2527,7 @@ function checkForSavedData() {
 function setupConfirmationActions() {
     // Remover qualquer botão de nova inscrição existente
     $('.new-registration-btn').remove();
-    
+
     // Não criar novo botão
     // (código de criação removido)
 }
@@ -2525,7 +2540,7 @@ function clearFormData() {
             localStorage.removeItem(key);
         }
     });
-    
+
     // Resetar variáveis globais
     currentEvent = null;
     participants = [];
@@ -2534,22 +2549,22 @@ function clearFormData() {
     selectedPaymentMethod = null;
     submissionInProgress = false;
     paymentLinkGenerated = false;
-    
-        console.log('Dados do formulário limpos');
+
+    console.log('Dados do formulário limpos');
 }
 
 // Extrair dados do participante do formulário
 function extractParticipantData($participant) {
-    const stayPeriodId = $participant.find('.stay-period-select').val() || 
-                        (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
-    
+    const stayPeriodId = $participant.find('.stay-period-select').val() ||
+        (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+
     // Buscar dados do período selecionado
     let numDiarias = null;
     let dataCheckin = null;
     let dataCheckout = null;
     let primeiraRefeicao = null;
     let ultimaRefeicao = null;
-    
+
     if (stayPeriodId && currentEvent.periodos_estadia_opcoes) {
         const periodoSelecionado = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
         if (periodoSelecionado) {
@@ -2557,7 +2572,7 @@ function extractParticipantData($participant) {
             if (periodoSelecionado.num_diarias) {
                 numDiarias = periodoSelecionado.num_diarias;
             }
-            
+
             // Capturar datas de check-in e check-out
             if (periodoSelecionado.data_inicio) {
                 dataCheckin = periodoSelecionado.data_inicio;
@@ -2602,7 +2617,7 @@ function extractParticipantData($participant) {
     if ($addressSection.is(':visible') && addressManager) {
         addressData = addressManager.extractAddressData($participant);
     }
-    
+
     return {
         fullName: $participant.find('.full-name').val() || '',
         phone: phoneNumber,
@@ -2613,10 +2628,10 @@ function extractParticipantData($participant) {
         email: emailValue,
         birthDate: $participant.find('.dob-input').val() || '',
         stayPeriod: stayPeriodId,
-        accommodation: $participant.find('.accommodation-select').val() || 
-                      (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
-        eventOption: $participant.find('.event-option-select').val() || 
-                    (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
+        accommodation: $participant.find('.accommodation-select').val() ||
+            (currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null),
+        eventOption: $participant.find('.event-option-select').val() ||
+            (getEventOptionsForParticipant($participant).length === 1 ? getEventOptionsForParticipant($participant)[0].id : null),
         bedPreference: $participant.find('.bed-preference-select').val() || '',
         restrictions: $participant.find('.restrictions-input').val().trim() || '',
         isResponsiblePayer: $participant.find('.responsible-payer').is(':checked'),
@@ -2635,9 +2650,9 @@ function getEventOptionsForParticipant($participant) {
     if (currentEvent.tipo_formulario === 'evento_apenas') {
         return currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
-        const stayPeriodId = $participant.find('.stay-period-select').val() || 
-                           (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
-        
+        const stayPeriodId = $participant.find('.stay-period-select').val() ||
+            (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+
         if (stayPeriodId) {
             const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === stayPeriodId);
             return periodo ? (periodo.valores_evento_opcoes || []) : [];
@@ -2652,7 +2667,7 @@ function updateParticipantInCalculator(participantId, participantData) {
 
     // Encontrar índice do participante
     const participantIndex = priceCalculator.participants.findIndex(p => p.id === participantId);
-    
+
     if (participantIndex >= 0) {
         // Atualizar participante existente
         priceCalculator.participants[participantIndex] = {
@@ -2674,23 +2689,23 @@ function updateParticipantCalculations($participant) {
 
     const participantData = extractParticipantData($participant);
     const participantId = $participant.attr('data-participant-id');
-    
+
     // Garantir que o participantData tenha o ID
     participantData.id = participantId;
 
     // Atualizar apenas este participante no calculador
     updateParticipantInCalculator(participantId, participantData);
-    
+
     // Calcular valores individuais usando os dados atualizados
     const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
     const eventValue = window.priceCalculator.calculateEventValue(participantData);
-    
+
     // Calcular idade para o debug
     const age = window.priceCalculator.calculateAge(participantData.birthDate);
-    
+
     // Atualizar display dos valores com informações adicionais
     updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
-    
+
     console.log(`Cálculos atualizados para participante ${participantId}:`, {
         idade: age,
         posicaoNoArray: window.priceCalculator.participants.findIndex(p => p.id === participantId),
@@ -2699,7 +2714,7 @@ function updateParticipantCalculations($participant) {
         lodgingValue,
         eventValue
     });
-    
+
     // Atualizar totais gerais se estivermos na tela de resumo
     if (currentStep === 3) {
         updateSummaryTotals();
@@ -2712,18 +2727,18 @@ function updateAllParticipantsInCalculator() {
 
     // Limpar participantes existentes
     window.priceCalculator.participants = [];
-    
+
     // Adicionar todos os participantes na ordem correta
-    $('#participants-container .participant-block').each(function() {
+    $('#participants-container .participant-block').each(function () {
         const $participant = $(this);
         const participantId = $participant.attr('data-participant-id');
-        
+
         // ✅ CORREÇÃO: Removida verificação redundante
         const participantData = extractParticipantData($participant);
         participantData.id = participantId;
         window.priceCalculator.participants.push(participantData);
     });
-    
+
     console.log('Todos os participantes atualizados no calculador:', window.priceCalculator.participants.length);
 }
 
@@ -2738,25 +2753,25 @@ function updateAllCalculations() {
     try {
         // Primeiro atualizar todos os participantes no calculador
         updateAllParticipantsInCalculator();
-        
+
         // Depois atualizar displays individuais
-        $('#participants-container .participant-block').each(function() {
+        $('#participants-container .participant-block').each(function () {
             const $participant = $(this);
             const participantId = $participant.attr('data-participant-id');
-            
+
             // Buscar dados do participante já no calculador
             const participantData = window.priceCalculator.participants.find(p => p.id === participantId);
-            
+
             if (participantData) {
                 // Calcular valores individuais
                 const lodgingValue = window.priceCalculator.calculateLodgingValue(participantData);
                 const eventValue = window.priceCalculator.calculateEventValue(participantData);
-                
+
                 // Atualizar display
                 updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData);
             }
         });
-        
+
         // Atualizar totais se estivermos na tela de resumo
         if (currentStep === 3) {
             updateSummaryTotals();
@@ -2773,7 +2788,7 @@ function updateAllCalculations() {
 function updateParticipantValueDisplay($participant, lodgingValue, eventValue, participantData) {
     const age = window.priceCalculator.calculateAge(participantData.birthDate);
     const participantId = $participant.attr('data-participant-id');
-    
+
     console.log(`🔄 Atualizando display para participante ${participantId}:`, {
         idade: age,
         lodgingValue,
@@ -2783,37 +2798,37 @@ function updateParticipantValueDisplay($participant, lodgingValue, eventValue, p
         isEligibleForFreeEvent: window.priceCalculator.isEligibleForFree(participantData, 'evento'),
         shouldApplyExcessEvent: window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')
     });
-    
+
     // Atualizar valor de hospedagem
     const $lodgingValue = $participant.find('.lodging-value');
     if ($lodgingValue.length > 0) {
         let lodgingText = window.priceCalculator.formatCurrency(lodgingValue);
-        
+
         // Adicionar indicador se necessário
         if (lodgingValue === 0 && age >= 0 && age <= 4) {
             lodgingText += ' <span class="free-indicator">(Gratuito)</span>';
         } else if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'hospedagem')) {
             lodgingText += ' <span class="discount-indicator">(50%)</span>';
         }
-        
+
         $lodgingValue.html(lodgingText);
         console.log(`💰 Hospedagem atualizada para ${participantId}: ${lodgingText}`);
     } else {
         console.warn(`⚠️ Elemento .lodging-value não encontrado para participante ${participantId}`);
     }
-    
+
     // Atualizar valor de evento
     const $eventValue = $participant.find('.event-value');
     if ($eventValue.length > 0) {
         let eventText = window.priceCalculator.formatCurrency(eventValue);
-        
+
         // Adicionar indicador se necessário
         if (eventValue === 0 && age >= 0 && age <= 4) {
             eventText += ' <span class="free-indicator">(Gratuito)</span>';
         } else if (age >= 0 && age <= 4 && window.priceCalculator.shouldApplyExcessRule(participantData, 'evento')) {
             eventText += ' <span class="discount-indicator">(50%)</span>';
         }
-        
+
         $eventValue.html(eventText);
         console.log(`🎈 Evento atualizado para ${participantId}: ${eventText}`);
     } else {
@@ -2826,7 +2841,7 @@ function updateSummaryTotals() {
     if (!window.priceCalculator) return;
 
     const summary = window.priceCalculator.getCalculationSummary();
-    
+
     // Atualizar displays para subtotais e total final
     $('#subtotal-hospedagem').text(summary.formatted.lodgingSubtotal);
     $('#subtotal-evento').text(summary.formatted.eventSubtotal);
@@ -2846,16 +2861,16 @@ function updateSummaryTotals() {
         $discountValue.text('-R\$ 0,00');
         $discountLine.hide();
     }
-    
+
     // Mostrar/ocultar linhas baseado no tipo de formulário
     const tipoFormulario = currentEvent.tipo_formulario;
-    
+
     if (tipoFormulario === 'hospedagem_apenas') {
         $('#subtotal-evento').parent().hide();
     } else if (tipoFormulario === 'evento_apenas') {
         $('#subtotal-hospedagem').parent().hide();
     }
-    
+
     console.log('Totais atualizados:', summary);
 }
 
@@ -2865,19 +2880,19 @@ function applyCoupon(couponCode) {
 
     const validation = priceCalculator.validateCoupon(couponCode);
     const $feedback = $('#coupon-feedback');
-    
+
     if (validation.valid) {
         priceCalculator.setCoupon(validation.coupon);
         $feedback.text(validation.message).removeClass('error-message').addClass('success-message');
         $('#coupon-code').removeClass('error').addClass('success');
-        
+
         // Atualizar totais
         updateSummaryTotals();
-        
+
         console.log('Cupom aplicado:', validation.coupon);
     } else {
         priceCalculator.setCoupon(null);
-        
+
         if (validation.message) {
             $feedback.text(validation.message).removeClass('success-message').addClass('error-message');
             $('#coupon-code').addClass('error').removeClass('success');
@@ -2885,7 +2900,7 @@ function applyCoupon(couponCode) {
             $feedback.text('').removeClass('success-message error-message');
             $('#coupon-code').removeClass('error success');
         }
-        
+
         // Atualizar totais
         updateSummaryTotals();
     }
@@ -2905,19 +2920,19 @@ function applyCoupon(couponCode) {
 
     const validation = window.priceCalculator.validateCoupon(couponCode);
     const $feedback = $('#coupon-feedback');
-    
+
     if (validation.valid) {
         window.priceCalculator.setCoupon(validation.coupon);
         $feedback.text(validation.message).removeClass('error-message').addClass('success-message');
         $('#coupon-code').removeClass('error').addClass('success');
-        
+
         // Atualizar totais
         updateSummaryTotals();
-        
+
         console.log('Cupom aplicado:', validation.coupon);
     } else {
         window.priceCalculator.setCoupon(null);
-        
+
         if (validation.message) {
             $feedback.text(validation.message).removeClass('success-message').addClass('error-message');
             $('#coupon-code').addClass('error').removeClass('success');
@@ -2925,7 +2940,7 @@ function applyCoupon(couponCode) {
             $feedback.text('').removeClass('success-message error-message');
             $('#coupon-code').removeClass('error success');
         }
-        
+
         // Atualizar totais
         updateSummaryTotals();
     }
@@ -2941,19 +2956,19 @@ function validateCoupon() {
 function updatePaymentMethod() {
     const selectedId = $('#payment-method').val();
     const forma = currentEvent.formas_pagamento_opcoes.find(f => f.id === selectedId);
-    
+
     if (forma) {
         $('#payment-method-description').text(forma.descricao);
         selectedPaymentMethod = forma;
-        
+
         // Atualizar calculador se disponível
         if (window.priceCalculator && typeof window.priceCalculator.setPaymentMethod === 'function') {
             window.priceCalculator.setPaymentMethod(forma);
         }
-        
+
         // Recalcular totais com nova taxa de gateway
         updateAllCalculations();
-        
+
         // Atualizar descrição da forma de pagamento na seção de política
         if (currentStep === 3) {
             loadCancellationPolicy();

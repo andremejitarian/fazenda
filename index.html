@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulário de Inscrição – Fazenda Serrinha</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="submission-overlay.css">
     <!-- jQuery CDN -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- jQuery Mask CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 </head>
+
 <body>
     <!-- Banner Header -->
-    <div class="header-banner" style="background-image: url('https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg');">
+    <div class="header-banner"
+        style="background-image: url('https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg');">
     </div>
 
     <!-- Container Principal -->
@@ -20,9 +24,10 @@
         <div class="form-card">
             <!-- Logo Container -->
             <div class="logo-container">
-                <img src="https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png" alt="Logo Fazenda Serrinha" class="logo">
+                <img src="https://assets.fazendaserrinha.com.br/logos/fs_logo_circular.png" alt="Logo Fazenda Serrinha"
+                    class="logo">
             </div>
-            
+
             <!-- Tela 1: Boas-vindas -->
             <div class="form-content" id="step-1">
                 <div class="welcome-section">
@@ -56,15 +61,15 @@
             <!-- Tela 2: Dados dos Participantes (oculta inicialmente) -->
             <div class="form-content" id="step-2" style="display: none;">
                 <h2 class="section-title">Dados dos Participantes</h2>
-                
+
                 <div id="participants-container">
                     <!-- Participantes serão adicionados aqui via JavaScript -->
                 </div>
-                
+
                 <button class="btn btn-secondary btn-add-participant" id="add-participant-btn">
                     ➕ Adicionar Participante
                 </button>
-                
+
                 <div class="navigation-buttons">
                     <button class="btn btn-secondary back-btn">Voltar</button>
                     <button class="btn btn-primary next-btn">Próximo</button>
@@ -74,7 +79,7 @@
             <!-- Tela 3: Resumo e Pagamento (oculta inicialmente) -->
             <div class="form-content" id="step-3" style="display: none;">
                 <h2 class="section-title">Resumo e Pagamento</h2>
-                
+
                 <div id="summary-content">
                     <!-- Resumo será preenchido via JavaScript -->
                 </div>
@@ -117,12 +122,13 @@
                 </div>
                 <!-- FIM DA NOVA SEÇÃO -->
 
-                
+
                 <div class="terms-section">
                     <label class="checkbox-container">
                         <input type="checkbox" id="terms-conditions" required>
                         <span class="checkmark"></span>
-                        <span class="checkbox-text">Li e concordo com os <a href="#" id="terms-link">Termos e Condições</a></span>
+                        <span class="checkbox-text">Li e concordo com os <a href="#" id="terms-link">Termos e
+                                Condições</a></span>
                     </label>
                 </div>
 
@@ -136,10 +142,10 @@
             <div class="form-content" id="step-4" style="display: none;">
                 <div class="success-container">
                     <h2>INSCRIÇÃO CONFIRMADA!</h2>
-                    
+
                     <div class="confirmation-card">
                         <p>Sua inscrição na Fazenda Serrinha foi enviada com sucesso!</p>
-                        
+
                         <div class="confirmation-details">
                             <div class="detail-item">
                                 <span class="label">📄 ID da Inscrição:</span>
@@ -154,10 +160,10 @@
                                 <span class="value" id="confirmation-payment-method"></span>
                             </div>
                         </div>
-                        
+
                         <p class="payment-instruction">📧 Clique no botão abaixo para realizar o pagamento.</p>
                     </div>
-                    
+
                     <button class="btn btn-primary payment-link-btn" style="display: none;">
                         Ir para Pagamento
                     </button>
@@ -173,7 +179,7 @@
                 <h3>PARTICIPANTE <span class="participant-number">1</span></h3>
                 <button class="btn btn-danger btn-remove-participant" style="display: none;">Remover</button>
             </div>
-            
+
             <div class="participant-form">
                 <div class="form-row">
                     <div class="form-group">
@@ -182,7 +188,7 @@
                     </div>
                 </div>
 
-                                <!-- Mover E-mail e Data de Nascimento para a próxima linha -->
+                <!-- Mover E-mail e Data de Nascimento para a próxima linha -->
                 <div class="form-row">
                     <div class="form-group">
                         <label>Data Nasc.:</label>
@@ -193,41 +199,42 @@
                         <!-- Coluna vazia ou outro campo futuro -->
                     </div>
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
-                    <label>Telefone:</label>
-                    <div class="phone-input-container">
-                        <select class="form-control country-select">
-                        <option value="+55" data-country="BR" selected>🇧🇷 +55</option>
-                        <option value="+1" data-country="US">🇺🇸 +1</option>
-                        <option value="+1" data-country="CA">🇨🇦 +1</option>
-                        <option value="+54" data-country="AR">🇦🇷 +54</option>
-                        <option value="+56" data-country="CL">🇨🇱 +56</option>
-                        <option value="+57" data-country="CO">🇨🇴 +57</option>
-                        <option value="+51" data-country="PE">🇵🇪 +51</option>
-                        <option value="+598" data-country="UY">🇺🇾 +598</option>
-                        <option value="+595" data-country="PY">🇵🇾 +595</option>
-                        <option value="+591" data-country="BO">🇧🇴 +591</option>
-                        <option value="+593" data-country="EC">🇪🇨 +593</option>
-                        <option value="+58" data-country="VE">🇻🇪 +58</option>
-                        <option value="+351" data-country="PT">🇵🇹 +351</option>
-                        <option value="+34" data-country="ES">🇪🇸 +34</option>
-                        <option value="+33" data-country="FR">🇫🇷 +33</option>
-                        <option value="+49" data-country="DE">🇩🇪 +49</option>
-                        <option value="+39" data-country="IT">🇮🇹 +39</option>
-                        <option value="+44" data-country="GB">🇬🇧 +44</option>
-                        </select>
-                        <input type="text" class="form-control phone-input" required placeholder="Digite o telefone">
+                        <label>Telefone:</label>
+                        <div class="phone-input-container">
+                            <select class="form-control country-select">
+                                <option value="+55" data-country="BR" selected>🇧🇷 +55</option>
+                                <option value="+1" data-country="US">🇺🇸 +1</option>
+                                <option value="+1" data-country="CA">🇨🇦 +1</option>
+                                <option value="+54" data-country="AR">🇦🇷 +54</option>
+                                <option value="+56" data-country="CL">🇨🇱 +56</option>
+                                <option value="+57" data-country="CO">🇨🇴 +57</option>
+                                <option value="+51" data-country="PE">🇵🇪 +51</option>
+                                <option value="+598" data-country="UY">🇺🇾 +598</option>
+                                <option value="+595" data-country="PY">🇵🇾 +595</option>
+                                <option value="+591" data-country="BO">🇧🇴 +591</option>
+                                <option value="+593" data-country="EC">🇪🇨 +593</option>
+                                <option value="+58" data-country="VE">🇻🇪 +58</option>
+                                <option value="+351" data-country="PT">🇵🇹 +351</option>
+                                <option value="+34" data-country="ES">🇪🇸 +34</option>
+                                <option value="+33" data-country="FR">🇫🇷 +33</option>
+                                <option value="+49" data-country="DE">🇩🇪 +49</option>
+                                <option value="+39" data-country="IT">🇮🇹 +39</option>
+                                <option value="+44" data-country="GB">🇬🇧 +44</option>
+                            </select>
+                            <input type="text" class="form-control phone-input" required
+                                placeholder="Digite o telefone">
                         </div>
                     </div>
-                <!-- QUARTA LINHA: CPF (será oculto inicialmente) -->
-                <div class="form-group">
-                    <label>CPF:</label>
-                    <input type="text" class="form-control cpf-mask" required>
-                    <p class="feedback-message cpf-feedback"></p>
+                    <!-- QUARTA LINHA: CPF (será oculto inicialmente) -->
+                    <div class="form-group">
+                        <label>CPF:</label>
+                        <input type="text" class="form-control cpf-mask" required>
+                        <p class="feedback-message cpf-feedback"></p>
+                    </div>
                 </div>
-            </div>
 
                 <!-- NOVA LINHA: Adicionar campo de gênero -->
                 <div class="form-row">
@@ -252,7 +259,7 @@
                     <div class="section-divider">
                         <h4>📍 ENDEREÇO PARA NOTA FISCAL</h4>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>CEP:</label>
@@ -264,14 +271,14 @@
                             <input type="text" class="form-control numero-input" placeholder="123">
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Logradouro:</label>
                             <input type="text" class="form-control logradouro-input" placeholder="Rua, Avenida, etc.">
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Complemento (opcional):</label>
@@ -282,7 +289,7 @@
                             <input type="text" class="form-control bairro-input" placeholder="Nome do bairro">
                         </div>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Cidade:</label>
@@ -323,30 +330,30 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Seção de Hospedagem -->
                 <div class="lodging-section" style="display: none;">
                     <div class="section-divider">
                         <h4>🏠 ESTADIA</h4>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Período:</label>
                         <select class="form-control stay-period-select"></select>
                         <p class="info-text stay-period-info" style="display: none;"></p>
                     </div>
-                    
+
                     <div class="checkin-checkout-info">
                         <p class="checkin-info"><strong>Check-in:</strong> <span class="checkin-datetime"></span></p>
                         <p class="checkout-info"><strong>Check-out:</strong> <span class="checkout-datetime"></span></p>
                         <p class="primeira-refeicao-info" style="display: none;">
-                        <strong>Primeira refeição:</strong> <span class="primeira-refeicao-text"></span>
+                            <strong>Primeira refeição:</strong> <span class="primeira-refeicao-text"></span>
                         </p>
                         <p class="ultima-refeicao-info" style="display: none;">
-                        <strong>Última refeição:</strong> <span class="ultima-refeicao-text"></span>
+                            <strong>Última refeição:</strong> <span class="ultima-refeicao-text"></span>
                         </p>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Acomodação:</label>
                         <select class="form-control accommodation-select"></select>
@@ -363,7 +370,8 @@
                                 <option value="casal">Cama de Casal</option>
                                 <option value="solteiro">Cama de Solteiro</option>
                             </select>
-                            <p class="info-text bed-preference-info">Esta preferência será considerada conforme disponibilidade.</p>
+                            <p class="info-text bed-preference-info">Esta preferência será considerada conforme
+                                disponibilidade.</p>
                         </div>
                     </div>
 
@@ -371,26 +379,27 @@
                     <div class="restrictions-section">
                         <div class="form-group">
                             <label>Restrições Alimentares e Observações (opcional):</label>
-                            <textarea class="form-control restrictions-input" 
-                                      rows="3" 
-                                      placeholder="Ex: Alergia a amendoim, vegetariano, necessidades especiais, etc."></textarea>
-                            <p class="info-text restrictions-info">Em caso de alimentação especial, a cozinha está aberta para autonomia do grupo e abraçará da melhor forma possível. E, em casos muito específicos, aconselhamos trazer seus próprios complementos</p>
+                            <textarea class="form-control restrictions-input" rows="3"
+                                placeholder="Ex: Alergia a amendoim, vegetariano, necessidades especiais, etc."></textarea>
+                            <p class="info-text restrictions-info">Em caso de alimentação especial, a cozinha está
+                                aberta para autonomia do grupo e abraçará da melhor forma possível. E, em casos muito
+                                específicos, aconselhamos trazer seus próprios complementos</p>
                         </div>
                     </div>
-                    
-                <!-- CORREÇÃO: Adicionar ID único e classes específicas -->
-                <div class="price-display lodging-price-display">
-                    <span class="price-label">Hospedagem:</span>
-                    <span class="price-value lodging-value" data-type="lodging">R$ 0,00</span>
+
+                    <!-- CORREÇÃO: Adicionar ID único e classes específicas -->
+                    <div class="price-display lodging-price-display">
+                        <span class="price-label">Hospedagem:</span>
+                        <span class="price-value lodging-value" data-type="lodging">R$ 0,00</span>
+                    </div>
                 </div>
-            </div>
 
                 <!-- Seção de Evento -->
                 <div class="event-section" style="display: none;">
                     <div class="section-divider">
                         <h4>🎈 EVENTO</h4>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Participação:</label>
                         <select class="form-control event-option-select"></select>
@@ -398,13 +407,13 @@
                         <p class="info-text child-discount-info" style="display: none;">
                             O desconto para crianças será calculado e exibido na próxima tela.</p>
                     </div>
-                    
-                <!-- CORREÇÃO: Adicionar ID único e classes específicas -->
-                <div class="price-display event-price-display">
-                    <span class="price-label">Evento:</span>
-                    <span class="price-value event-value" data-type="event">R$ 0,00</span>
+
+                    <!-- CORREÇÃO: Adicionar ID único e classes específicas -->
+                    <div class="price-display event-price-display">
+                        <span class="price-label">Evento:</span>
+                        <span class="price-value event-value" data-type="event">R$ 0,00</span>
+                    </div>
                 </div>
-            </div>
 
                 <!-- Responsável pelo Pagamento -->
                 <div class="responsible-payer-section" style="display: none;">
@@ -426,6 +435,26 @@
         </div>
     </template>
 
+    <!-- Overlay de Submissão -->
+    <div class="submission-overlay" style="display: none;">
+        <div class="submission-content">
+            <div class="submission-spinner"></div>
+            <h3>Processando sua Inscrição</h3>
+            <p>Por favor, aguarde enquanto finalizamos seu cadastro. Não feche esta página.</p>
+            <div class="processing-steps">
+                <div class="processing-step active" id="step-sending">
+                    <span class="step-icon">🔄</span> Enviando dados...
+                </div>
+                <div class="processing-step" id="step-processing">
+                    <span class="step-icon">⚙️</span> Gerando inscrição...
+                </div>
+                <div class="processing-step" id="step-finalizing">
+                    <span class="step-icon">🏁</span> Finalizando...
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Indicador de Conectividade -->
     <div class="connectivity-indicator testing" id="connectivity-indicator" style="display: none;">
         <span class="webhook-status-icon"></span>
@@ -433,11 +462,12 @@
     </div>
 
     <!-- Scripts na ordem correta -->
-        <script src="js/cpfValidation.js"></script>
-        <script src="js/cepValidation.js"></script>
-        <script src="js/addressManager.js"></script>
-        <script src="js/priceCalculator.js"></script>
-        <script src="js/webhookIntegration.js"></script>
-        <script src="js/script.js"></script>
+    <script src="js/cpfValidation.js"></script>
+    <script src="js/cepValidation.js"></script>
+    <script src="js/addressManager.js"></script>
+    <script src="js/priceCalculator.js"></script>
+    <script src="js/webhookIntegration.js"></script>
+    <script src="js/script.js"></script>
 </body>
+
 </html>

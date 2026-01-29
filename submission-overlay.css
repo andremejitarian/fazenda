@@ -1,0 +1,78 @@
+/* Estilos para o overlay de carregamento da submissão */
+.submission-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.submission-content {
+    background: white;
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    max-width: 400px;
+    width: 90%;
+}
+
+.submission-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid var(--border-color);
+    border-left-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 30px;
+}
+
+.submission-content h3 {
+    color: var(--primary-color);
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.submission-content p {
+    color: var(--text-secondary);
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.processing-steps {
+    margin-top: 20px;
+    text-align: left;
+    font-size: 0.95em;
+    color: var(--text-secondary);
+}
+
+.processing-step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+.processing-step.active {
+    opacity: 1;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.processing-step.completed {
+    opacity: 1;
+    color: var(--success-color);
+}
+
+.step-icon {
+    margin-right: 10px;
+}
