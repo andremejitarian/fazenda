@@ -932,7 +932,7 @@
 
       "cupons_desconto": [
         {
-          "codigo": "HOSPEDAGEM10xyz",
+          "codigo": "HOSPEDAGEM10VORTEX",
           "tipo_desconto": "percentual",
           "valor_desconto": 0.10,
           "data_validade_fim": "2090-10-10T23:59:59",
