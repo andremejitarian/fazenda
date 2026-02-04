@@ -703,7 +703,7 @@
         }
       ]
     },
-        {
+    {
       "id": "G004",
       "external_reference": "4a4837d1-f779-4307-b4a8-79b9e4753cc4",
       "planilha_url": "https://docs.google.com/spreadsheets/d/1yUzQwRvb3hWfsBGO7EnPAVJ8BUG-tNjMBAk5FHwJsRI/edit?gid=0#gid=0",
@@ -824,7 +824,7 @@
         }
       ]
     },
-        {
+    {
       "id": "G005",
       "external_reference": "534f18c5-eafb-4af9-aa32-20d34576e10e",
       "planilha_url": "https://docs.google.com/spreadsheets/d/17nszYfhdWSd14fq86ckqFe7g6tYUU6eay22S5J6vdC8/edit?gid=505962950#gid=505962950",
@@ -1167,7 +1167,6 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
