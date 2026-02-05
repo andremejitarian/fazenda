@@ -965,7 +965,7 @@
       "periodos_estadia_opcoes": [
         {
           "id": "tres_noites",
-          "label": "3 Noites (30/04 - 03/05)",
+          "label": "3,3 diárias (30/04 - 03/05)",
           "data_inicio": "2026-04-30T08:00",
           "data_fim": "2026-05-03T16:00",
           "primeira_refeicao": "Café da manhã",
@@ -974,7 +974,7 @@
         },
         {
           "id": "quatro_noites",
-          "label": "4 Noites (29/04 - 03/05)",
+          "label": "3,8 diárias (29/04 - 03/05)",
           "data_inicio": "2026-04-29T18:00",
           "data_fim": "2026-05-03T16:00",
           "primeira_refeicao": "somente pernoite",
@@ -1084,7 +1084,7 @@
       "periodos_estadia_opcoes": [
         {
           "id": "quatro_noites",
-          "label": "4 Noites (03/06 - 07/06)",
+          "label": "4,5 diárias (03/06 - 07/06)",
           "data_inicio": "2026-06-03T08:00",
           "data_fim": "2026-06-07T16:00",
           "primeira_refeicao": "Café da manhã",
@@ -1093,7 +1093,7 @@
         },
         {
           "id": "cinco_noites",
-          "label": "5 Noites (02/06 - 07/06)",
+          "label": "5 diárias (02/06 - 07/06)",
           "data_inicio": "2026-06-02T18:00",
           "data_fim": "2026-06-07T16:00",
           "primeira_refeicao": "somente pernoite",
