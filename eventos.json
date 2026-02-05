@@ -1176,6 +1176,140 @@
           "aplicacao": "hospedagem"
         }
       ]
+    },
+
+    {
+      "id": "G008",
+      "external_reference": "15dae117-9835-467f-b004-4fc5140774eb",
+      "planilha_url": "http",
+      "header": {
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1770302574/caminhosinterior-1319_jgnuvs.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
+      },
+      "nome": "Caminhos do Interior",
+      "descricao": "Este programa é um convite para famílias viverem um tempo de presença. São dias de despertar para o ritmo da vida no campo, abrir passagem para o sensível, voltar os olhos e os corações para o pulsar da terra, ouvir os sussurros do chão.",
+      "politicas_evento_url": "https://drive.google.com/file/d/1IuRoFRJbBzBihsu1XjIf_js9qVExIqLB/view",
+      "observacoes_adicionais": "Essa edição será na Páscoa, de 2 a 5 de abril de 2026",
+      "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [
+        {
+          "id": "maromba",
+          "label": "Maromba (chalé) e suíte conjugada do lago",
+          "descricao": "Maromba (chalé) e suíte conjugada do lago",
+          "valor_diaria_por_pessoa": 898
+        },
+        {
+          "id": "suite",
+          "label": "Suites - Quartos privativos",
+          "descricao": "Suites - Quartos privativos",
+          "valor_diaria_por_pessoa": 761
+        },
+        {
+          "id": "refugio_quarto3",
+          "label": "Refúgio e Quarto 3 (acomodações com beliches e sem cama de casal)",
+          "descricao": "Refúgio e Quarto 3 (acomodações com beliches e sem cama de casal)",
+          "valor_diaria_por_pessoa": 650.67
+        },
+        {
+          "id": "acampamento",
+          "label": "Acampamento (cada um traz sua barraca e apetrechos)",
+          "descricao": "Acampamento (cada um traz sua barraca e apetrechos)",
+          "valor_diaria_por_pessoa": 446
+        },
+        {
+          "id": "sem_pernoite",
+          "label": "Sem pernoite (para aqueles que moram nas redondezas)",
+          "descricao": "Sem pernoite (para aqueles que moram nas redondezas)",
+          "valor_diaria_por_pessoa": 408.66
+        }        
+      ],
+
+      "periodos_estadia_opcoes": [
+        {
+          "id": "tres_noites",
+          "label": "3 Noites (02/04 - 05/04)",
+          "data_inicio": "2026-04-02T18:00",
+          "data_fim": "2026-04-05T16:00",
+          "primeira_refeicao": "Jantar",
+          "ultima_refeicao": "Almoço",
+          "num_diarias": 3
+        }       
+      ],
+
+      "valores_evento_opcoes": [],
+
+      "formas_pagamento_opcoes": [
+        {
+          "id": "cartao_parcelado",
+          "label": "Cartão Parcelado (até 6x sem juros)",
+          "tipo": "cartao_parcelado",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": 0.00
+        },
+        {
+          "id": "cartao_vista",
+          "label": "Cartão Á vista com 6% de desconto",
+          "tipo": "cartao",
+          "parcelas_maximas": 1,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.06
+        },
+        {
+          "id": "pix_vista",
+          "label": "PIX à Vista com 10% de desconto",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.10
+        },      
+        {
+          "id": "pix_sinal",
+          "label": "Pix sinal 30% e 70% (valor total com 10% de desconto)",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.10
+        }
+      ],
+
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 0.5,
+              "descricao": "Crianças 0-3 anos extras pagam 50% da hospedagem"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 10 anos pagam valor integral de hospedagem"
+          }
+        ],
+        "evento": []
+      },
+      "cupons_desconto": [
+        {
+          "codigo": "HOSPEDAGEM10ANAXYZ",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.10,
+          "data_validade_fim": "2090-10-10T23:59:59",
+          "aplicacao": "hospedagem"
+        }
+      ]
     }    
   ]
 }
