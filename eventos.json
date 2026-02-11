@@ -695,7 +695,7 @@
 
       "cupons_desconto": [
         {
-          "codigo": "GOMIDES10KOMBI",
+          "codigo": "CUPOMXYZKK10",
           "tipo_desconto": "percentual",
           "valor_desconto": 0.10,
           "data_validade_fim": "2090-10-10T23:59:59",
@@ -816,7 +816,7 @@
 
       "cupons_desconto": [
         {
-          "codigo": "HOSPEDAGEM10xyz",
+          "codigo": "GOMIDES10KOMBI",
           "tipo_desconto": "percentual",
           "valor_desconto": 0.10,
           "data_validade_fim": "2090-10-10T23:59:59",
