@@ -2,7 +2,7 @@
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
-            submission: 'POST https://andremejitarian--pranna-webhook-server-fastapi-app.modal.run/api/webhooks/prod/fazenda-serrinha/fazenda-checkin-grupos?secret=6f0a9e372a658fede926e6b001a92b431b98bdc5c6034dbf274a076ac98949f1&sync=true'
+            submission: 'https://andremejitarian--pranna-webhook-server-fastapi-app.modal.run/api/webhooks/prod/fazenda-serrinha/fazenda-checkin-grupos?secret=6f0a9e372a658fede926e6b001a92b431b98bdc5c6034dbf274a076ac98949f1&sync=true'
         };
         this.timeout = 60000;
         this.retryAttempts = 1;
