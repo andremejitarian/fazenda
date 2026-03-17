@@ -387,6 +387,35 @@ function setupParticipantSections($participant) {
     }
 }
 
+// Retorna o label de acomodação com valor total do período (ou por diária como fallback)
+function buildAccommodationLabel(acomodacao, numDiarias) {
+    const valorDiaria = acomodacao.valor_diaria_por_pessoa;
+    if (numDiarias) {
+        const total = valorDiaria * numDiarias;
+        const totalFormatado = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        return `${acomodacao.label} - ${totalFormatado}`;
+    }
+    const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
+    return `${acomodacao.label} - ${valorFormatado}/diária`;
+}
+
+// Atualiza os labels de acomodação quando o período muda
+function updateAccommodationLabels($participant, numDiarias) {
+    const acomodacoes = currentEvent.tipos_acomodacao;
+    if (acomodacoes.length === 1) {
+        const label = buildAccommodationLabel(acomodacoes[0], numDiarias);
+        $participant.find('.accommodation-info')
+            .text(`${label} - ${acomodacoes[0].descricao}`);
+    } else {
+        $participant.find('.accommodation-select option').each(function () {
+            const val = $(this).val();
+            if (!val) return;
+            const acomodacao = acomodacoes.find(a => String(a.id) === String(val));
+            if (acomodacao) $(this).text(buildAccommodationLabel(acomodacao, numDiarias));
+        });
+    }
+}
+
 // Configurar opções de hospedagem
 function setupLodgingOptions($participant) {
     const $stayPeriodSelect = $participant.find('.stay-period-select');
@@ -423,21 +452,18 @@ function setupLodgingOptions($participant) {
 
     // Tipos de acomodação
     const acomodacoes = currentEvent.tipos_acomodacao;
+    const numDiariasInicial = periodos.length === 1 ? periodos[0].num_diarias : null;
 
     if (acomodacoes.length === 1) {
         // Apenas uma opção - mostrar como texto COM VALOR
-        const valorDiaria = acomodacoes[0].valor_diaria_por_pessoa;
-        const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
+        const label = buildAccommodationLabel(acomodacoes[0], numDiariasInicial);
         $accommodationSelect.hide();
-        $accommodationInfo.text(`${acomodacoes[0].label} - ${valorFormatado}/diária - ${acomodacoes[0].descricao}`).show();
+        $accommodationInfo.text(`${label} - ${acomodacoes[0].descricao}`).show();
     } else {
         // Múltiplas opções - mostrar dropdown COM VALORES
         $accommodationSelect.empty().append('<option value="">Selecione a acomodação</option>');
         acomodacoes.forEach(acomodacao => {
-            const valorDiaria = acomodacao.valor_diaria_por_pessoa;
-            const valorFormatado = `R$ ${valorDiaria.toFixed(2).replace('.', ',')}`;
-            const optionLabel = `${acomodacao.label} - ${valorFormatado}/diária`;
-
+            const optionLabel = buildAccommodationLabel(acomodacao, numDiariasInicial);
             $accommodationSelect.append(`<option value="${acomodacao.id}">${optionLabel}</option>`);
         });
         $accommodationSelect.show();
@@ -886,6 +912,11 @@ function setupParticipantEventListeners($participant) {
             } else {
                 $p.find('.checkin-datetime').text('');
                 $p.find('.checkout-datetime').text('');
+            }
+
+            // Atualizar labels de acomodação com valor total do período
+            if (periodoSelecionado && periodoSelecionado.num_diarias) {
+                updateAccommodationLabels($p, periodoSelecionado.num_diarias);
             }
 
             // Atualizar opções de evento disponíveis
