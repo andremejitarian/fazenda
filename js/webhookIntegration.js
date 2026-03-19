@@ -2,7 +2,7 @@
 class WebhookIntegration {
     constructor() {
         this.endpoints = {
-            submission: 'https://auto-n8n-webhook.rbnawr.easypanel.host/webhook/5fd5f5c1-6d60-4c4f-a463-cc9b0302afae'
+            submission: 'https://andremejitarian--pranna-webhook-server-fastapi-app.modal.run/api/webhooks/prod/fazenda-serrinha/fazenda-checkin-grupos?secret=6f0a9e372a658fede926e6b001a92b431b98bdc5c6034dbf274a076ac98949f1&sync=true'
         };
         this.timeout = 60000;
         this.retryAttempts = 1;
@@ -39,7 +39,7 @@ class WebhookIntegration {
                     success: true,
                     data: {
                         message: response.message || 'Inscrição processada com sucesso',
-                        link: response.link || response.payment_link || response.pagamento_link
+                        link: response.output?.link || response.link || response.payment_link || response.pagamento_link
                     }
                 };
             } else {
