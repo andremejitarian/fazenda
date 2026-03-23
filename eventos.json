@@ -619,8 +619,8 @@
         {
           "id": "sem_pernoite",
           "label": "22 a 24 de maio, sem pernoite, com almoço e café da tarde",
-          "data_inicio": "2026-05-22T09:00",
-          "data_fim": "2026-05-24T18:00",
+          "data_inicio": "2026-05-22T16:00",
+          "data_fim": "2026-05-24T16:00",
           "primeira_refeicao": "Almoço",
           "ultima_refeicao": "Café da tarde",
           "num_diarias": 2
