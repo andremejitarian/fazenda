@@ -821,6 +821,13 @@
           "valor_desconto": 0.10,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
+        },
+        {
+          "codigo": "GOMIDES2900PIX",
+          "tipo_desconto": "fixo",
+          "valor_desconto": 961.24,
+          "data_validade_fim": "2090-10-10T23:59:59",
+          "aplicacao": "hospedagem"
         }
       ]
     },
