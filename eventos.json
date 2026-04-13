@@ -1572,7 +1572,7 @@
           "id": "pernoite",
           "label": "Com pernoite na fazenda (programa completo)",
           "descricao": "Inclui jantar na sexta-feira, pernoite em habitação confortável e café da manhã no sábado",
-          "valor_diaria_por_pessoa": 120
+          "valor_diaria_por_pessoa": 130
         },
         {
           "id": "sem_pernoite",
@@ -1594,7 +1594,7 @@
             {
               "id": "passarinhada",
               "label": "Passarinhada de outono",
-              "valor": 170,
+              "valor": 185,
               "descricao": "Conduzida pelo biólogo e educador Rafael Miranda. Programa completo: saída vespertina e noturna na sexta + matinal no sábado. Chegada no sábado: somente saída matinal."
             }
           ]
