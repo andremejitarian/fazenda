@@ -482,14 +482,12 @@ function setupEventOptions($participant) {
         eventOptions = currentEvent.valores_evento_opcoes;
     } else if (currentEvent.tipo_formulario === 'hospedagem_e_evento') {
         const selectedPeriodId = $participant.find('.stay-period-select').val();
-        if (selectedPeriodId) {
-            const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
-            if (periodo && periodo.valores_evento_opcoes) {
-                eventOptions = periodo.valores_evento_opcoes;
-            }
-        } else {
-            // ✅ NÃO RETORNAR AQUI - apenas deixar eventOptions vazio
-            eventOptions = [];
+        const periodos = currentEvent.periodos_estadia_opcoes;
+        const periodoAtivo = selectedPeriodId
+            ? periodos.find(p => p.id === selectedPeriodId)
+            : periodos.length === 1 ? periodos[0] : null;
+        if (periodoAtivo && periodoAtivo.valores_evento_opcoes) {
+            eventOptions = periodoAtivo.valores_evento_opcoes;
         }
     }
 
