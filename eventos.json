@@ -1563,21 +1563,21 @@
         "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
       },
       "nome": "Passarinhada de outono",
-      "descricao": "Esta é a ficha de inscrição e pagamento da Passarinhada de outono, que acontece de 8 a 9 de maio na Fazenda Serrinha. Os valores são por pessoa e incluem 1 pernoite, jantar na sexta-feira e almoço no sábado, e as saídas de observação de aves conduzidas pelo biólogo e educador Rafael Miranda, com chegada no dia 8 à tarde (primeira refeição jantar) e saída no dia 9 (última refeição almoço).",
+      "descricao": "Esta é a ficha de inscrição e pagamento da Passarinhada de outono, que acontece de 8 a 9 de maio na Fazenda Serrinha. Os valores são por pessoa e incluem 1 pernoite, jantar na sexta-feira e café da manhã no sábado, e as saídas de observação de aves conduzidas pelo biólogo e educador Rafael Miranda, com chegada no dia 8 à tarde (primeira refeição jantar) e saída no dia 9 (última refeição café da manhã).",
       "politicas_evento_url": "https://drive.google.com/file/d/1IuRoFRJbBzBihsu1XjIf_js9qVExIqLB/view",
-      "observacoes_adicionais": "O programa inclui jantar na sexta-feira, pernoite em habitação confortável e charmosa, e almoço no sábado. Comida de fazenda no fogão a lenha. Para quem chega somente no sábado: inclui saída de observação matinal e almoço.",
+      "observacoes_adicionais": "O programa inclui jantar na sexta-feira, pernoite em habitação confortável e charmosa, e café da manhã no sábado. Comida de fazenda no fogão a lenha. Para quem chega somente no sábado: inclui saída de observação matinal e café da manhã.",
       "tipo_formulario": "hospedagem_e_evento",
       "tipos_acomodacao": [
         {
           "id": "pernoite",
           "label": "Com pernoite na fazenda (programa completo)",
-          "descricao": "Inclui jantar na sexta-feira, pernoite em habitação confortável e almoço no sábado",
+          "descricao": "Inclui jantar na sexta-feira, pernoite em habitação confortável e café da manhã no sábado",
           "valor_diaria_por_pessoa": 120
         },
         {
           "id": "sem_pernoite",
           "label": "Sem pernoite – chegada no sábado",
-          "descricao": "Somente observação matinal e almoço no sábado (sem pernoite)",
+          "descricao": "Somente observação matinal e café da manhã no sábado (sem pernoite)",
           "valor_diaria_por_pessoa": 0
         }
       ],
@@ -1589,7 +1589,7 @@
           "data_fim": "2026-05-09T12:00",
           "num_diarias": 1,
           "primeira_refeicao": "Jantar (sexta-feira, 08/05)",
-          "ultima_refeicao": "Almoço (sábado, 09/05)",
+          "ultima_refeicao": "Café da manhã (sábado, 09/05)",
           "valores_evento_opcoes": [
             {
               "id": "passarinhada",
