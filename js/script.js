@@ -895,7 +895,7 @@ function setupParticipantEventListeners($participant) {
                 }
             }
 
-            // Atualizar check-in conforme acomodação selecionada
+            // Atualizar check-in e preferência de cama conforme acomodação selecionada
             const accommodationId = $(this).val();
             const selectedPeriodId = $p.find('.stay-period-select').val() ||
                 (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
@@ -903,6 +903,7 @@ function setupParticipantEventListeners($participant) {
                 const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
                 if (periodo) updateCheckInOutInfo($p, periodo, accommodationId);
             }
+            updateBedPreferenceSection();
 
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
             clearTimeout($p.data('accommodationTimer'));
@@ -1160,8 +1161,16 @@ function updateBedPreferenceSection() {
             isAdult = (age !== null && age >= 18); // CORRIGIDO: Só adulto com data válida
         }
 
-        // Mostrar seção apenas para adultos quando há múltiplos adultos
-        if (showBedPreference && isAdult) {
+        // Verificar se a acomodação selecionada é sem pernoite (valor_diaria = 0)
+        const accommodationId = $participant.find('.accommodation-select').val() ||
+            (currentEvent.tipos_acomodacao && currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null);
+        const acomodacao = accommodationId && currentEvent.tipos_acomodacao
+            ? currentEvent.tipos_acomodacao.find(a => a.id === accommodationId)
+            : null;
+        const isSemPernoite = acomodacao && acomodacao.valor_diaria_por_pessoa === 0;
+
+        // Mostrar seção apenas para adultos quando há múltiplos adultos e tem pernoite
+        if (showBedPreference && isAdult && !isSemPernoite) {
             $bedSection.show();
         } else {
             $bedSection.hide();
@@ -2194,9 +2203,12 @@ function prepareFormData(inscricaoId) {
             email: participantData.email,
             birthDate: participantData.birthDate,
             stayPeriod: participantData.stayPeriod,
-            accommodation: participantData.accommodation,
+            accommodation: getAccommodationLabel(participantData.accommodation),
             eventOption: participantData.eventOption,
-            bedPreference: participantData.bedPreference, // Campo existente
+            bedPreference: (() => {
+                const acomodacao = currentEvent.tipos_acomodacao?.find(a => a.id === participantData.accommodation);
+                return (acomodacao && acomodacao.valor_diaria_por_pessoa === 0) ? '' : participantData.bedPreference;
+            })(), // Campo existente
             restrictions: participantData.restrictions, // NOVA LINHA
             isResponsiblePayer: participantData.isResponsiblePayer,
             isResponsibleChild: participantData.isResponsibleChild,
