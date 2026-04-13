@@ -1578,7 +1578,8 @@
           "id": "sem_pernoite",
           "label": "Sem pernoite – chegada no sábado",
           "descricao": "Somente observação matinal e café da manhã no sábado (sem pernoite)",
-          "valor_diaria_por_pessoa": 0
+          "valor_diaria_por_pessoa": 0,
+          "checkin_override": "2026-05-09T07:00"
         }
       ],
       "periodos_estadia_opcoes": [

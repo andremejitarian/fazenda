@@ -513,7 +513,7 @@ function setupEventOptions($participant) {
 }
 
 // Atualizar informações de check-in/out E refeições
-function updateCheckInOutInfo($participant, periodo) {
+function updateCheckInOutInfo($participant, periodo, accommodationId) {
     if (!periodo || !periodo.data_inicio || !periodo.data_fim) {
         $participant.find('.checkin-datetime').text('');
         $participant.find('.checkout-datetime').text('');
@@ -523,8 +523,16 @@ function updateCheckInOutInfo($participant, periodo) {
         return;
     }
 
-    // Atualizar datas (código existente)
-    const checkinFormatted = formatDateTimeForDisplay(periodo.data_inicio);
+    // Verificar override de check-in por tipo de acomodação
+    let dataInicio = periodo.data_inicio;
+    if (accommodationId && currentEvent.tipos_acomodacao) {
+        const acomodacao = currentEvent.tipos_acomodacao.find(a => a.id === accommodationId);
+        if (acomodacao && acomodacao.checkin_override) {
+            dataInicio = acomodacao.checkin_override;
+        }
+    }
+
+    const checkinFormatted = formatDateTimeForDisplay(dataInicio);
     const checkoutFormatted = formatDateTimeForDisplay(periodo.data_fim);
 
     $participant.find('.checkin-datetime').text(checkinFormatted);
@@ -885,6 +893,15 @@ function setupParticipantEventListeners($participant) {
                 } else {
                     $childDiscountInfo.hide();
                 }
+            }
+
+            // Atualizar check-in conforme acomodação selecionada
+            const accommodationId = $(this).val();
+            const selectedPeriodId = $p.find('.stay-period-select').val() ||
+                (currentEvent.periodos_estadia_opcoes.length === 1 ? currentEvent.periodos_estadia_opcoes[0].id : null);
+            if (selectedPeriodId) {
+                const periodo = currentEvent.periodos_estadia_opcoes.find(p => p.id === selectedPeriodId);
+                if (periodo) updateCheckInOutInfo($p, periodo, accommodationId);
             }
 
             // ✅ DEBOUNCE: Aguardar 300ms antes de calcular
@@ -2537,6 +2554,16 @@ function extractParticipantData($participant) {
             }
             if (periodoSelecionado.data_fim) {
                 dataCheckout = periodoSelecionado.data_fim;
+            }
+
+            // Aplicar override de check-in por tipo de acomodação
+            const acomodacaoSelecionadaId = $participant.find('.accommodation-select').val() ||
+                (currentEvent.tipos_acomodacao && currentEvent.tipos_acomodacao.length === 1 ? currentEvent.tipos_acomodacao[0].id : null);
+            if (acomodacaoSelecionadaId && currentEvent.tipos_acomodacao) {
+                const acomodacao = currentEvent.tipos_acomodacao.find(a => a.id === acomodacaoSelecionadaId);
+                if (acomodacao && acomodacao.checkin_override) {
+                    dataCheckin = acomodacao.checkin_override;
+                }
             }
 
             // ✅ NOVO: Capturar informações de refeições
