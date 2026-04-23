@@ -561,7 +561,23 @@ function updateCheckInOutInfo($participant, periodo, accommodationId) {
 
 // Configurar máscaras para participante
 function setupParticipantMasks($participant) {
-    $participant.find('.cpf-mask').mask('000.000.000-00');
+    const $cpfField = $participant.find('.cpf-mask');
+
+    // Máscara dinâmica: CPF (11 dígitos) ou CNPJ (14 dígitos)
+    // O plugin jquery.mask suporta máscara com dois formatos via função
+    $cpfField.mask(function (val) {
+        return val.replace(/\D/g, '').length <= 11
+            ? '000.000.000-009'
+            : '00.000.000/0000-00';
+    }, {
+        onKeyPress: function (val, e, field, options) {
+            const mask = val.replace(/\D/g, '').length <= 11
+                ? '000.000.000-009'
+                : '00.000.000/0000-00';
+            field.mask(mask, options);
+        }
+    });
+
     const $phoneInput = $participant.find('.phone-input');
     applyPhoneMask($phoneInput, 'BR');
 }
@@ -1320,7 +1336,7 @@ function validateParticipantsStep() {
         // Campos condicionalmente obrigatórios (apenas se visíveis)
         const conditionalFields = [
             { selector: '.phone-input', name: 'Telefone' },
-            { selector: '.cpf-mask', name: 'CPF' },
+            { selector: '.cpf-mask', name: 'CPF/CNPJ' },
             { selector: '.email-input', name: 'E-mail' }
         ];
 
@@ -1778,7 +1794,7 @@ function generateParticipantsSummary() {
 
         // CORRIGIDO: Só mostrar campos se eles têm valor
         if (responsiblePayerData.cpf && responsiblePayerData.cpf.trim()) {
-            summaryHtml += `<p><strong>CPF:</strong> ${responsiblePayerData.cpf}</p>`;
+            summaryHtml += `<p><strong>CPF/CNPJ:</strong> ${responsiblePayerData.cpf}</p>`;
         }
         if (responsiblePayerData.email && responsiblePayerData.email.trim()) {
             summaryHtml += `<p><strong>Email:</strong> ${responsiblePayerData.email}</p>`;
@@ -1841,7 +1857,7 @@ function generateParticipantsSummary() {
 
             // CORRIGIDO: Só mostrar campos se eles têm valor
             if (responsibleChildData.cpf && responsibleChildData.cpf.trim()) {
-                summaryHtml += `<p><strong>CPF:</strong> ${responsibleChildData.cpf}</p>`;
+                summaryHtml += `<p><strong>CPF/CNPJ:</strong> ${responsibleChildData.cpf}</p>`;
             }
             if (responsibleChildData.email && responsibleChildData.email.trim()) {
                 summaryHtml += `<p><strong>Email:</strong> ${responsibleChildData.email}</p>`;
@@ -1925,7 +1941,7 @@ function generateParticipantsSummary() {
 
         // CORRIGIDO: Só mostrar dados pessoais se existirem E tiverem valor
         if (participantData.cpf && participantData.cpf.trim()) {
-            summaryHtml += `<p><strong>CPF:</strong> ${participantData.cpf}</p>`;
+            summaryHtml += `<p><strong>CPF/CNPJ:</strong> ${participantData.cpf}</p>`;
         }
         if (participantData.email && participantData.email.trim()) {
             summaryHtml += `<p><strong>Email:</strong> ${participantData.email}</p>`;
