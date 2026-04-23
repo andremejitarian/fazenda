@@ -236,6 +236,20 @@
                     </div>
                 </div>
 
+                <!-- CPF pessoal do hóspede: aparece apenas quando o campo CPF/CNPJ acima for preenchido com CNPJ -->
+                <div class="form-row cpf-pessoal-row" style="display: none;">
+                    <div class="form-group">
+                        <label>CPF do Hóspede:</label>
+                        <input type="text" class="form-control cpf-pessoal-input" placeholder="000.000.000-00">
+                        <p class="feedback-message cpf-pessoal-feedback" style="font-size: 0.85em; color: #555;">
+                            O responsável pelo pagamento é uma empresa. Informe o CPF pessoal do hóspede.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <!-- coluna vazia -->
+                    </div>
+                </div>
+
                 <!-- NOVA LINHA: Adicionar campo de gênero -->
                 <div class="form-row">
                     <div class="form-group">

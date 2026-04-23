@@ -578,6 +578,9 @@ function setupParticipantMasks($participant) {
         }
     });
 
+    // Máscara CPF pessoal do hóspede (sempre CPF, 11 dígitos)
+    $participant.find('.cpf-pessoal-input').mask('000.000.000-00');
+
     const $phoneInput = $participant.find('.phone-input');
     applyPhoneMask($phoneInput, 'BR');
 }
@@ -842,11 +845,21 @@ function setupParticipantEventListeners($participant) {
             validatePhoneNumber($(this), selectedCountry);
         });
 
-    // Validação de CPF
+    // Validação de CPF e controle do campo CPF pessoal (aparece quando CNPJ)
     $participant.find('.cpf-mask')
-        .off('blur.participant')
+        .off('blur.participant input.participant-cnpj')
         .on('blur.participant', function () {
             validateCPF($(this));
+        })
+        .on('input.participant-cnpj', function () {
+            const digits = $(this).val().replace(/\D/g, '');
+            const $row = $participant.find('.cpf-pessoal-row');
+            if (digits.length === 14) {
+                $row.show();
+            } else {
+                $row.hide();
+                $participant.find('.cpf-pessoal-input').val('');
+            }
         });
 
     // Validação de email (blur)
@@ -2215,6 +2228,7 @@ function prepareFormData(inscricaoId) {
             fullName: participantData.fullName,
             phone: participantData.phone,
             cpf: participantData.cpf,
+            cpfPessoal: participantData.cpfPessoal || undefined,
             gender: participantData.gender,
             email: participantData.email,
             birthDate: participantData.birthDate,
@@ -2631,12 +2645,15 @@ function extractParticipantData($participant) {
         addressData = addressManager.extractAddressData($participant);
     }
 
+    const cpfPessoalValue = $participant.find('.cpf-pessoal-input').val() || '';
+
     return {
         fullName: $participant.find('.full-name').val() || '',
         phone: phoneNumber,
         phoneCountryCode: countryCode,
         phoneCountry: countryName,
         cpf: cpfValue,
+        cpfPessoal: cpfPessoalValue || undefined,
         gender: $participant.find('.gender-select').val() || '',
         email: emailValue,
         birthDate: $participant.find('.dob-input').val() || '',
