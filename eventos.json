@@ -1687,6 +1687,81 @@
         ]
       },
       "cupons_desconto": []
+    },
+    {
+      "id": "G012",
+      "external_reference": "b7d9f1c4-2a85-4e63-9f17-8c4a2b5d9e03",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1VJi_wOgxZRrKGfVT9GnvRwRyQ1Vx4I0uZe_5AoFdEvQ/edit?gid=0#gid=0",
+      "header": {
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
+      },
+      "nome": "Lauriane Soares e Amigos",
+      "descricao": "Hospedagem na Fazenda Serrinha para Lauriane Soares e Amigos, com 1 diária (01/05 a 02/05 de 2026) e café da manhã incluso.",
+      "politicas_evento_url": "https://drive.google.com/file/d/1IuRoFRJbBzBihsu1XjIf_js9qVExIqLB/view",
+      "observacoes_adicionais": "A hospedagem inclui apenas café da manhã. Não estão inclusos almoço nem jantar.",
+      "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [
+        {
+          "id": "compart",
+          "label": "Quarto Compartilhado",
+          "descricao": "Acomodação compartilhada com outras pessoas",
+          "valor_diaria_por_pessoa": 340.00
+        }
+      ],
+
+      "periodos_estadia_opcoes": [
+        {
+          "id": "uma_noite",
+          "label": "1 Diária (01/05 - 02/05)",
+          "data_inicio": "2026-05-01T14:00",
+          "data_fim": "2026-05-02T12:00",
+          "primeira_refeicao": "Café da manhã do dia 02/05",
+          "ultima_refeicao": "Café da manhã do dia 02/05",
+          "num_diarias": 1
+        }
+      ],
+
+      "valores_evento_opcoes": [],
+
+      "formas_pagamento_opcoes": [
+        {
+          "id": "pix_vista",
+          "label": "PIX à Vista",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": 0.00
+        }
+      ],
+
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 0.5,
+              "descricao": "Crianças 0-3 anos extras pagam 50% da hospedagem"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 10 anos pagam valor integral de hospedagem"
+          }
+        ],
+        "evento": []
+      },
+
+      "cupons_desconto": []
     }
   ]
 }
