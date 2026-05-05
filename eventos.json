@@ -1715,37 +1715,37 @@
           "id": "pousada-compartilhado",
           "label": "Pousada / Casa do Lago — Quarto Compartilhado",
           "descricao": "Quarto privativo para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
-          "valor_diaria_por_pessoa": 400.0
+          "valor_diaria_por_pessoa": 460.0
         },
         {
           "id": "pousada-individual",
           "label": "Pousada / Casa do Lago — Quarto Individual",
           "descricao": "Quarto privativo para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
-          "valor_diaria_por_pessoa": 650.0
+          "valor_diaria_por_pessoa": 740.0
         },
         {
           "id": "quarto6",
           "label": "Quarto 6 (cama de solteiro)",
           "descricao": "Quarto privativo com cama de solteiro para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
-          "valor_diaria_por_pessoa": 400.0
+          "valor_diaria_por_pessoa": 460.0
         },
         {
           "id": "maromba-compartilhado",
           "label": "Maromba — Quarto Compartilhado",
           "descricao": "Quarto privativo na Maromba para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
-          "valor_diaria_por_pessoa": 500.0
+          "valor_diaria_por_pessoa": 570.0
         },
         {
           "id": "maromba-individual",
           "label": "Maromba — Quarto Individual",
           "descricao": "Quarto privativo na Maromba para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
-          "valor_diaria_por_pessoa": 800.0
+          "valor_diaria_por_pessoa": 910.0
         },
         {
           "id": "alojamento",
           "label": "Alojamento Coletivo",
           "descricao": "Não inclui roupa de cama, cobertor nem toalha (trazer os próprios).",
-          "valor_diaria_por_pessoa": 280.0
+          "valor_diaria_por_pessoa": 320.0
         }
       ],
       "periodos_estadia_opcoes": [],
