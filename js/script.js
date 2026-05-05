@@ -69,6 +69,51 @@ $(document).ready(function () {
     initializeForm();
 });
 
+// Aplica params de URL ?checkin=DATE&checkout=DATE&acomodacao=ID ao currentEvent antes do render.
+// Quando presentes, injeta período sintético (length=1 → exibe como texto) e filtra tipos_acomodacao
+// para a opção selecionada (length=1 → exibe como texto). Sem os params, não altera nada.
+function applyURLParams() {
+    const params = new URLSearchParams(window.location.search);
+    const checkin = params.get('checkin');
+    const checkout = params.get('checkout');
+    const acomodacaoId = params.get('acomodacao');
+
+    if (!checkin || !checkout) return;
+
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
+    const numDiarias = Math.round((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+    if (numDiarias <= 0) return;
+
+    const fmt = (dateStr) => {
+        const [y, m, d] = dateStr.split('-');
+        return `${d}/${m}/${y}`;
+    };
+
+    // Primeira refeição: café da manhã do dia seguinte ao check-in
+    const nextDay = new Date(checkinDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayStr = nextDay.toISOString().split('T')[0];
+
+    const periodo = {
+        id: 'festival-personalizado',
+        label: `Festival Arte Serrinha: ${fmt(checkin)} → ${fmt(checkout)} (${numDiarias} ${numDiarias === 1 ? 'noite' : 'noites'})`,
+        data_inicio: `${checkin}T16:30`,
+        data_fim: `${checkout}T14:00`,
+        num_diarias: numDiarias,
+        primeira_refeicao: `Café da manhã de ${fmt(nextDayStr)}`,
+        ultima_refeicao: `Almoço de ${fmt(checkout)}`,
+        valores_evento_opcoes: []
+    };
+
+    currentEvent.periodos_estadia_opcoes = [periodo];
+
+    if (acomodacaoId && currentEvent.tipos_acomodacao) {
+        const acomodacao = currentEvent.tipos_acomodacao.find(a => a.id === acomodacaoId);
+        if (acomodacao) currentEvent.tipos_acomodacao = [acomodacao];
+    }
+}
+
 // Função principal de inicialização
 function initializeForm() {
     // Detectar parâmetro de evento na URL
@@ -94,6 +139,9 @@ function initializeForm() {
         if (eventoData) {
             currentEvent = eventoData;
             console.log('📋 Evento carregado do JSON:', currentEvent);
+
+            // Aplicar parâmetros de URL para reservas com datas travadas (ex: FEST2026)
+            applyURLParams();
 
             // Configurar interface com dados do evento
             setupEventInterface();

@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Link — Festival Arte Serrinha 2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f0;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a3a1a;
+      color: #fff;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 600; }
+    header p  { font-size: 0.8rem; opacity: 0.75; margin-top: 2px; }
+
+    .container { max-width: 520px; margin: 0 auto; padding: 16px; }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .card h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #666;
+      margin-bottom: 14px;
+    }
+
+    label { display: block; font-size: 0.88rem; font-weight: 500; margin-bottom: 4px; }
+
+    select, input[type="date"], input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      background: #fff;
+      margin-bottom: 14px;
+      appearance: auto;
+    }
+    select:focus, input:focus { outline: none; border-color: #1a3a1a; }
+
+    .row { display: flex; gap: 10px; }
+    .row > div { flex: 1; }
+
+    .counter-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .counter-row label { margin: 0; flex: 1; }
+    .counter-btn {
+      width: 34px; height: 34px;
+      border: 1.5px solid #ddd;
+      border-radius: 7px;
+      background: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none;
+    }
+    .counter-btn:active { background: #f0f0ea; }
+    .counter-val {
+      font-size: 1.1rem;
+      font-weight: 600;
+      min-width: 28px;
+      text-align: center;
+    }
+
+    .child-ages { margin-bottom: 14px; }
+    .child-age-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .child-age-row label { margin: 0; font-size: 0.85rem; white-space: nowrap; }
+    .child-age-row input {
+      width: 80px;
+      margin: 0;
+      padding: 7px 10px;
+      font-size: 0.95rem;
+    }
+
+    .result-card {
+      background: #1a3a1a;
+      color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+    .result-card h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      opacity: 0.65;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+    .result-line.total {
+      font-size: 1.1rem;
+      font-weight: 700;
+      opacity: 1;
+      border-top: 1px solid rgba(255,255,255,.25);
+      padding-top: 10px;
+      margin-top: 6px;
+    }
+
+    .info-box {
+      background: rgba(255,255,255,.12);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      margin-top: 14px;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 0.83rem;
+      color: #7a5800;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .link-box { background: #fff; border-radius: 10px; padding: 20px; }
+    .link-box h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #666;
+      margin-bottom: 14px;
+    }
+
+    #link-preview {
+      font-size: 0.75rem;
+      color: #555;
+      word-break: break-all;
+      background: #f5f5f0;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      min-height: 40px;
+      font-family: monospace;
+    }
+
+    #btn-copiar {
+      width: 100%;
+      padding: 14px;
+      background: #1a3a1a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    #btn-copiar:active { background: #0f2410; }
+    #btn-copiar:disabled { background: #aaa; cursor: default; }
+    #btn-copiar.copied { background: #2d7a2d; }
+
+    .meta { font-size: 0.75rem; color: #888; text-align: center; padding: 10px 0 20px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Gerador de Link — Festival Arte Serrinha 2026</h1>
+  <p>Ferramenta interna · Leandra / Atendimento</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Configurar Reserva</h2>
+
+    <label for="sel-acomodacao">Tipo de Acomodação</label>
+    <select id="sel-acomodacao">
+      <option value="">Selecione...</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label for="dt-checkin">Check-in</label>
+        <input type="date" id="dt-checkin" min="2026-07-06" max="2026-07-25">
+      </div>
+      <div>
+        <label for="dt-checkout">Check-out</label>
+        <input type="date" id="dt-checkout" min="2026-07-08" max="2026-07-26">
+      </div>
+    </div>
+
+    <div class="counter-row">
+      <label>Adultos</label>
+      <button class="counter-btn" onclick="change('adultos', -1)">−</button>
+      <span class="counter-val" id="val-adultos">1</span>
+      <button class="counter-btn" onclick="change('adultos', +1)">+</button>
+    </div>
+
+    <div class="counter-row">
+      <label>Crianças</label>
+      <button class="counter-btn" onclick="change('criancas', -1)">−</button>
+      <span class="counter-val" id="val-criancas">0</span>
+      <button class="counter-btn" onclick="change('criancas', +1)">+</button>
+    </div>
+
+    <div class="child-ages" id="child-ages"></div>
+  </div>
+
+  <div id="warning-min" class="warning"></div>
+
+  <div class="result-card" id="result-card">
+    <h2>Resumo</h2>
+    <div id="result-lines">
+      <div class="result-line" style="opacity:.5">Preencha os campos acima.</div>
+    </div>
+  </div>
+
+  <div class="link-box">
+    <h2>Link para o Hóspede</h2>
+    <div id="link-preview">—</div>
+    <button id="btn-copiar" disabled onclick="copiarLink()">Copiar Link</button>
+  </div>
+
+  <div class="meta">Festival Arte Serrinha · 6 a 26 de julho de 2026</div>
+</div>
+
+<script>
+  // ─── Dados do festival (espelhados do FEST2026 em eventos.json) ───────────
+  const ACOMODACOES = [
+    { id: 'pousada-compartilhado', label: 'Pousada / Casa do Lago — Quarto Compartilhado', valor: 400 },
+    { id: 'pousada-individual',    label: 'Pousada / Casa do Lago — Quarto Individual',    valor: 650 },
+    { id: 'quarto6',               label: 'Quarto 6 (cama de solteiro)',                   valor: 400 },
+    { id: 'maromba-compartilhado', label: 'Maromba — Quarto Compartilhado',                valor: 500 },
+    { id: 'maromba-individual',    label: 'Maromba — Quarto Individual',                   valor: 800 },
+    { id: 'alojamento',            label: 'Alojamento Coletivo',                           valor: 280 },
+  ];
+
+  // Regras de idade: 0-3 grátis (1 por reserva), 4-10 = 50%, 11+ = 100%
+  const REGRAS_IDADE = [
+    { min: 0,  max: 3,        pct: 0.0, limite_gratuito: 1 },
+    { min: 4,  max: 10,       pct: 0.5 },
+    { min: 11, max: Infinity, pct: 1.0 },
+  ];
+
+  // ─── Estado ───────────────────────────────────────────────────────────────
+  let adultos = 1;
+  let criancas = 0;
+  let idadesCriancas = [];
+
+  // ─── Init ─────────────────────────────────────────────────────────────────
+  const selAcomodacao = document.getElementById('sel-acomodacao');
+  ACOMODACOES.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.id;
+    opt.textContent = `${a.label}  —  R$ ${a.valor.toFixed(2).replace('.', ',')}/pessoa/noite`;
+    selAcomodacao.appendChild(opt);
+  });
+
+  selAcomodacao.addEventListener('change', calcular);
+  document.getElementById('dt-checkin').addEventListener('change', onCheckinChange);
+  document.getElementById('dt-checkout').addEventListener('change', calcular);
+
+  function onCheckinChange() {
+    const checkin = document.getElementById('dt-checkin').value;
+    if (!checkin) return;
+    // Ajustar min do checkout para checkin + 2 noites
+    const d = new Date(checkin);
+    d.setDate(d.getDate() + 2);
+    document.getElementById('dt-checkout').min = d.toISOString().split('T')[0];
+    calcular();
+  }
+
+  // ─── Contadores ───────────────────────────────────────────────────────────
+  function change(campo, delta) {
+    if (campo === 'adultos') {
+      adultos = Math.max(1, adultos + delta);
+      document.getElementById('val-adultos').textContent = adultos;
+    } else {
+      criancas = Math.max(0, criancas + delta);
+      document.getElementById('val-criancas').textContent = criancas;
+      renderChildAges();
+    }
+    calcular();
+  }
+
+  function renderChildAges() {
+    // Ajustar array de idades
+    while (idadesCriancas.length < criancas) idadesCriancas.push('');
+    idadesCriancas = idadesCriancas.slice(0, criancas);
+
+    const container = document.getElementById('child-ages');
+    container.innerHTML = '';
+    for (let i = 0; i < criancas; i++) {
+      const row = document.createElement('div');
+      row.className = 'child-age-row';
+      row.innerHTML = `
+        <label>Criança ${i + 1}:</label>
+        <input type="number" min="0" max="17" placeholder="Idade" value="${idadesCriancas[i]}"
+               oninput="idadesCriancas[${i}] = this.value; calcular()">
+        <span style="font-size:.8rem;color:#888">anos</span>
+      `;
+      container.appendChild(row);
+    }
+  }
+
+  // ─── Cálculo de preço ─────────────────────────────────────────────────────
+  function getAgeRule(age) {
+    return REGRAS_IDADE.find(r => age >= r.min && age <= r.max) || { pct: 1.0 };
+  }
+
+  function calcularPreco() {
+    const acomodacaoId = selAcomodacao.value;
+    const checkin = document.getElementById('dt-checkin').value;
+    const checkout = document.getElementById('dt-checkout').value;
+
+    if (!acomodacaoId || !checkin || !checkout) return null;
+
+    const acomodacao = ACOMODACOES.find(a => a.id === acomodacaoId);
+    const numDiarias = Math.round((new Date(checkout) - new Date(checkin)) / 86400000);
+    if (numDiarias <= 0) return null;
+
+    const valorBase = acomodacao.valor * numDiarias;
+
+    const linhas = [];
+    let total = 0;
+    let gratuitos0a3 = 0;
+
+    // Adultos
+    for (let i = 0; i < adultos; i++) {
+      linhas.push({ desc: `Adulto ${i + 1}`, valor: valorBase });
+      total += valorBase;
+    }
+
+    // Crianças
+    for (let i = 0; i < criancas; i++) {
+      const idade = parseInt(idadesCriancas[i]);
+      if (isNaN(idade)) {
+        linhas.push({ desc: `Criança ${i + 1} (idade não informada)`, valor: null });
+        continue;
+      }
+      const regra = getAgeRule(idade);
+      let valor;
+      let descSuffix = '';
+      if (regra.pct === 0) {
+        if (gratuitos0a3 < (regra.limite_gratuito || 1)) {
+          valor = 0;
+          descSuffix = ' (cortesia)';
+          gratuitos0a3++;
+        } else {
+          // Excedente paga integral
+          valor = valorBase;
+          descSuffix = ' (excedente — valor integral)';
+        }
+      } else {
+        valor = valorBase * regra.pct;
+        if (regra.pct === 0.5) descSuffix = ' (50%)';
+      }
+      linhas.push({ desc: `Criança ${i + 1} (${idade} anos)${descSuffix}`, valor });
+      if (valor !== null) total += valor;
+    }
+
+    return { acomodacao, numDiarias, checkin, checkout, valorBase, linhas, total };
+  }
+
+  function calcular() {
+    const result = calcularPreco();
+    const linesEl = document.getElementById('result-lines');
+    const linkPreview = document.getElementById('link-preview');
+    const btnCopiar = document.getElementById('btn-copiar');
+    const warnEl = document.getElementById('warning-min');
+
+    if (!result) {
+      linesEl.innerHTML = '<div class="result-line" style="opacity:.5">Preencha os campos acima.</div>';
+      linkPreview.textContent = '—';
+      btnCopiar.disabled = true;
+      warnEl.style.display = 'none';
+      return;
+    }
+
+    // Aviso de mínimo de estadia
+    const checkinDow = new Date(result.checkin).getDay(); // 0=Dom, 5=Sex, 6=Sab
+    const checkoutDow = new Date(result.checkout).getDay();
+    const hasWeekend = temFimDeSemana(result.checkin, result.checkout);
+    const minNoites = hasWeekend ? 2 : 3;
+
+    if (result.numDiarias < minNoites) {
+      warnEl.textContent = `⚠️ Mínimo de ${minNoites} ${minNoites === 1 ? 'noite' : 'noites'} para esse período (${hasWeekend ? 'fim de semana' : 'semana'}).`;
+      warnEl.style.display = 'block';
+    } else {
+      warnEl.style.display = 'none';
+    }
+
+    // Linhas do resumo
+    const fmt = v => v === null ? '?' : `R$ ${v.toFixed(2).replace('.', ',')}`;
+    const fmtDate = s => { const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`; };
+
+    let html = '';
+    html += `<div class="result-line"><span>${result.numDiarias} noite${result.numDiarias > 1 ? 's' : ''} · ${fmtDate(result.checkin)} → ${fmtDate(result.checkout)}</span></div>`;
+    html += `<div class="result-line"><span>Diária: ${result.acomodacao.label}</span><span>${fmt(result.acomodacao.valor)}/pessoa</span></div>`;
+    html += '<div style="height:8px"></div>';
+    result.linhas.forEach(l => {
+      html += `<div class="result-line"><span>${l.desc}</span><span>${fmt(l.valor)}</span></div>`;
+    });
+    const temIdadeNula = result.linhas.some(l => l.valor === null);
+    if (!temIdadeNula) {
+      html += `<div class="result-line total"><span>Total estimado</span><span>${fmt(result.total)}</span></div>`;
+      html += `<div class="info-box">Valor sem taxa de gateway. PIX à vista (+1%) ou cartão (+3,5%) escolhidos no formulário.</div>`;
+    } else {
+      html += `<div class="result-line total" style="opacity:.6"><span>Total</span><span>Informe as idades</span></div>`;
+    }
+    linesEl.innerHTML = html;
+
+    // Gerar link (absoluto quando servido, relativo como fallback)
+    const queryStr = `?evento=FEST2026&checkin=${result.checkin}&checkout=${result.checkout}&acomodacao=${result.acomodacao.id}`;
+    let base = 'https://andremejitarian.github.io/fazenda/index.html';
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.protocol.startsWith('file')) {
+      base = window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html');
+    }
+    const url = base + queryStr;
+    linkPreview.textContent = url;
+    btnCopiar.disabled = false;
+  }
+
+  function temFimDeSemana(checkin, checkout) {
+    // Verifica se algum dia entre checkin (inclusivo) e checkout (exclusivo) é Sex(5), Sab(6) ou Dom(0)
+    const d = new Date(checkin);
+    const fim = new Date(checkout);
+    while (d < fim) {
+      const dow = d.getDay();
+      if (dow === 0 || dow === 5 || dow === 6) return true;
+      d.setDate(d.getDate() + 1);
+    }
+    return false;
+  }
+
+  // ─── Copiar link ──────────────────────────────────────────────────────────
+  function copiarLink() {
+    const url = document.getElementById('link-preview').textContent;
+    if (!url || url === '—') return;
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.getElementById('btn-copiar');
+      btn.textContent = '✓ Copiado!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copiar Link';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+</body>
+</html>

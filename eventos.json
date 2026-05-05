@@ -18,22 +18,20 @@
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G001",
       "observacoes_adicionais": "Trazer tapete de yoga e roupas confortáveis.",
       "tipo_formulario": "hospedagem_e_evento",
-      
       "tipos_acomodacao": [
         {
           "id": "indiv",
           "label": "Individual",
           "descricao": "Acomodação privativa com cama de solteiro.",
-          "valor_diaria_por_pessoa": 250.00
+          "valor_diaria_por_pessoa": 250.0
         },
         {
           "id": "compart",
           "label": "Compartilhada (até 3 pessoas)",
           "descricao": "Quarto compartilhado com até 2 outros participantes.",
-          "valor_diaria_por_pessoa": 180.00
+          "valor_diaria_por_pessoa": 180.0
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "padrao",
@@ -47,13 +45,13 @@
             {
               "id": "ideal_2dias",
               "label": "Valor Ideal (2 dias)",
-              "valor": 850.00,
+              "valor": 850.0,
               "descricao": "Valor que cobre os custos e sustenta o projeto para 2 dias."
             },
             {
               "id": "social_2dias",
               "label": "Valor Social (2 dias)",
-              "valor": 700.00,
+              "valor": 700.0,
               "descricao": "Opção para quem busca apoio e solidariedade para 2 dias."
             }
           ]
@@ -70,21 +68,19 @@
             {
               "id": "ideal_3dias",
               "label": "Valor Ideal (3 dias)",
-              "valor": 1000.00,
+              "valor": 1000.0,
               "descricao": "Valor que cobre os custos e sustenta o projeto para 3 dias."
             },
             {
               "id": "social_3dias",
               "label": "Valor Social (3 dias)",
-              "valor": 850.00,
+              "valor": 850.0,
               "descricao": "Opção para quem busca apoio e solidariedade para 3 dias."
             }
           ]
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "pix_vista",
@@ -92,7 +88,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de <b>70%</b> deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": 0.01
-        },      
+        },
         {
           "id": "cartao_parcelado",
           "label": "Cartão Parcelado (até 6x sem juros)",
@@ -102,7 +98,7 @@
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.035
         },
-                {
+        {
           "id": "cartao_vista",
           "label": "Cartão Á vista",
           "tipo": "cartao",
@@ -111,7 +107,7 @@
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
           "taxa_gateway_percentual": 0.035
         },
-                        {
+        {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70%",
           "tipo": "pix_sinal",
@@ -121,7 +117,6 @@
           "taxa_gateway_percentual": 0.035
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -170,19 +165,18 @@
           }
         ]
       },
-
       "cupons_desconto": [
         {
           "codigo": "VERAO2025",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2025-12-31T23:59:59",
           "aplicacao": "total"
         },
         {
           "codigo": "EVENTODESC50",
           "tipo_desconto": "fixo",
-          "valor_desconto": 50.00,
+          "valor_desconto": 50.0,
           "data_validade_fim": "2025-11-30T23:59:59",
           "aplicacao": "evento"
         }
@@ -201,25 +195,22 @@
       "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G002",
       "observacoes_adicionais": "Evento ocorre das 09h às 17h. Almoço não incluso.",
       "tipo_formulario": "evento_apenas",
-
       "tipos_acomodacao": [],
       "periodos_estadia_opcoes": [],
-      
       "valores_evento_opcoes": [
         {
           "id": "workshop_basico",
           "label": "Acesso Básico ao Workshop",
-          "valor": 300.00,
+          "valor": 300.0,
           "descricao": "Inclui acesso a todas as sessões do workshop."
         },
         {
           "id": "workshop_premium",
           "label": "Acesso Premium ao Workshop",
-          "valor": 450.00,
+          "valor": 450.0,
           "descricao": "Inclui acesso e material de apoio exclusivo."
         }
       ],
-
       "formas_pagamento_opcoes": [
         {
           "id": "pix_vista",
@@ -229,7 +220,6 @@
           "taxa_gateway_percentual": 0.01
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [],
         "evento": [
@@ -256,12 +246,11 @@
           }
         ]
       },
-
       "cupons_desconto": [
         {
           "codigo": "WORKSHOP10",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2025-09-30T23:59:59",
           "aplicacao": "total"
         }
@@ -285,16 +274,15 @@
           "id": "padrao_single",
           "label": "Quarto Padrão Individual",
           "descricao": "Acomodação para uma pessoa.",
-          "valor_diaria_por_pessoa": 200.00
+          "valor_diaria_por_pessoa": 200.0
         },
         {
           "id": "padrao_duplo",
           "label": "Quarto Padrão Duplo",
           "descricao": "Acomodação para duas pessoas.",
-          "valor_diaria_por_pessoa": 150.00
+          "valor_diaria_por_pessoa": 150.0
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "uma_noite",
@@ -311,16 +299,14 @@
           "num_diarias": 2
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_credito",
           "label": "Cartão de Crédito em até 6x",
           "tipo": "cartao",
           "descricao": " ",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "pix_vista2",
@@ -330,7 +316,6 @@
           "taxa_gateway_percentual": -0.05
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -357,7 +342,6 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "HOSPEDAGEM15",
@@ -386,16 +370,15 @@
           "id": "compart",
           "label": "Quarto Compartilhado",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 540.00
+          "valor_diaria_por_pessoa": 540.0
         },
         {
           "id": "indiv",
           "label": "Quarto Individual",
           "descricao": "Acomodação individual, não compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 840.00
+          "valor_diaria_por_pessoa": 840.0
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "duas_noites",
@@ -407,9 +390,7 @@
           "num_diarias": 2
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -418,7 +399,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -435,7 +416,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de <b>70%</b> deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -446,7 +427,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -473,12 +453,11 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "HOSPEDAGEM10",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -504,16 +483,14 @@
       "tipo_formulario": "evento_apenas",
       "tipos_acomodacao": [],
       "periodos_estadia_opcoes": [],
-      
       "valores_evento_opcoes": [
         {
           "id": "sem_pernoite",
           "label": "22 a 24 de maio, sem pernoite, com almoço e café da tarde",
-          "valor": 883.00,
+          "valor": 883.0,
           "descricao": "22 a 24 de maio, sem pernoite, com almoço e café da tarde"
         }
       ],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -522,7 +499,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -539,7 +516,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -550,7 +527,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [],
         "evento": [
@@ -577,18 +553,17 @@
           }
         ]
       },
-
       "cupons_desconto": [
         {
           "codigo": "WORKSHOP10",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2025-09-30T23:59:59",
           "aplicacao": "total"
         }
       ]
     },
-            {
+    {
       "id": "G004ee",
       "external_reference": "4a4837d1-f779-4307-b4a8-79b9e4753cc4",
       "planilha_url": "https://docs.google.com/spreadsheets/d/1yUzQwRvb3hWfsBGO7EnPAVJ8BUG-tNjMBAk5FHwJsRI/edit?gid=0#gid=0",
@@ -611,10 +586,9 @@
           "id": "sem_acomodacao",
           "label": "sem acomodação",
           "descricao": "sem pernoite",
-          "valor_diaria_por_pessoa": 441.50
+          "valor_diaria_por_pessoa": 441.5
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "sem_pernoite",
@@ -626,9 +600,7 @@
           "num_diarias": 2
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -637,7 +609,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -654,7 +626,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -665,7 +637,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -692,12 +663,11 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "CUPOMXYZKK10",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -726,16 +696,15 @@
           "id": "compart",
           "label": "Alojamento com até 6 pessoas (quarto coletivo)",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 579.00
+          "valor_diaria_por_pessoa": 579.0
         },
         {
           "id": "indiv",
           "label": "Quartos privativos para casais, amigos e famílias",
           "descricao": "Acomodação individual, não compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 699.50
+          "valor_diaria_por_pessoa": 699.5
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "duas_noites",
@@ -747,9 +716,7 @@
           "num_diarias": 2
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -758,7 +725,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -775,7 +742,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -786,7 +753,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -813,12 +779,11 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "GOMIDES10KOMBI",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         },
@@ -849,16 +814,15 @@
           "id": "compart",
           "label": "Alojamento com até 6 pessoas (quarto coletivo)",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 632.50
+          "valor_diaria_por_pessoa": 632.5
         },
         {
           "id": "indiv",
           "label": "Quartos privativos para casais, amigos e famílias",
           "descricao": "Acomodação individual, não compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 802.50
+          "valor_diaria_por_pessoa": 802.5
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "quatro_noites",
@@ -870,9 +834,7 @@
           "num_diarias": 4
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -881,7 +843,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -898,7 +860,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -909,7 +871,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -936,12 +897,11 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "HOSPEDAGEM10VORTEX",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -968,7 +928,6 @@
           "valor_diaria_por_pessoa": 533.58
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "tres_noites",
@@ -987,11 +946,9 @@
           "primeira_refeicao": "somente pernoite",
           "ultima_refeicao": "Almoço",
           "num_diarias": 3.8
-        }        
+        }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -1000,7 +957,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1017,7 +974,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -1028,7 +985,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1055,12 +1011,11 @@
         ],
         "evento": []
       },
-
       "cupons_desconto": [
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -1084,10 +1039,9 @@
           "id": "compart",
           "label": "Alojamento com até 6 pessoas (quarto coletivo)",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 533.20
+          "valor_diaria_por_pessoa": 533.2
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "quatro_noites",
@@ -1106,11 +1060,9 @@
           "primeira_refeicao": "somente pernoite",
           "ultima_refeicao": "Almoço",
           "num_diarias": 5
-        }        
+        }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -1119,7 +1071,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1136,7 +1088,7 @@
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
           "taxa_gateway_percentual": -0.08
-        },      
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 8% de desconto)",
@@ -1147,7 +1099,6 @@
           "taxa_gateway_percentual": -0.08
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1178,13 +1129,12 @@
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
       ]
     },
-
     {
       "id": "G008",
       "external_reference": "15dae117-9835-467f-b004-4fc5140774eb",
@@ -1228,9 +1178,8 @@
           "label": "Sem pernoite (para aqueles que moram nas redondezas)",
           "descricao": "Sem pernoite (para aqueles que moram nas redondezas)",
           "valor_diaria_por_pessoa": 408.66
-        }        
+        }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "tres_noites",
@@ -1240,11 +1189,9 @@
           "primeira_refeicao": "Jantar",
           "ultima_refeicao": "Almoço",
           "num_diarias": 3
-        }       
+        }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -1253,7 +1200,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1269,8 +1216,8 @@
           "label": "PIX à Vista com 10% de desconto",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
-        },      
+          "taxa_gateway_percentual": -0.1
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 10% de desconto)",
@@ -1278,10 +1225,9 @@
           "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
+          "taxa_gateway_percentual": -0.1
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1312,7 +1258,7 @@
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -1349,9 +1295,8 @@
           "label": "Sem pernoite (para aqueles que moram nas redondezas)",
           "descricao": "Sem pernoite (para aqueles que moram nas redondezas)",
           "valor_diaria_por_pessoa": 450
-        }        
+        }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "duas_noites",
@@ -1361,11 +1306,9 @@
           "primeira_refeicao": "Jantar",
           "ultima_refeicao": "Almoço",
           "num_diarias": 2
-        }       
+        }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -1374,7 +1317,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1390,8 +1333,8 @@
           "label": "PIX à Vista com 10% de desconto",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
-        },      
+          "taxa_gateway_percentual": -0.1
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 10% de desconto)",
@@ -1399,10 +1342,9 @@
           "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
+          "taxa_gateway_percentual": -0.1
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1433,7 +1375,7 @@
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -1464,9 +1406,8 @@
           "label": "Sem pernoite (para aqueles que moram nas redondezas)",
           "descricao": "Sem pernoite (para aqueles que moram nas redondezas)",
           "valor_diaria_por_pessoa": 450
-        }        
+        }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "sete_noites",
@@ -1476,11 +1417,9 @@
           "primeira_refeicao": "Jantar",
           "ultima_refeicao": "Almoço",
           "num_diarias": 7
-        }       
+        }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "cartao_parcelado",
@@ -1489,7 +1428,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1505,8 +1444,8 @@
           "label": "PIX à Vista com 10% de desconto",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
-        },      
+          "taxa_gateway_percentual": -0.1
+        },
         {
           "id": "pix_sinal",
           "label": "Pix sinal 30% e 70% (valor total com 10% de desconto)",
@@ -1514,10 +1453,9 @@
           "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
+          "taxa_gateway_percentual": -0.1
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1548,7 +1486,7 @@
         {
           "codigo": "HOSPEDAGEM10ANAXYZ",
           "tipo_desconto": "percentual",
-          "valor_desconto": 0.10,
+          "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
         }
@@ -1610,7 +1548,7 @@
           "parcelas_maximas": 6,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         },
         {
           "id": "cartao_vista",
@@ -1626,7 +1564,7 @@
           "label": "PIX à Vista com 10% de desconto",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
+          "taxa_gateway_percentual": -0.1
         },
         {
           "id": "pix_sinal",
@@ -1635,7 +1573,7 @@
           "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.10
+          "taxa_gateway_percentual": -0.1
         }
       ],
       "regras_idade_precificacao": {
@@ -1706,10 +1644,9 @@
           "id": "compart",
           "label": "Quarto Compartilhado",
           "descricao": "Acomodação compartilhada com outras pessoas",
-          "valor_diaria_por_pessoa": 340.00
+          "valor_diaria_por_pessoa": 340.0
         }
       ],
-
       "periodos_estadia_opcoes": [
         {
           "id": "uma_noite",
@@ -1721,19 +1658,16 @@
           "num_diarias": 1
         }
       ],
-
       "valores_evento_opcoes": [],
-
       "formas_pagamento_opcoes": [
         {
           "id": "pix_vista",
           "label": "PIX à Vista",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": 0.00
+          "taxa_gateway_percentual": 0.0
         }
       ],
-
       "regras_idade_precificacao": {
         "hospedagem": [
           {
@@ -1760,7 +1694,124 @@
         ],
         "evento": []
       },
-
+      "cupons_desconto": []
+    },
+    {
+      "id": "FEST2026",
+      "external_reference": "f3a7e2d1-9c4b-4f8a-b6d5-2e1a8c7f0395",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/PLACEHOLDER_FEST2026",
+      "header": {
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg",
+        "logo_duplo": false
+      },
+      "nome": "Festival Arte Serrinha 2026 — Hospedagem na Pousada",
+      "descricao": "Durante o Festival Arte Serrinha (6 a 26 de julho), a Fazenda Serrinha abre como pousada. Inclui pernoite, café da manhã, almoço e acesso às áreas de lazer.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/FEST2026",
+      "observacoes_adicionais": "Check-in a partir das 16h30 e check-out até as 14h. Jantar não incluso (disponível no Bistrô da Serrinha). Estadias de semana: mínimo 3 diárias. Estadias de fim de semana: mínimo 2 diárias (sexta a domingo).",
+      "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [
+        {
+          "id": "pousada-compartilhado",
+          "label": "Pousada / Casa do Lago — Quarto Compartilhado",
+          "descricao": "Quarto privativo para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
+          "valor_diaria_por_pessoa": 400.0
+        },
+        {
+          "id": "pousada-individual",
+          "label": "Pousada / Casa do Lago — Quarto Individual",
+          "descricao": "Quarto privativo para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
+          "valor_diaria_por_pessoa": 650.0
+        },
+        {
+          "id": "quarto6",
+          "label": "Quarto 6 (cama de solteiro)",
+          "descricao": "Quarto privativo com cama de solteiro para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
+          "valor_diaria_por_pessoa": 400.0
+        },
+        {
+          "id": "maromba-compartilhado",
+          "label": "Maromba — Quarto Compartilhado",
+          "descricao": "Quarto privativo na Maromba para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
+          "valor_diaria_por_pessoa": 500.0
+        },
+        {
+          "id": "maromba-individual",
+          "label": "Maromba — Quarto Individual",
+          "descricao": "Quarto privativo na Maromba para 1 pessoa. Inclui roupa de cama, cobertor e toalha.",
+          "valor_diaria_por_pessoa": 800.0
+        },
+        {
+          "id": "alojamento",
+          "label": "Alojamento Coletivo",
+          "descricao": "Não inclui roupa de cama, cobertor nem toalha (trazer os próprios).",
+          "valor_diaria_por_pessoa": 280.0
+        }
+      ],
+      "periodos_estadia_opcoes": [],
+      "valores_evento_opcoes": [],
+      "formas_pagamento_opcoes": [
+        {
+          "id": "pix_vista",
+          "label": "PIX à Vista",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a <b>30% do valor total da reserva</b>, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de <b>70%</b> deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": 0.01
+        },
+        {
+          "id": "cartao_parcelado",
+          "label": "Cartão Parcelado (até 6x sem juros)",
+          "tipo": "cartao_parcelado",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": 0.035
+        },
+        {
+          "id": "cartao_vista",
+          "label": "Cartão Á vista",
+          "tipo": "cartao",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": 0.035
+        },
+        {
+          "id": "pix_sinal",
+          "label": "Pix sinal 30% e 70%",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b>Parcelamento em até 6 vezes sem juros no cartão de crédito.",
+          "taxa_gateway_percentual": 0.035
+        }
+      ],
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 1.0,
+              "descricao": "Segunda criança de até 3 anos paga valor integral"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor da hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "A partir de 11 anos, valor integral"
+          }
+        ],
+        "evento": []
+      },
       "cupons_desconto": []
     }
   ]
