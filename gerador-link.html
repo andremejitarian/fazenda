@@ -12,6 +12,7 @@
       background: #f5f5f0;
       color: #222;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     header {
@@ -23,7 +24,12 @@
     header h1 { font-size: 1.1rem; font-weight: 600; }
     header p  { font-size: 0.8rem; opacity: 0.75; margin-top: 2px; }
 
-    .container { max-width: 520px; margin: 0 auto; padding: 16px; }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 16px;
+      padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
 
     .card {
       background: #fff;
@@ -47,7 +53,7 @@
       padding: 10px 12px;
       border: 1.5px solid #ddd;
       border-radius: 7px;
-      font-size: 0.95rem;
+      font-size: 1rem; /* 16px — evita zoom automático no iOS */
       background: #fff;
       margin-bottom: 14px;
       appearance: auto;
@@ -57,6 +63,11 @@
     .row { display: flex; gap: 10px; }
     .row > div { flex: 1; }
 
+    /* Datas empilhadas em telas pequenas */
+    @media (max-width: 480px) {
+      .row { flex-direction: column; gap: 0; }
+    }
+
     .counter-row {
       display: flex;
       align-items: center;
@@ -65,14 +76,15 @@
     }
     .counter-row label { margin: 0; flex: 1; }
     .counter-btn {
-      width: 34px; height: 34px;
+      width: 44px; height: 44px; /* 44px mínimo para toque confortável */
       border: 1.5px solid #ddd;
       border-radius: 7px;
       background: #fff;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       user-select: none;
+      flex-shrink: 0;
     }
     .counter-btn:active { background: #f0f0ea; }
     .counter-val {
@@ -161,7 +173,13 @@
       display: none;
     }
 
-    .msg-box { background: #fff; border-radius: 10px; padding: 20px; }
+    .msg-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
     .msg-box h2 {
       font-size: 0.85rem;
       text-transform: uppercase;
@@ -174,6 +192,8 @@
       font-size: 0.88rem;
       color: #222;
       white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: break-word;
       background: #f0f7f0;
       border: 1px solid #d0e8d0;
       border-radius: 8px;
@@ -201,6 +221,42 @@
     #btn-copiar.copied { background: #1da851; }
 
     .meta { font-size: 0.75rem; color: #888; text-align: center; padding: 10px 0 20px; }
+
+    /* Botão sticky de copiar (mobile) */
+    .sticky-copy {
+      display: none;
+    }
+    @media (max-width: 520px) {
+      .sticky-copy {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 16px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom));
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-top: 1px solid #e0e0e0;
+        z-index: 100;
+      }
+      .sticky-copy button {
+        width: 100%;
+        padding: 15px;
+        background: #25d366;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .sticky-copy button:disabled { background: #bbb; cursor: default; }
+      .sticky-copy button.copied { background: #1da851; }
+      /* Esconder o botão inline no mobile — o sticky substitui */
+      #btn-copiar { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -264,6 +320,10 @@
   </div>
 
   <div class="meta">Festival Arte Serrinha · 6 a 26 de julho de 2026</div>
+</div>
+
+<div class="sticky-copy">
+  <button id="btn-copiar-sticky" disabled onclick="copiarMensagem()">Copiar Mensagem para WhatsApp</button>
 </div>
 
 <script>
@@ -460,13 +520,19 @@
     const linesEl = document.getElementById('result-lines');
     const msgPreview = document.getElementById('msg-preview');
     const btnCopiar = document.getElementById('btn-copiar');
+    const btnSticky = document.getElementById('btn-copiar-sticky');
     const warnEl = document.getElementById('warning-min');
+
+    function setBtnState(enabled) {
+      if (btnCopiar) btnCopiar.disabled = !enabled;
+      if (btnSticky) btnSticky.disabled = !enabled;
+    }
 
     if (!result) {
       linesEl.innerHTML = '<div class="result-line" style="opacity:.5">Preencha os campos acima.</div>';
       msgPreview.textContent = 'Preencha os campos acima para gerar a mensagem.';
       msgPreview.classList.add('vazio');
-      btnCopiar.disabled = true;
+      setBtnState(false);
       warnEl.style.display = 'none';
       return;
     }
@@ -523,11 +589,11 @@
       const msg = gerarMensagem(result);
       msgPreview.textContent = msg;
       msgPreview.classList.remove('vazio');
-      btnCopiar.disabled = false;
+      setBtnState(true);
     } else {
       msgPreview.textContent = 'Informe a idade de todas as crianças para gerar a mensagem.';
       msgPreview.classList.add('vazio');
-      btnCopiar.disabled = true;
+      setBtnState(false);
     }
   }
 
@@ -545,15 +611,23 @@
 
   // ─── Copiar mensagem ──────────────────────────────────────────────────────
   function copiarMensagem() {
-    const msg = document.getElementById('msg-preview').textContent;
-    if (!msg || document.getElementById('msg-preview').classList.contains('vazio')) return;
+    const preview = document.getElementById('msg-preview');
+    if (!preview || preview.classList.contains('vazio')) return;
+    const msg = preview.textContent;
     navigator.clipboard.writeText(msg).then(() => {
-      const btn = document.getElementById('btn-copiar');
-      btn.textContent = '✓ Mensagem copiada!';
-      btn.classList.add('copied');
+      const btns = [
+        document.getElementById('btn-copiar'),
+        document.getElementById('btn-copiar-sticky'),
+      ].filter(Boolean);
+      btns.forEach(btn => {
+        btn.textContent = '✓ Mensagem copiada!';
+        btn.classList.add('copied');
+      });
       setTimeout(() => {
-        btn.textContent = 'Copiar Mensagem para WhatsApp';
-        btn.classList.remove('copied');
+        btns.forEach(btn => {
+          btn.textContent = 'Copiar Mensagem para WhatsApp';
+          btn.classList.remove('copied');
+        });
       }, 2500);
     });
   }
