@@ -439,12 +439,9 @@
     }
     linesEl.innerHTML = html;
 
-    // Gerar link (absoluto quando servido, relativo como fallback)
+    // Gerar link absoluto baseado no domínio atual
     const queryStr = `?evento=FEST2026&checkin=${result.checkin}&checkout=${result.checkout}&acomodacao=${result.acomodacao.id}`;
-    let base = 'https://andremejitarian.github.io/fazenda/index.html';
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && !window.location.protocol.startsWith('file')) {
-      base = window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html');
-    }
+    const base = window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html');
     const url = base + queryStr;
     linkPreview.textContent = url;
     btnCopiar.disabled = false;
