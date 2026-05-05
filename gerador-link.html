@@ -264,6 +264,13 @@
     { id: 'alojamento',            label: 'Alojamento Coletivo',                           valor: 320 },
   ];
 
+  const FORMAS_PAGAMENTO = [
+    { id: 'cartao_parcelado', label: 'Cartão parcelado (até 6x sem juros)', taxa: 0.0,  parcelas: 6 },
+    { id: 'cartao_vista',     label: 'Cartão à vista (−6%)',                taxa: -0.06, parcelas: 1 },
+    { id: 'pix_vista',        label: 'PIX à vista (−10%)',                  taxa: -0.1,  parcelas: 1 },
+    { id: 'pix_sinal',        label: 'PIX sinal 30% + 70% (−10%)',          taxa: -0.1,  parcelas: 1, sinal: true },
+  ];
+
   // Regras de idade: 0-3 grátis (1 por reserva), 4-10 = 50%, 11+ = 100%
   const REGRAS_IDADE = [
     { min: 0,  max: 3,        pct: 0.0, limite_gratuito: 1 },
@@ -432,8 +439,22 @@
     });
     const temIdadeNula = result.linhas.some(l => l.valor === null);
     if (!temIdadeNula) {
-      html += `<div class="result-line total"><span>Total estimado</span><span>${fmt(result.total)}</span></div>`;
-      html += `<div class="info-box">Valor sem taxa de gateway. PIX à vista (+1%) ou cartão (+3,5%) escolhidos no formulário.</div>`;
+      html += '<div style="height:10px"></div>';
+      html += '<div style="border-top:1px solid rgba(255,255,255,.2);padding-top:12px;margin-top:2px">';
+      FORMAS_PAGAMENTO.forEach(fp => {
+        const total = Math.round(result.total * (1 + fp.taxa) * 100) / 100;
+        let detalhe = '';
+        if (fp.parcelas > 1) {
+          const parcela = Math.round(total / fp.parcelas * 100) / 100;
+          detalhe = ` <span style="opacity:.65;font-size:.8rem">(${fp.parcelas}x de ${fmt(parcela)})</span>`;
+        }
+        if (fp.sinal) {
+          const sinal = Math.round(total * 0.3 * 100) / 100;
+          detalhe = ` <span style="opacity:.65;font-size:.8rem">(sinal ${fmt(sinal)})</span>`;
+        }
+        html += `<div class="result-line" style="margin-bottom:8px"><span>${fp.label}</span><span style="font-weight:600">${fmt(total)}${detalhe}</span></div>`;
+      });
+      html += '</div>';
     } else {
       html += `<div class="result-line total" style="opacity:.6"><span>Total</span><span>Informe as idades</span></div>`;
     }
