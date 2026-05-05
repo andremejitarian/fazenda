@@ -1812,7 +1812,29 @@
         ],
         "evento": []
       },
-      "cupons_desconto": []
+      "cupons_desconto": [
+        {
+          "codigo": "FEST5",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.05,
+          "data_validade_fim": "2026-07-31T23:59:59",
+          "aplicacao": "total"
+        },
+        {
+          "codigo": "FEST10",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.1,
+          "data_validade_fim": "2026-07-31T23:59:59",
+          "aplicacao": "total"
+        },
+        {
+          "codigo": "FEST15",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.15,
+          "data_validade_fim": "2026-07-31T23:59:59",
+          "aplicacao": "total"
+        }
+      ]
     }
   ]
 }
