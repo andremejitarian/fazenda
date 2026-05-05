@@ -150,8 +150,8 @@
       display: none;
     }
 
-    .link-box { background: #fff; border-radius: 10px; padding: 20px; }
-    .link-box h2 {
+    .msg-box { background: #fff; border-radius: 10px; padding: 20px; }
+    .msg-box h2 {
       font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: .05em;
@@ -159,22 +159,24 @@
       margin-bottom: 14px;
     }
 
-    #link-preview {
-      font-size: 0.75rem;
-      color: #555;
-      word-break: break-all;
-      background: #f5f5f0;
-      border-radius: 6px;
-      padding: 10px 12px;
+    #msg-preview {
+      font-size: 0.88rem;
+      color: #222;
+      white-space: pre-wrap;
+      background: #f0f7f0;
+      border: 1px solid #d0e8d0;
+      border-radius: 8px;
+      padding: 14px;
       margin-bottom: 12px;
-      min-height: 40px;
-      font-family: monospace;
+      min-height: 60px;
+      line-height: 1.55;
     }
+    #msg-preview.vazio { color: #aaa; font-style: italic; }
 
     #btn-copiar {
       width: 100%;
       padding: 14px;
-      background: #1a3a1a;
+      background: #25d366;
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -183,9 +185,9 @@
       cursor: pointer;
       transition: background .15s;
     }
-    #btn-copiar:active { background: #0f2410; }
+    #btn-copiar:active { background: #1da851; }
     #btn-copiar:disabled { background: #aaa; cursor: default; }
-    #btn-copiar.copied { background: #2d7a2d; }
+    #btn-copiar.copied { background: #1da851; }
 
     .meta { font-size: 0.75rem; color: #888; text-align: center; padding: 10px 0 20px; }
   </style>
@@ -244,10 +246,10 @@
     </div>
   </div>
 
-  <div class="link-box">
-    <h2>Link para o Hóspede</h2>
-    <div id="link-preview">—</div>
-    <button id="btn-copiar" disabled onclick="copiarLink()">Copiar Link</button>
+  <div class="msg-box">
+    <h2>Mensagem para o Hóspede</h2>
+    <div id="msg-preview" class="vazio">Preencha os campos acima para gerar a mensagem.</div>
+    <button id="btn-copiar" disabled onclick="copiarMensagem()">Copiar Mensagem para WhatsApp</button>
   </div>
 
   <div class="meta">Festival Arte Serrinha · 6 a 26 de julho de 2026</div>
@@ -398,16 +400,56 @@
     return { acomodacao, numDiarias, checkin, checkout, valorBase, linhas, total };
   }
 
+  function gerarURL(result) {
+    const queryStr = `?evento=FEST2026&checkin=${result.checkin}&checkout=${result.checkout}&acomodacao=${result.acomodacao.id}`;
+    return window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html') + queryStr;
+  }
+
+  function gerarMensagem(result) {
+    const fmt = v => `R$ ${v.toFixed(2).replace('.', ',')}`;
+    const fmtDate = s => { const [y,m,d] = s.split('-'); return `${d}/${m}`; };
+
+    let participantes = `${adultos} adulto${adultos > 1 ? 's' : ''}`;
+    if (criancas > 0) participantes += `, ${criancas} criança${criancas > 1 ? 's' : ''}`;
+
+    let msg = `🌿 *Festival Arte Serrinha 2026*\n\n`;
+    msg += `🏡 ${result.acomodacao.label}\n`;
+    msg += `📅 Check-in: ${fmtDate(result.checkin)} | Check-out: ${fmtDate(result.checkout)} (${result.numDiarias} noite${result.numDiarias > 1 ? 's' : ''})\n`;
+    msg += `👥 ${participantes}\n\n`;
+    msg += `💰 *Valores da reserva:*\n\n`;
+
+    FORMAS_PAGAMENTO.forEach(fp => {
+      const total = Math.round(result.total * (1 + fp.taxa) * 100) / 100;
+      if (fp.id === 'cartao_parcelado') {
+        const parcela = Math.round(total / fp.parcelas * 100) / 100;
+        msg += `💳 Cartão parcelado 6x: *${fmt(total)}* (6x de ${fmt(parcela)})\n`;
+      } else if (fp.id === 'cartao_vista') {
+        msg += `💳 Cartão à vista: *${fmt(total)}*\n`;
+      } else if (fp.id === 'pix_vista') {
+        msg += `💸 PIX à vista: *${fmt(total)}*\n`;
+      } else if (fp.id === 'pix_sinal') {
+        const sinal = Math.round(total * 0.3 * 100) / 100;
+        msg += `💸 PIX sinal: *${fmt(total)}* (entrada de ${fmt(sinal)} + restante na saída)\n`;
+      }
+    });
+
+    msg += `\nPara confirmar a reserva, preencha o formulário abaixo com seus dados:\n`;
+    msg += `👉 ${gerarURL(result)}`;
+
+    return msg;
+  }
+
   function calcular() {
     const result = calcularPreco();
     const linesEl = document.getElementById('result-lines');
-    const linkPreview = document.getElementById('link-preview');
+    const msgPreview = document.getElementById('msg-preview');
     const btnCopiar = document.getElementById('btn-copiar');
     const warnEl = document.getElementById('warning-min');
 
     if (!result) {
       linesEl.innerHTML = '<div class="result-line" style="opacity:.5">Preencha os campos acima.</div>';
-      linkPreview.textContent = '—';
+      msgPreview.textContent = 'Preencha os campos acima para gerar a mensagem.';
+      msgPreview.classList.add('vazio');
       btnCopiar.disabled = true;
       warnEl.style.display = 'none';
       return;
@@ -460,12 +502,17 @@
     }
     linesEl.innerHTML = html;
 
-    // Gerar link absoluto baseado no domínio atual
-    const queryStr = `?evento=FEST2026&checkin=${result.checkin}&checkout=${result.checkout}&acomodacao=${result.acomodacao.id}`;
-    const base = window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html');
-    const url = base + queryStr;
-    linkPreview.textContent = url;
-    btnCopiar.disabled = false;
+    // Mensagem WhatsApp
+    if (!temIdadeNula) {
+      const msg = gerarMensagem(result);
+      msgPreview.textContent = msg;
+      msgPreview.classList.remove('vazio');
+      btnCopiar.disabled = false;
+    } else {
+      msgPreview.textContent = 'Informe a idade de todas as crianças para gerar a mensagem.';
+      msgPreview.classList.add('vazio');
+      btnCopiar.disabled = true;
+    }
   }
 
   function temFimDeSemana(checkin, checkout) {
@@ -480,18 +527,18 @@
     return false;
   }
 
-  // ─── Copiar link ──────────────────────────────────────────────────────────
-  function copiarLink() {
-    const url = document.getElementById('link-preview').textContent;
-    if (!url || url === '—') return;
-    navigator.clipboard.writeText(url).then(() => {
+  // ─── Copiar mensagem ──────────────────────────────────────────────────────
+  function copiarMensagem() {
+    const msg = document.getElementById('msg-preview').textContent;
+    if (!msg || document.getElementById('msg-preview').classList.contains('vazio')) return;
+    navigator.clipboard.writeText(msg).then(() => {
       const btn = document.getElementById('btn-copiar');
-      btn.textContent = '✓ Copiado!';
+      btn.textContent = '✓ Mensagem copiada!';
       btn.classList.add('copied');
       setTimeout(() => {
-        btn.textContent = 'Copiar Link';
+        btn.textContent = 'Copiar Mensagem para WhatsApp';
         btn.classList.remove('copied');
-      }, 2000);
+      }, 2500);
     });
   }
 </script>
