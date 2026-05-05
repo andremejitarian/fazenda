@@ -422,18 +422,23 @@
       const total = Math.round(result.total * (1 + fp.taxa) * 100) / 100;
       if (fp.id === 'cartao_parcelado') {
         const parcela = Math.round(total / fp.parcelas * 100) / 100;
-        msg += `💳 Cartão parcelado 6x: *${fmt(total)}* (6x de ${fmt(parcela)})\n`;
+        msg += `Cartão parcelado 6x: *${fmt(total)}* (6x de ${fmt(parcela)})\n`;
       } else if (fp.id === 'cartao_vista') {
-        msg += `💳 Cartão à vista: *${fmt(total)}*\n`;
+        msg += `Cartão à vista: *${fmt(total)}*\n`;
       } else if (fp.id === 'pix_vista') {
-        msg += `💸 PIX à vista: *${fmt(total)}*\n`;
+        msg += `PIX à vista: *${fmt(total)}*\n`;
       } else if (fp.id === 'pix_sinal') {
         const sinal = Math.round(total * 0.3 * 100) / 100;
-        msg += `💸 PIX sinal: *${fmt(total)}* (entrada de ${fmt(sinal)} + restante na saída)\n`;
+        msg += `PIX sinal: *${fmt(total)}* (entrada de ${fmt(sinal)} + restante na saída)\n`;
       }
     });
 
-    msg += `\nPara confirmar a reserva, preencha o formulário abaixo com seus dados:\n`;
+    msg += `\n📋 *Política de cancelamento:*\n`;
+    msg += `Até 30 dias antes: reembolso integral\n`;
+    msg += `Até 15 dias antes: reembolso de 50%\n`;
+    msg += `Menos de 15 dias: sem reembolso\n`;
+
+    msg += `\nPara confirmar a reserva, preencha o formulário com seus dados:\n`;
     msg += `👉 ${gerarURL(result)}`;
 
     return msg;
