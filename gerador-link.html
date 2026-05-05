@@ -126,7 +126,7 @@
       flex: 1;
       min-width: 0;
     }
-    .result-line span:last-child {
+    .result-line span.val {
       flex-shrink: 0;
       text-align: right;
       white-space: nowrap;
@@ -490,10 +490,10 @@
 
     let html = '';
     html += `<div class="result-line"><span>${result.numDiarias} noite${result.numDiarias > 1 ? 's' : ''} · ${fmtDate(result.checkin)} → ${fmtDate(result.checkout)}</span></div>`;
-    html += `<div class="result-line"><span>Diária: ${result.acomodacao.label}</span><span>${fmt(result.acomodacao.valor)}/pessoa</span></div>`;
+    html += `<div class="result-line"><span>Diária: ${result.acomodacao.label}</span><span class="val">${fmt(result.acomodacao.valor)}/pessoa</span></div>`;
     html += '<div style="height:8px"></div>';
     result.linhas.forEach(l => {
-      html += `<div class="result-line"><span>${l.desc}</span><span>${fmt(l.valor)}</span></div>`;
+      html += `<div class="result-line"><span>${l.desc}</span><span class="val">${fmt(l.valor)}</span></div>`;
     });
     const temIdadeNula = result.linhas.some(l => l.valor === null);
     if (!temIdadeNula) {
@@ -510,7 +510,7 @@
           const sinal = Math.round(total * 0.3 * 100) / 100;
           detalhe = ` <span style="opacity:.65;font-size:.8rem">(sinal ${fmt(sinal)})</span>`;
         }
-        html += `<div class="result-line" style="margin-bottom:8px"><span>${fp.label}</span><span style="font-weight:600">${fmt(total)}${detalhe}</span></div>`;
+        html += `<div class="result-line" style="margin-bottom:8px"><span>${fp.label}</span><span class="val" style="font-weight:600">${fmt(total)}${detalhe}</span></div>`;
       });
       html += '</div>';
     } else {
