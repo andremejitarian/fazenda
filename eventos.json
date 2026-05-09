@@ -1835,6 +1835,109 @@
           "aplicacao": "total"
         }
       ]
+    },
+    {
+      "id": "G013",
+      "external_reference": "c7f3a2b1-4d8e-4f9a-b6c5-3e2a7d8f1095",
+      "planilha_url": "https://docs.google.com/spreadsheets/d/1IrTcq80QrC03WfZcZe6VeLgeScjXmrsQcts-vhsjZWw/edit?gid=505962950#gid=505962950",
+      "header": {
+        "banner_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1757067076/background_1_nuo0n6.jpg",
+        "logo_url": "https://res.cloudinary.com/ddjlqajrd/image/upload/v1755164802/logo_serrinha_iiva1a.jpg"
+      },
+      "nome": "Encontro de Aprofundamento com Alan Kaplan e Sue",
+      "descricao": "Encontro de aprofundamento com Alan Kaplan e Sue na Fazenda Serrinha. 5 dias de imersão, 25 a 30 de agosto de 2026.",
+      "politicas_evento_url": "https://fazendaserrinha.com.br/politicas/G013",
+      "observacoes_adicionais": "Check-in dia 25/08 a partir das 09h (café da manhã disponível até 10h30). Check-out dia 30/08 após o almoço.",
+      "tipo_formulario": "hospedagem_apenas",
+      "tipos_acomodacao": [
+        {
+          "id": "compart_apoio",
+          "label": "Quarto Compartilhado — Valor de Apoio",
+          "descricao": "Acomodação compartilhada. R$400 por diária — valor especial de apoio ao evento. Total: R$2.000.",
+          "valor_diaria_por_pessoa": 400
+        },
+        {
+          "id": "compart_real",
+          "label": "Quarto Compartilhado — Valor Real",
+          "descricao": "Acomodação compartilhada. Composição: 5 diárias × R$485 + 1 café da manhã extra (R$50) + 1 almoço extra (R$80) = R$2.555.",
+          "valor_diaria_por_pessoa": 511
+        }
+      ],
+      "periodos_estadia_opcoes": [
+        {
+          "id": "cinco_noites",
+          "label": "5 Diárias (25/08 - 30/08)",
+          "data_inicio": "2026-08-25T09:00",
+          "data_fim": "2026-08-30T14:00",
+          "primeira_refeicao": "Café da manhã do dia 25/08",
+          "ultima_refeicao": "Almoço do dia 30/08",
+          "num_diarias": 5
+        }
+      ],
+      "valores_evento_opcoes": [],
+      "formas_pagamento_opcoes": [
+        {
+          "id": "cartao_parcelado",
+          "label": "Cartão Parcelado (até 6x sem juros)",
+          "tipo": "cartao_parcelado",
+          "parcelas_maximas": 6,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": 0.0
+        },
+        {
+          "id": "cartao_vista",
+          "label": "Cartão À Vista com 4% de desconto",
+          "tipo": "cartao",
+          "parcelas_maximas": 1,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.04
+        },
+        {
+          "id": "pix_vista",
+          "label": "PIX à Vista com 8% de desconto",
+          "tipo": "pix",
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.08
+        },
+        {
+          "id": "pix_sinal",
+          "label": "PIX Sinal 30% e 70% (valor total com 8% de desconto)",
+          "tipo": "pix_sinal",
+          "parcelas_maximas": 2,
+          "juros": false,
+          "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
+          "taxa_gateway_percentual": -0.08
+        }
+      ],
+      "regras_idade_precificacao": {
+        "hospedagem": [
+          {
+            "faixa_min_anos": 0,
+            "faixa_max_anos": 3,
+            "percentual_valor_adulto": 0.0,
+            "limite_gratuidade_por_reserva": 1,
+            "regra_excedente_gratuito": {
+              "percentual_valor_adulto": 0.5,
+              "descricao": "Crianças 0-3 anos extras pagam 50% da hospedagem"
+            }
+          },
+          {
+            "faixa_min_anos": 4,
+            "faixa_max_anos": 10,
+            "percentual_valor_adulto": 0.5,
+            "descricao": "Crianças de 4 a 10 anos pagam 50% do valor de hospedagem"
+          },
+          {
+            "faixa_min_anos": 11,
+            "percentual_valor_adulto": 1.0,
+            "descricao": "Acima de 10 anos pagam valor integral de hospedagem"
+          }
+        ],
+        "evento": []
+      },
+      "cupons_desconto": []
     }
   ]
 }
