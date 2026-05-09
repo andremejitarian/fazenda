@@ -1853,14 +1853,14 @@
         {
           "id": "compart_apoio",
           "label": "Quarto Compartilhado — Valor de Apoio",
-          "descricao": "Acomodação compartilhada. R$400 por diária — valor especial de apoio ao evento. Total: R$2.000.",
-          "valor_diaria_por_pessoa": 400
+          "descricao": "Acomodação compartilhada. R$450 por diária em até 6x no cartão. Total: R$2.250.",
+          "valor_diaria_por_pessoa": 450
         },
         {
           "id": "compart_real",
           "label": "Quarto Compartilhado — Valor Real",
-          "descricao": "Acomodação compartilhada. Composição: 5 diárias × R$485 + 1 café da manhã extra (R$50) + 1 almoço extra (R$80) = R$2.555.",
-          "valor_diaria_por_pessoa": 511
+          "descricao": "Acomodação compartilhada. R$575 por diária em até 6x no cartão — inclui hospedagem (5×R$485) + café da manhã extra (R$50) + almoço extra (R$80). Total: R$2.875.",
+          "valor_diaria_por_pessoa": 575
         }
       ],
       "periodos_estadia_opcoes": [
@@ -1896,19 +1896,19 @@
         },
         {
           "id": "pix_vista",
-          "label": "PIX à Vista com 8% de desconto",
+          "label": "PIX à Vista com 10% de desconto",
           "tipo": "pix",
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>A reserva somente será confirmada após o recebimento do pagamento.<br>Enquanto o pagamento não for realizado, a hospedagem permanecerá disponível para outros interessados.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.08
+          "taxa_gateway_percentual": -0.10
         },
         {
           "id": "pix_sinal",
-          "label": "PIX Sinal 30% e 70% (valor total com 8% de desconto)",
+          "label": "PIX Sinal 30% e 70% (valor total com 10% de desconto)",
           "tipo": "pix_sinal",
           "parcelas_maximas": 2,
           "juros": false,
           "descricao": "<h4>POLÍTICA DE CONFIRMAÇÃO E CANCELAMENTO</h4><p><b>Confirmação da Reserva:</b></p><p>O sinal corresponde a 30% do valor total da reserva, e deve ser pago no momento da reserva.<br>Enquanto o pagamento do sinal não for realizado, a hospedagem permanecerá disponível para outros interessados.<br>O saldo de 70% deverá ser pago até a data de saída.</p><p><b>Cancelamento:</b></p><p>Até 30 dias antes da data de chegada – reembolso de 100% do valor pago.<br>Até 15 dias antes da data de chegada – reembolso de 50% do valor pago.<br>Menos de 15 dias antes da data de chegada – sem reembolso.</p>",
-          "taxa_gateway_percentual": -0.08
+          "taxa_gateway_percentual": -0.10
         }
       ],
       "regras_idade_precificacao": {
