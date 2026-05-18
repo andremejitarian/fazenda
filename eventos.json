@@ -670,6 +670,13 @@
           "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
+        },
+        {
+          "codigo": "GOMIDES15",
+          "tipo_desconto": "percentual",
+          "valor_desconto": 0.15,
+          "data_validade_fim": "2090-10-10T23:59:59",
+          "aplicacao": "hospedagem"
         }
       ]
     },
@@ -1496,6 +1503,13 @@
           "valor_desconto": 0.1,
           "data_validade_fim": "2090-10-10T23:59:59",
           "aplicacao": "hospedagem"
+        },
+        {
+          "codigo": "MONICA487FLOREST",
+          "tipo_desconto": "fixo",
+          "valor_desconto": 487.42,
+          "data_validade_fim": "2026-10-02T23:59:59",
+          "aplicacao": "total"
         }
       ]
     },
