@@ -1734,7 +1734,7 @@
       "tipos_acomodacao": [
         {
           "id": "pousada-compartilhado",
-          "label": "Pousada / Casa do Lago — Quarto Compartilhado",
+          "label": "Pousada / Casa do Lago — Quarto Privativo (mínimo de 2 pessoas)",
           "descricao": "Quarto privativo para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
           "valor_diaria_por_pessoa": 460.0
         },
@@ -1752,7 +1752,7 @@
         },
         {
           "id": "maromba-compartilhado",
-          "label": "Maromba — Quarto Compartilhado",
+          "label": "Maromba — Quarto Privativo (mínimo de 2 pessoas)",
           "descricao": "Quarto privativo na Maromba para mín. 2 pessoas. Inclui roupa de cama, cobertor e toalha.",
           "valor_diaria_por_pessoa": 570.0
         },

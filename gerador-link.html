@@ -322,10 +322,10 @@
 <script>
   // ─── Dados do festival (espelhados do FEST2026 em eventos.json) ───────────
   const ACOMODACOES = [
-    { id: 'pousada-compartilhado', label: 'Pousada / Casa do Lago — Quarto Compartilhado', valor: 460 },
+    { id: 'pousada-compartilhado', label: 'Pousada / Casa do Lago — Quarto Privativo (mínimo de 2 pessoas)', valor: 460, minAdultos: 2 },
     { id: 'pousada-individual',    label: 'Pousada / Casa do Lago — Quarto Individual',    valor: 740 },
     { id: 'quarto6',               label: 'Quarto 6 (cama de solteiro)',                   valor: 460 },
-    { id: 'maromba-compartilhado', label: 'Maromba — Quarto Compartilhado',                valor: 570 },
+    { id: 'maromba-compartilhado', label: 'Maromba — Quarto Privativo (mínimo de 2 pessoas)', valor: 570, minAdultos: 2 },
     { id: 'maromba-individual',    label: 'Maromba — Quarto Individual',                   valor: 910 },
     { id: 'alojamento',            label: 'Alojamento Coletivo',                           valor: 320 },
   ];
@@ -539,7 +539,14 @@
     const hasWeekend = temFimDeSemana(result.checkin, result.checkout);
     const minNoites = hasWeekend ? 2 : 3;
 
-    if (result.numDiarias < minNoites) {
+    // Mínimo de adultos exigido pela acomodação (ex.: Quarto Privativo p/ mín. 2 pessoas)
+    const minAdultos = result.acomodacao.minAdultos || 1;
+    const minAdultosViolado = adultos < minAdultos;
+
+    if (minAdultosViolado) {
+      warnEl.textContent = `⚠️ "${result.acomodacao.label}" exige no mínimo ${minAdultos} adultos. Ajuste o número de adultos para gerar o link.`;
+      warnEl.style.display = 'block';
+    } else if (result.numDiarias < minNoites) {
       warnEl.textContent = `⚠️ Mínimo de ${minNoites} ${minNoites === 1 ? 'noite' : 'noites'} para esse período (${hasWeekend ? 'fim de semana' : 'semana'}).`;
       warnEl.style.display = 'block';
     } else {
@@ -581,7 +588,11 @@
     linesEl.innerHTML = html;
 
     // Mensagem WhatsApp
-    if (!temIdadeNula) {
+    if (minAdultosViolado) {
+      msgPreview.textContent = `Esta acomodação exige no mínimo ${minAdultos} adultos. Ajuste o número de adultos para gerar o link.`;
+      msgPreview.classList.add('vazio');
+      setBtnState(false);
+    } else if (!temIdadeNula) {
       const msg = gerarMensagem(result);
       msgPreview.textContent = msg;
       msgPreview.classList.remove('vazio');
