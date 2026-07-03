@@ -611,18 +611,20 @@ function updateCheckInOutInfo($participant, periodo, accommodationId) {
 function setupParticipantMasks($participant) {
     const $cpfField = $participant.find('.cpf-mask');
 
-    // Máscara dinâmica: CPF (11 dígitos) ou CNPJ (14 dígitos)
-    // O plugin jquery.mask suporta máscara com dois formatos via função
-    $cpfField.mask(function (val) {
-        return val.replace(/\D/g, '').length <= 11
-            ? '000.000.000-009'
-            : '00.000.000/0000-00';
-    }, {
-        onKeyPress: function (val, e, field, options) {
-            const mask = val.replace(/\D/g, '').length <= 11
-                ? '000.000.000-009'
-                : '00.000.000/0000-00';
-            field.mask(mask, options);
+    // Máscara dinâmica: CPF (11 dígitos, numérico) ou CNPJ (14 posições,
+    // alfanumérico nas 12 primeiras — RFB 2026, ian-code#57).
+    // O plugin jquery.mask usa replace(/\D/g) internamente e corromperia
+    // letras de CNPJ, então a máscara é aplicada manualmente via
+    // cpfValidation.formatCpfCnpj no evento input/keyup.
+    $cpfField.off('input.cpfCnpjMask keyup.cpfCnpjMask');
+    $cpfField.on('input.cpfCnpjMask keyup.cpfCnpjMask', function () {
+        const cursorAtEnd = this.selectionStart === this.value.length;
+        const formatted = window.cpfValidation.formatCpfCnpj(this.value);
+        if (this.value !== formatted) {
+            this.value = formatted;
+            if (cursorAtEnd) {
+                this.setSelectionRange(formatted.length, formatted.length);
+            }
         }
     });
 
@@ -900,9 +902,9 @@ function setupParticipantEventListeners($participant) {
             validateCPF($(this));
         })
         .on('input.participant-cnpj', function () {
-            const digits = $(this).val().replace(/\D/g, '');
+            const clean = window.cpfValidation.normalizeCpfCnpj($(this).val());
             const $row = $participant.find('.cpf-pessoal-row');
-            if (digits.length === 14) {
+            if (clean.length === 14) {
                 $row.show();
             } else {
                 $row.hide();
