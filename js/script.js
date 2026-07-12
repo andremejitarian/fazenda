@@ -2277,6 +2277,11 @@ function prepareFormData(inscricaoId) {
         const participantForWebhook = {
             fullName: participantData.fullName,
             phone: participantData.phone,
+            // E.164 (ian-memory#119 P3): DDI do select agora entra no payload —
+            // antes era capturado em extractParticipantData e descartado aqui,
+            // deixando número estrangeiro ambíguo no pipeline (ian-automacoes).
+            phoneCountryCode: participantData.phoneCountryCode || '+55',
+            phoneCountry: participantData.phoneCountry || 'Brasil',
             cpf: participantData.cpf,
             cpfPessoal: participantData.cpfPessoal || undefined,
             gender: participantData.gender,
@@ -2338,7 +2343,9 @@ function prepareFormData(inscricaoId) {
         nome: responsiblePayer.fullName,
         cpf: responsiblePayer.cpf,
         email: responsiblePayer.email,
-        telefone: responsiblePayer.phone
+        telefone: responsiblePayer.phone,
+        // E.164 (ian-memory#119 P3): DDI do responsável no payload
+        phoneCountryCode: responsiblePayer.phoneCountryCode || '+55'
     };
 
     // NOVO: Adicionar endereço se disponível
