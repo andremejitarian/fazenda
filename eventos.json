@@ -1854,6 +1854,13 @@
           "valor_desconto": 0.15,
           "data_validade_fim": "2026-07-31T23:59:59",
           "aplicacao": "total"
+        },
+        {
+          "codigo": "JULIANA1242FEST",
+          "tipo_desconto": "fixo",
+          "valor_desconto": 1242.00,
+          "data_validade_fim": "2026-07-31T23:59:59",
+          "aplicacao": "total"
         }
       ]
     },

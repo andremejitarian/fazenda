@@ -467,9 +467,14 @@
     return { acomodacao, numDiarias, checkin, checkout, valorBase, linhas, total };
   }
 
+  // Base canônica do formulário (cutover Netlify -> Vercel, 2026-07-06).
+  // Fixa por design: o gerador roda tanto local quanto no domínio antigo, e o link
+  // enviado ao cliente precisa apontar sempre para producao.
+  const BASE_URL = 'https://fazendaserrinha.vercel.app';
+
   function gerarURL(result) {
     const queryStr = `?evento=FEST2026&checkin=${result.checkin}&checkout=${result.checkout}&acomodacao=${result.acomodacao.id}`;
-    return window.location.origin + window.location.pathname.replace('gerador-link.html', 'index.html') + queryStr;
+    return `${BASE_URL}/${queryStr}`;
   }
 
   function gerarMensagem(result) {
